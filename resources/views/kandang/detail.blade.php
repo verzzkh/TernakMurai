@@ -296,7 +296,7 @@
     </main>
     
     <!-- Modal Tambah Anakan -->
-    <div id="addOffspringModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+    <div id="addOffspringModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center hidden">
         <div class="bg-white dark:bg-darker rounded-lg w-full max-w-lg mx-4 overflow-y-auto max-h-[90vh]">
             <div class="px-4 py-3 border-b dark:border-primary-darker flex justify-between items-center">
                 <h3 class="text-lg font-medium text-gray-700 dark:text-light">Tambah Anakan Baru</h3>
