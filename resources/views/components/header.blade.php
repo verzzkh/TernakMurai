@@ -11,77 +11,77 @@
                 </svg>
             </span>
         </button>
-    
+
         <!-- Mobile main menu (hidden by default) -->
 
-    <div class="border-b md:hidden dark:border-primary-darker" x-show="isMobileMainMenuOpen"
-    @click.away="isMobileMainMenuOpen = false">
-    <nav aria-label="Main" class="px-2 py-4 space-y-2">
-        <!-- Dashboard link -->
-        <div x-data="{ isActive: false, open: false }">
-            <a href="/"
-                class="flex items-center p-2 text-gray-500 transition-colors rounded-md dark:text-light hover:bg-primary-100 dark:hover:bg-primary"
-                :class="{ 'bg-primary-100 dark:bg-primary': isActive || open }">
-                <span aria-hidden="true">
-                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                    </svg>
-                </span>
-                <span class="ml-2 text-sm"> Dashboards </span>
-            </a>
-        </div>
+        <div class="border-b md:hidden dark:border-primary-darker" x-show="isMobileMainMenuOpen"
+            @click.away="isMobileMainMenuOpen = false">
+            <nav aria-label="Main" class="px-2 py-4 space-y-2">
+                <!-- Dashboard link -->
+                <div x-data="{ isActive: false, open: false }">
+                    <a href="/"
+                        class="flex items-center p-2 text-gray-500 transition-colors rounded-md dark:text-light hover:bg-primary-100 dark:hover:bg-primary"
+                        :class="{ 'bg-primary-100 dark:bg-primary': isActive || open }">
+                        <span aria-hidden="true">
+                            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                            </svg>
+                        </span>
+                        <span class="ml-2 text-sm"> Dashboards </span>
+                    </a>
+                </div>
 
-        <!-- Kandang link -->
-        <div x-data="{ isActive: false, open: false }">
-            <a href="/kandang"
-                class="flex items-center p-2 text-gray-500 transition-colors rounded-md dark:text-light hover:bg-primary-100 dark:hover:bg-primary"
-                :class="{ 'bg-primary-100 dark:bg-primary': isActive || open }">
-                <span aria-hidden="true">
-                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                    </svg>
-                </span>
-                <span class="ml-2 text-sm"> Kandang </span>
-            </a>
-        </div>
+                <!-- Kandang link -->
+                <div x-data="{ isActive: false, open: false }">
+                    <a href="/kandang"
+                        class="flex items-center p-2 text-gray-500 transition-colors rounded-md dark:text-light hover:bg-primary-100 dark:hover:bg-primary"
+                        :class="{ 'bg-primary-100 dark:bg-primary': isActive || open }">
+                        <span aria-hidden="true">
+                            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                            </svg>
+                        </span>
+                        <span class="ml-2 text-sm"> Kandang </span>
+                    </a>
+                </div>
 
-        <!-- Anakan link -->
-        <div x-data="{ isActive: false, open: false }">
-            <a href="/anakan"
-                class="flex items-center p-2 text-gray-500 transition-colors rounded-md dark:text-light hover:bg-primary-100 dark:hover:bg-primary"
-                :class="{ 'bg-primary-100 dark:bg-primary': isActive || open }">
-                <span aria-hidden="true">
-                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                    </svg>
-                </span>
-                <span class="ml-2 text-sm"> Anakan </span>
-            </a>
-        </div>
+                <!-- Anakan link -->
+                <div x-data="{ isActive: false, open: false }">
+                    <a href="/anakan"
+                        class="flex items-center p-2 text-gray-500 transition-colors rounded-md dark:text-light hover:bg-primary-100 dark:hover:bg-primary"
+                        :class="{ 'bg-primary-100 dark:bg-primary': isActive || open }">
+                        <span aria-hidden="true">
+                            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                            </svg>
+                        </span>
+                        <span class="ml-2 text-sm"> Anakan </span>
+                    </a>
+                </div>
 
-        <!-- Pencatatan link -->
-        <div x-data="{ isActive: false, open: false }">
-            <a href="/pencatatan"
-                class="flex items-center p-2 text-gray-500 transition-colors rounded-md dark:text-light hover:bg-primary-100 dark:hover:bg-primary"
-                :class="{ 'bg-primary-100 dark:bg-primary': isActive || open }">
-                <span aria-hidden="true">
-                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
-                    </svg>
-                </span>
-                <span class="ml-2 text-sm"> Pencatatan Keuangan </span>
-            </a>
+                <!-- Pencatatan link -->
+                <div x-data="{ isActive: false, open: false }">
+                    <a href="/pencatatan"
+                        class="flex items-center p-2 text-gray-500 transition-colors rounded-md dark:text-light hover:bg-primary-100 dark:hover:bg-primary"
+                        :class="{ 'bg-primary-100 dark:bg-primary': isActive || open }">
+                        <span aria-hidden="true">
+                            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+                            </svg>
+                        </span>
+                        <span class="ml-2 text-sm"> Pencatatan Keuangan </span>
+                    </a>
+                </div>
+            </nav>
         </div>
-    </nav>
-</div>
 
         <!-- Brand -->
         <a href="/"
@@ -155,7 +155,13 @@
                         class="block px-4 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-100 dark:text-light dark:hover:bg-primary">
                         Settings
                     </a>
+                    <!-- Logout menggunakan POST -->
+                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
+                        @csrf
+                    </form>
+
                     <a href="#" role="menuitem"
+                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
                         class="block px-4 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-100 dark:text-light dark:hover:bg-primary">
                         Logout
                     </a>
@@ -229,8 +235,8 @@
                     </a>
                 </div>
             </div>
-   
+
         </nav>
     </div>
-    
+
 </header>

@@ -31,7 +31,7 @@
         <!-- Sidebar links -->
         <nav aria-label="Main" class="flex-1 px-2 py-4 space-y-2 overflow-y-hidden hover:overflow-y-auto">
             <!-- Dashboard link -->
-            <a href="/"
+            <a href="{{ route('dashboard') }}"
                 class="flex items-center p-2 text-gray-500 transition-colors rounded-md dark:text-light hover:bg-primary-100 dark:hover:bg-primary" data-page="dashboard">
                 <span aria-hidden="true">
                     <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -44,7 +44,7 @@
             </a>
 
             <!-- Kandang link -->
-            <a href="/kandang"
+            <a href="{{ route('peternak.kandang.index') }}"
                 class="flex items-center p-2 text-gray-500 transition-colors rounded-md dark:text-light hover:bg-primary-100 dark:hover:bg-primary" data-page="kandang">
                 <span aria-hidden="true">
                     <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -58,7 +58,7 @@
             </a>
 
             <!-- Anakan link -->
-            <a href="/anakan"
+            <a href="{{ route('peternak.anakan.index') }}"
                 class="flex items-center p-2 text-gray-500 transition-colors rounded-md dark:text-light hover:bg-primary-100 dark:hover:bg-primary" data-page="anakan">
                 <span aria-hidden="true">
                     <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -72,7 +72,7 @@
             </a>
             
             <!-- Pencatatan link -->
-            <a href="/pencatatan"
+            <a href="{{ route('peternak.pencatatan') }}"
                 class="flex items-center p-2 text-gray-500 transition-colors rounded-md dark:text-light hover:bg-primary-100 dark:hover:bg-primary" data-page="pencatatan">
                 <span aria-hidden="true">
                     <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -91,7 +91,7 @@
             <h5 class="px-2 text-xs font-semibold text-gray-600 uppercase dark:text-primary-light">Lainnya</h5>
             
             <!-- Deteksi Penyakit link -->
-            <a href="/deteksi-penyakit"
+            <a href="{{ route('peternak.deteksi-penyakit.index') }}"
                 class="flex items-center p-2 text-gray-500 transition-colors rounded-md dark:text-light hover:bg-primary-100 dark:hover:bg-primary" data-page="reports">
                 <span aria-hidden="true">
                     <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"

@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Admin extends Model
 {
@@ -11,5 +14,14 @@ class Admin extends Model
 
     protected $table = 'admin';
 
-    protected $fillable = ['user_id','username','nama_lengkap'];
+    protected $fillable = [
+        'user_id',
+        'username',
+        'nama_lengkap',
+    ];
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 }

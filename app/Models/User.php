@@ -45,4 +45,35 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function admin()
+    {
+        return $this->hasOne(Admin::class);
+    }
+
+    public function peternak()
+    {
+        return $this->hasOne(Peternak::class);
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->admin()->exists();
+    }
+
+    public function isPeternak(): bool
+    {
+        return $this->peternak()->exists();
+    }
+
+    public function getRole(): string
+    {
+        if ($this->isAdmin()) {
+            return 'admin';
+        } elseif ($this->isPeternak()) {
+            return 'peternak';
+        }
+
+        return 'guest';
+    }
 }
