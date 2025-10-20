@@ -19,5 +19,15 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
+
+        // Call the SQL importer / dynamic seeder which will try to execute
+        // database/migrations/ternak.sql if it exists, otherwise it will
+        // provide lightweight fallback sample data.
+
+    // Also provide an Eloquent-based seeder that generates similar data
+    // (models + factories) instead of executing raw SQL. Run manually with:
+    // php artisan db:seed --class=Database\\Seeders\\TernakEloquentSeeder
+    // Uncomment the next line to run it automatically.
+        $this->call(TernakEloquentSeeder::class);
     }
 }
