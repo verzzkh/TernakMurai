@@ -31,8 +31,8 @@
                     </div>
                 </div>
 
-                <form action="{{ url('/anakan/store') }}" method="POST" enctype="multipart/form-data">
-                    <!-- @csrf -->
+                <form action="{{ route('peternak.anakan.store') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
                     
                     <!-- Form untuk anakan dari kandang -->
                     <div id="form-dari-kandang" class="p-6 space-y-6">
@@ -44,12 +44,20 @@
                             <select id="kandang_id" name="kandang_id" required
                                 class="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-300 rounded-md dark:bg-darker dark:text-gray-300 dark:border-gray-600 focus:border-primary dark:focus:border-primary focus:outline-none focus:ring focus:ring-primary focus:ring-opacity-40">
                                 <option value="" disabled selected>Pilih Kandang</option>
-                                <option value="1">Kandang #001 - MB-J-001 & MB-B-001</option>
-                                <option value="2">Kandang #002 - MB-J-002 & MB-B-002</option>
-                                <option value="3">Kandang #003 - MB-J-003 & MB-B-003</option>
-                                <option value="4">Kandang #004 - MB-J-004 & MB-B-004</option>
+                                @forelse($kandangs as $kandang)
+                                    <option value="{{ $kandang->id }}">
+                                        {{ $kandang->nomor_kandang }} - 
+                                        {{ $kandang->indukanJantan->nomor_ring ?? 'N/A' }} & 
+                                        {{ $kandang->indukanBetina->nomor_ring ?? 'N/A' }}
+                                    </option>
+                                @empty
+                                    <option value="" disabled>Tidak ada kandang dengan status "Menetas"</option>
+                                @endforelse
                             </select>
                             <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Hanya kandang dengan status "Menetas" yang dapat dipilih</p>
+                            @error('kandang_id')
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                            @enderror
                         </div>
                         
                         <div id="info-kandang" class="mt-4 hidden bg-gray-50 dark:bg-darker-2 p-4 rounded-md border border-gray-200 dark:border-gray-700">
@@ -94,19 +102,22 @@
                             <label class="text-gray-700 dark:text-gray-200">Jenis Kelamin <span class="text-red-500">*</span></label>
                             <div class="mt-2 flex space-x-4">
                                 <label class="inline-flex items-center">
-                                    <input type="radio" name="jenis_kelamin" value="jantan" class="form-radio text-primary" checked>
+                                    <input type="radio" name="jenis_kelamin" value="jantan" class="form-radio text-primary" {{ old('jenis_kelamin', 'jantan') == 'jantan' ? 'checked' : '' }}>
                                     <span class="ml-2 text-gray-700 dark:text-gray-300">Jantan</span>
                                 </label>
                                 <label class="inline-flex items-center">
-                                    <input type="radio" name="jenis_kelamin" value="betina" class="form-radio text-primary">
+                                    <input type="radio" name="jenis_kelamin" value="betina" class="form-radio text-primary" {{ old('jenis_kelamin') == 'betina' ? 'checked' : '' }}>
                                     <span class="ml-2 text-gray-700 dark:text-gray-300">Betina</span>
                                 </label>
                                 <label class="inline-flex items-center">
-                                    <input type="radio" name="jenis_kelamin" value="belum_tahu" class="form-radio text-primary">
+                                    <input type="radio" name="jenis_kelamin" value="tidak_diketahui" class="form-radio text-primary" {{ old('jenis_kelamin') == 'tidak_diketahui' ? 'checked' : '' }}>
                                     <span class="ml-2 text-gray-700 dark:text-gray-300">Belum Tahu</span>
                                 </label>
                             </div>
                             <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Jenis kelamin dapat diubah nanti jika belum yakin</p>
+                            @error('jenis_kelamin')
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                            @enderror
                         </div>
                         
                         <!-- Multiple Anakan Form (hidden by default) -->
@@ -171,10 +182,13 @@
                             <select id="jenis_kelamin_luar" name="jenis_kelamin_luar" required
                                 class="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-300 rounded-md dark:bg-darker dark:text-gray-300 dark:border-gray-600 focus:border-primary dark:focus:border-primary focus:outline-none focus:ring focus:ring-primary focus:ring-opacity-40">
                                 <option value="" disabled selected>Pilih Jenis Kelamin</option>
-                                <option value="jantan">Jantan</option>
-                                <option value="betina">Betina</option>
-                                <option value="belum_tahu">Belum Tahu</option>
+                                <option value="jantan" {{ old('jenis_kelamin_luar') == 'jantan' ? 'selected' : '' }}>Jantan</option>
+                                <option value="betina" {{ old('jenis_kelamin_luar') == 'betina' ? 'selected' : '' }}>Betina</option>
+                                <option value="tidak_diketahui" {{ old('jenis_kelamin_luar') == 'tidak_diketahui' ? 'selected' : '' }}>Belum Tahu</option>
                             </select>
+                            @error('jenis_kelamin_luar')
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                            @enderror
                         </div>
                         
                         <!-- Foto Anakan -->
@@ -253,11 +267,14 @@
                             <select id="status" name="status" required
                                 class="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-300 rounded-md dark:bg-darker dark:text-gray-300 dark:border-gray-600 focus:border-primary dark:focus:border-primary focus:outline-none focus:ring focus:ring-primary focus:ring-opacity-40">
                                 <option value="" disabled selected>Pilih Status Pertumbuhan</option>
-                                <option value="trotol">Trotol</option>
-                                <option value="pastol">Pastol</option>
-                                <option value="lomba" class="status-jantan">Lomba</option>
+                                <option value="trotol" {{ old('status') == 'trotol' ? 'selected' : '' }}>Trotol</option>
+                                <option value="pastol" {{ old('status') == 'pastol' ? 'selected' : '' }}>Pastol</option>
+                                <option value="lomba" class="status-jantan" {{ old('status') == 'lomba' ? 'selected' : '' }}>Lomba</option>
                                 <option value="dewasa" class="status-betina hidden">Dewasa</option>
                             </select>
+                            @error('status')
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                            @enderror
                         </div>
                         
                         <!-- Harga -->
@@ -265,9 +282,12 @@
                             <label for="harga" class="text-gray-700 dark:text-gray-200">Harga <span class="text-red-500">*</span></label>
                             <div class="relative">
                                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-700 dark:text-gray-300">Rp</span>
-                                <input type="number" id="harga" name="harga" required min="0" step="1000"
+                                <input type="number" id="harga" name="harga" required min="0" step="1000" value="{{ old('harga') }}"
                                     class="block w-full px-10 py-2 mt-2 text-gray-700 bg-white border border-gray-300 rounded-md dark:bg-darker dark:text-gray-300 dark:border-gray-600 focus:border-primary dark:focus:border-primary focus:outline-none focus:ring focus:ring-primary focus:ring-opacity-40">
                             </div>
+                            @error('harga')
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                            @enderror
                         </div>
                         
                         <!-- Harga Beli -->
@@ -275,9 +295,12 @@
                             <label for="harga_beli" class="text-gray-700 dark:text-gray-200">Harga Beli <span class="text-red-500">*</span></label>
                             <div class="relative">
                                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-700 dark:text-gray-300">Rp</span>
-                                <input type="number" id="harga_beli" name="harga_beli" required min="0" step="1000"
+                                <input type="number" id="harga_beli" name="harga_beli" required min="0" step="1000" value="{{ old('harga_beli') }}"
                                     class="block w-full px-10 py-2 mt-2 text-gray-700 bg-white border border-gray-300 rounded-md dark:bg-darker dark:text-gray-300 dark:border-gray-600 focus:border-primary dark:focus:border-primary focus:outline-none focus:ring focus:ring-primary focus:ring-opacity-40">
                             </div>
+                            @error('harga_beli')
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                            @enderror
                         </div>
                         
                         <!-- Catatan Tambahan -->
@@ -285,13 +308,16 @@
                             <label for="catatan_luar" class="text-gray-700 dark:text-gray-200">Catatan Tambahan</label>
                             <textarea id="catatan_luar" name="catatan_luar" rows="3"
                                 class="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-300 rounded-md dark:bg-darker dark:text-gray-300 dark:border-gray-600 focus:border-primary dark:focus:border-primary focus:outline-none focus:ring focus:ring-primary focus:ring-opacity-40"
-                                placeholder="Informasi tambahan tentang anakan"></textarea>
+                                placeholder="Informasi tambahan tentang anakan">{{ old('catatan_luar') }}</textarea>
+                            @error('catatan_luar')
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                            @enderror
                         </div>
                     </div>
                     
                     <!-- Form actions -->
                     <div class="flex items-center justify-end px-6 py-4 bg-gray-50 dark:bg-darker-2 border-t dark:border-primary-darker">
-                        <a href="{{ url('/anakan') }}" class="px-4 py-2 mr-2 text-gray-700 bg-white border rounded-md dark:text-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-darker-2 focus:outline-none focus:ring focus:ring-primary-lighter">
+                        <a href="{{ route('peternak.anakan.index') }}" class="px-4 py-2 mr-2 text-gray-700 bg-white border rounded-md dark:text-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-darker-2 focus:outline-none focus:ring focus:ring-primary-lighter">
                             Batal
                         </a>
                         <button type="submit" class="px-4 py-2 text-white bg-primary rounded-md hover:bg-primary-dark focus:outline-none focus:ring focus:ring-primary focus:ring-offset-1 focus:ring-offset-white dark:focus:ring-offset-dark">
