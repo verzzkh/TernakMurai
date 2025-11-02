@@ -2,18 +2,25 @@
   <main>
       <!-- Content header -->
       <div class="flex items-center justify-between px-4 py-4 border-b lg:py-6 dark:border-primary-darker">
-          <h1 class="text-2xl font-semibold">Tambah Kandang Baru</h1>
-          <a href="{{ route('peternak.kandang.index') }}" 
-             class="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring focus:ring-gray-500 focus:ring-offset-1">
-              Kembali
-          </a>
+          <h1 class="text-2xl font-semibold">Edit Kandang - {{ $kandang->nomor_kandang }}</h1>
+          <div class="flex items-center space-x-3">
+              <a href="{{ route('peternak.kandang.show', $kandang) }}" 
+                 class="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring focus:ring-gray-500 focus:ring-offset-1">
+                  Batal
+              </a>
+              <a href="{{ route('peternak.kandang.index') }}" 
+                 class="px-4 py-2 text-white bg-primary rounded-md hover:bg-primary-dark focus:outline-none focus:ring focus:ring-primary focus:ring-offset-1 focus:ring-offset-white dark:focus:ring-offset-dark">
+                  Kembali
+              </a>
+          </div>
       </div>
 
       <!-- Form -->
       <div class="px-4 py-6">
           <div class="max-w-2xl mx-auto">
-              <form action="{{ route('peternak.kandang.store') }}" method="POST" class="space-y-6">
+              <form action="{{ route('peternak.kandang.update', $kandang) }}" method="POST" class="space-y-6">
                   @csrf
+                  @method('PUT')
                   
                   <div class="bg-white dark:bg-darker rounded-lg shadow p-6">
                       <h2 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Informasi Dasar</h2>
@@ -24,7 +31,7 @@
                               <label for="nomor_kandang" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                                   Nomor Kandang <span class="text-red-500">*</span>
                               </label>
-                              <input type="text" name="nomor_kandang" id="nomor_kandang" value="{{ old('nomor_kandang') }}" required
+                              <input type="text" name="nomor_kandang" id="nomor_kandang" value="{{ old('nomor_kandang', $kandang->nomor_kandang) }}" required
                                      class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary dark:bg-darker dark:border-primary-darker dark:text-white sm:text-sm @error('nomor_kandang') border-red-300 @enderror">
                               @error('nomor_kandang')
                                   <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -39,10 +46,10 @@
                               <select name="status" id="status" required
                                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary dark:bg-darker dark:border-primary-darker dark:text-white sm:text-sm @error('status') border-red-300 @enderror">
                                   <option value="">Pilih Status</option>
-                                  <option value="kosong" {{ old('status') === 'kosong' ? 'selected' : '' }}>Kosong</option>
-                                  <option value="bertelur" {{ old('status') === 'bertelur' ? 'selected' : '' }}>Bertelur</option>
-                                  <option value="mengeram" {{ old('status') === 'mengeram' ? 'selected' : '' }}>Mengeram</option>
-                                  <option value="menetas" {{ old('status') === 'menetas' ? 'selected' : '' }}>Menetas</option>
+                                  <option value="kosong" {{ old('status', $kandang->status) === 'kosong' ? 'selected' : '' }}>Kosong</option>
+                                  <option value="bertelur" {{ old('status', $kandang->status) === 'bertelur' ? 'selected' : '' }}>Bertelur</option>
+                                  <option value="mengeram" {{ old('status', $kandang->status) === 'mengeram' ? 'selected' : '' }}>Mengeram</option>
+                                  <option value="menetas" {{ old('status', $kandang->status) === 'menetas' ? 'selected' : '' }}>Menetas</option>
                               </select>
                               @error('status')
                                   <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -55,7 +62,7 @@
                                   Deskripsi Kandang
                               </label>
                               <textarea name="deskripsi_kandang" id="deskripsi_kandang" rows="3"
-                                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary dark:bg-darker dark:border-primary-darker dark:text-white sm:text-sm @error('deskripsi_kandang') border-red-300 @enderror">{{ old('deskripsi_kandang') }}</textarea>
+                                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary dark:bg-darker dark:border-primary-darker dark:text-white sm:text-sm @error('deskripsi_kandang') border-red-300 @enderror">{{ old('deskripsi_kandang', $kandang->deskripsi_kandang) }}</textarea>
                               @error('deskripsi_kandang')
                                   <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                               @enderror
@@ -77,7 +84,7 @@
                                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary dark:bg-darker dark:border-primary-darker dark:text-white sm:text-sm @error('indukan_jantan_id') border-red-300 @enderror">
                                   <option value="">Pilih Indukan Jantan (Opsional)</option>
                                   @foreach($indukan['jantan'] as $jantan)
-                                      <option value="{{ $jantan->id }}" {{ old('indukan_jantan_id') == $jantan->id ? 'selected' : '' }}>
+                                      <option value="{{ $jantan->id }}" {{ old('indukan_jantan_id', $kandang->indukan_jantan_id) == $jantan->id ? 'selected' : '' }}>
                                           {{ $jantan->nomor_ring }} @if($jantan->nama) - {{ $jantan->nama }} @endif
                                       </option>
                                   @endforeach
@@ -96,7 +103,7 @@
                                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary dark:bg-darker dark:border-primary-darker dark:text-white sm:text-sm @error('indukan_betina_id') border-red-300 @enderror">
                                   <option value="">Pilih Indukan Betina (Opsional)</option>
                                   @foreach($indukan['betina'] as $betina)
-                                      <option value="{{ $betina->id }}" {{ old('indukan_betina_id') == $betina->id ? 'selected' : '' }}>
+                                      <option value="{{ $betina->id }}" {{ old('indukan_betina_id', $kandang->indukan_betina_id) == $betina->id ? 'selected' : '' }}>
                                           {{ $betina->nomor_ring }} @if($betina->nama) - {{ $betina->nama }} @endif
                                       </option>
                                   @endforeach
@@ -130,13 +137,13 @@
 
                   <!-- Form Actions -->
                   <div class="flex justify-end space-x-3">
-                      <a href="{{ route('peternak.kandang.index') }}" 
+                      <a href="{{ route('peternak.kandang.show', $kandang) }}" 
                          class="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring focus:ring-gray-500 focus:ring-offset-1">
                           Batal
                       </a>
                       <button type="submit" 
                               class="px-4 py-2 text-white bg-primary rounded-md hover:bg-primary-dark focus:outline-none focus:ring focus:ring-primary focus:ring-offset-1 focus:ring-offset-white dark:focus:ring-offset-dark">
-                          Simpan Kandang
+                          Update Kandang
                       </button>
                   </div>
               </form>

@@ -1,532 +1,213 @@
 <x-layout>
-    <main>
-        <!-- Content header -->
-        <div class="flex items-center justify-between px-4 py-4 border-b lg:py-6 dark:border-primary-darker">
-            <h1 class="text-2xl font-semibold">Detail Anakan</h1>
-            <a href="{{ route('peternak.anakan.index') }}" class="px-4 py-2 text-sm text-white rounded-md bg-primary hover:bg-primary-dark focus:outline-none focus:ring focus:ring-primary focus:ring-offset-1 focus:ring-offset-white dark:focus:ring-offset-dark">
-                Kembali
-            </a>
-        </div>
+  <main>
+      <!-- Content header -->
+      <div class="flex items-center justify-between px-4 py-4 border-b lg:py-6 dark:border-primary-darker">
+          <div>
+              <h1 class="text-2xl font-semibold">{{ $indukan->nomor_ring }}</h1>
+              @if($indukan->nama)
+                  <p class="text-gray-600 dark:text-gray-400">{{ $indukan->nama }}</p>
+              @endif
+          </div>
+          <div class="flex items-center space-x-3">
+              <a href="{{ route('peternak.indukan.edit', $indukan) }}" 
+                 class="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring focus:ring-gray-500 focus:ring-offset-1">
+                  Edit
+              </a>
+              <a href="{{ route('peternak.indukan.index') }}" 
+                 class="px-4 py-2 text-white bg-primary rounded-md hover:bg-primary-dark focus:outline-none focus:ring focus:ring-primary focus:ring-offset-1 focus:ring-offset-white dark:focus:ring-offset-dark">
+                  Kembali
+              </a>
+          </div>
+      </div>
 
-        <!-- Content -->
-        <div class="mt-2 p-4">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <!-- Section Info Utama -->
-                <div class="lg:col-span-1 bg-white dark:bg-darker rounded-md shadow-md p-4">
-                    <h2 class="text-xl font-semibold mb-4 text-gray-700 dark:text-light">Informasi Anakan</h2>
-                    
-                    <!-- Foto Profil -->
-                    <div class="mb-6">
-                        <div class="relative h-64 bg-gray-100 dark:bg-gray-800 rounded-md overflow-hidden">
-                            @if($anakan->foto_path)
-                                <img src="{{ Storage::url($anakan->foto_path) }}" alt="Foto Anakan" id="profileImage" class="w-full h-full object-cover">
-                            @else
-                                <div class="w-full h-full flex items-center justify-center">
-                                    <svg class="w-16 h-16 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                    </svg>
-                                </div>
-                            @endif
-                            <button class="absolute bottom-2 right-2 bg-primary hover:bg-primary-dark text-white rounded-full p-2" id="changePhotoBtn">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <!-- Data Identitas -->
-                    <div class="space-y-4">
-                        <div class="flex items-center justify-between">
-                            <span class="text-gray-700 dark:text-light font-medium">Ring Number:</span>
-                            <span class="text-gray-600 dark:text-gray-300">{{ $anakan->nomor_ring }}</span>
-                        </div>
-                        
-                        <div class="flex items-center justify-between">
-                            <span class="text-gray-700 dark:text-light font-medium">Tanggal Lahir:</span>
-                            <span class="text-gray-600 dark:text-gray-300">{{ $anakan->tanggal_lahir ? $anakan->tanggal_lahir->format('d F Y') : 'Tidak diketahui' }}</span>
-                        </div>
-                        
-                        <div class="flex items-center justify-between">
-                            <span class="text-gray-700 dark:text-light font-medium">Umur:</span>
-                            <span class="text-gray-600 dark:text-gray-300">{{ $anakan->age['formatted'] }}</span>
-                        </div>
-                        
-                        <div class="flex items-center justify-between">
-                            <span class="text-gray-700 dark:text-light font-medium">Gender:</span>
-                            <div>
-                                <select id="genderSelect" class="pl-2 pr-8 py-1 text-sm border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary dark:bg-darker dark:border-primary">
-                                    <option value="jantan" {{ $anakan->jenis_kelamin == 'jantan' ? 'selected' : '' }}>Jantan</option>
-                                    <option value="betina" {{ $anakan->jenis_kelamin == 'betina' ? 'selected' : '' }}>Betina</option>
-                                    <option value="tidak_diketahui" {{ $anakan->jenis_kelamin == 'tidak_diketahui' ? 'selected' : '' }}>Belum Diketahui</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-center justify-between">
-                            <span class="text-gray-700 dark:text-light font-medium">Status:</span>
-                            <span class="px-2 py-1 {{ $anakan->status_pertumbuhan == 'trotol' ? 'bg-blue-500' : ($anakan->status_pertumbuhan == 'pastol' ? 'bg-purple-500' : 'bg-green-500') }} text-white text-xs rounded-md">{{ ucfirst($anakan->status_pertumbuhan) }}</span>
-                        </div>
-                        
-                        <div class="flex items-center justify-between">
-                            <span class="text-gray-700 dark:text-light font-medium">Harga:</span>
-                            <div class="flex items-center">
-                                <span class="text-gray-600 dark:text-gray-300 mr-2">Rp {{ number_format($anakan->harga ?? 0, 0, ',', '.') }}</span>
-                                <button class="text-primary hover:text-primary-dark" id="editPriceBtn">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <label class="block text-gray-700 dark:text-light font-medium mb-1">Karakteristik & Catatan:</label>
-                            <textarea id="karakteristikTextarea" class="w-full px-3 py-2 border rounded-md dark:bg-darker dark:border-primary focus:outline-none focus:ring focus:ring-primary-light" rows="4" placeholder="Tambahkan karakteristik atau catatan khusus...">{{ $anakan->deskripsi_karakteristik ?? '' }}</textarea>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Section Info Asal dan Actions -->
-                <div class="lg:col-span-2 space-y-8">
-                    <!-- Info Asal -->
-                    <div class="bg-white dark:bg-darker rounded-md shadow-md p-4">
-                        <h2 class="text-xl font-semibold mb-4 text-gray-700 dark:text-light">Informasi Asal</h2>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            @if($anakan->kandang)
-                                <!-- Data Kandang -->
-                                <div class="border dark:border-primary-darker rounded-md p-4">
-                                    <h3 class="text-lg font-medium text-primary-dark dark:text-primary-light mb-3">Data Kandang</h3>
-                                    
-                                    <div class="space-y-3">
-                                        <div class="flex items-center">
-                                            <span class="text-gray-700 dark:text-light font-medium w-32">Nomor Kandang:</span>
-                                            <a href="{{ route('peternak.kandang.show', $anakan->kandang->id) }}" class="text-primary hover:text-primary-dark">{{ $anakan->kandang->nomor_kandang }}</a>
-                                        </div>
-                                        
-                                        <div class="flex items-center">
-                                            <span class="text-gray-700 dark:text-light font-medium w-32">Deskripsi:</span>
-                                            <span class="text-gray-600 dark:text-gray-300">{{ $anakan->kandang->deskripsi_kandang ?? 'Tidak ada deskripsi' }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Data Indukan -->
-                                <div class="border dark:border-primary-darker rounded-md p-4">
-                                    <h3 class="text-lg font-medium text-primary-dark dark:text-primary-light mb-3">Data Indukan</h3>
-                                    
-                                    <div class="space-y-3">
-                                        @if($anakan->kandang->indukanJantan)
-                                            <div class="flex items-center">
-                                                <span class="text-gray-700 dark:text-light font-medium w-32">Bapak (Jantan):</span>
-                                                <a href="#" class="text-primary hover:text-primary-dark">{{ $anakan->kandang->indukanJantan->nomor_ring }}</a>
-                                            </div>
-                                        @endif
-                                        
-                                        @if($anakan->kandang->indukanBetina)
-                                            <div class="flex items-center">
-                                                <span class="text-gray-700 dark:text-light font-medium w-32">Induk (Betina):</span>
-                                                <a href="#" class="text-primary hover:text-primary-dark">{{ $anakan->kandang->indukanBetina->nomor_ring }}</a>
-                                            </div>
-                                        @endif
-                                        
-                                        <div class="flex items-center">
-                                            <span class="text-gray-700 dark:text-light font-medium w-32">Jumlah Saudara:</span>
-                                            <span class="text-gray-600 dark:text-gray-300">{{ $siblings->count() }} ekor</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            @else
-                                <!-- Anakan dari luar -->
-                                <div class="border dark:border-primary-darker rounded-md p-4">
-                                    <h3 class="text-lg font-medium text-primary-dark dark:text-primary-light mb-3">Informasi Pembelian</h3>
-                                    
-                                    <div class="space-y-3">
-                                        <div class="flex items-center">
-                                            <span class="text-gray-700 dark:text-light font-medium w-32">Asal:</span>
-                                            <span class="text-gray-600 dark:text-gray-300">Dibeli dari luar</span>
-                                        </div>
-                                        
-                                        <div class="flex items-center">
-                                            <span class="text-gray-700 dark:text-light font-medium w-32">Tanggal Beli:</span>
-                                            <span class="text-gray-600 dark:text-gray-300">{{ $anakan->created_at->format('d F Y') }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endif
-                        </div>
-                    </div>
-                    
-                    <!-- Tracking Pertumbuhan -->
-                    <div class="bg-white dark:bg-darker rounded-md shadow-md p-4">
-                        <h2 class="text-xl font-semibold mb-4 text-gray-700 dark:text-light">Tracking Pertumbuhan</h2>
-                        
-                        <!-- Timeline Visual -->
-                        <div class="relative mb-6 pl-8">
-                            <div class="absolute left-3 inset-y-0 w-1 bg-gray-200 dark:bg-gray-700"></div>
-                            
-                            @if($anakan->catatan_perubahan && count($anakan->catatan_perubahan) > 0)
-                                @foreach($anakan->catatan_perubahan as $index => $perubahan)
-                                    <div class="relative pb-6">
-                                        <div class="absolute left-0 mt-1.5 -translate-x-1/2 w-5 h-5 rounded-full {{ $perubahan['status_baru'] == 'trotol' ? 'bg-blue-300' : ($perubahan['status_baru'] == 'pastol' ? 'bg-purple-500' : 'bg-green-500') }} border-4 border-white dark:border-darker"></div>
-                                        <div class="text-sm font-medium {{ $perubahan['status_baru'] == 'trotol' ? 'text-blue-500' : ($perubahan['status_baru'] == 'pastol' ? 'text-purple-500' : 'text-green-500') }}">{{ ucfirst($perubahan['status_baru']) }}</div>
-                                        <div class="text-xs text-gray-500 dark:text-gray-400">{{ \Carbon\Carbon::parse($perubahan['tanggal'])->format('d F Y') }}</div>
-                                        <div class="text-sm text-gray-600 dark:text-gray-300 mt-1">
-                                            @if($perubahan['harga_lama'] != $perubahan['harga_baru'])
-                                                <p>Harga: Rp {{ number_format($perubahan['harga_lama'], 0, ',', '.') }} → Rp {{ number_format($perubahan['harga_baru'], 0, ',', '.') }}</p>
-                                            @endif
-                                            @if($perubahan['catatan'])
-                                                <p>{{ $perubahan['catatan'] }}</p>
-                                            @endif
-                                        </div>
-                                    </div>
-                                @endforeach
-                            @else
-                                <div class="relative pb-6">
-                                    <div class="absolute left-0 mt-1.5 -translate-x-1/2 w-5 h-5 rounded-full {{ $anakan->status_pertumbuhan == 'trotol' ? 'bg-blue-300' : ($anakan->status_pertumbuhan == 'pastol' ? 'bg-purple-500' : 'bg-green-500') }} border-4 border-white dark:border-darker"></div>
-                                    <div class="text-sm font-medium {{ $anakan->status_pertumbuhan == 'trotol' ? 'text-blue-500' : ($anakan->status_pertumbuhan == 'pastol' ? 'text-purple-500' : 'text-green-500') }}">{{ ucfirst($anakan->status_pertumbuhan) }}</div>
-                                    <div class="text-xs text-gray-500 dark:text-gray-400">{{ $anakan->created_at->format('d F Y') }}</div>
-                                    <div class="text-sm text-gray-600 dark:text-gray-300 mt-1">
-                                        <p>Status awal</p>
-                                    </div>
-                                </div>
-                            @endif
-                        </div>
-                        
-                        <!-- Panel Update Status -->
-                        <div class="border dark:border-primary-darker rounded-md p-4 mt-4">
-                            <h3 class="text-lg font-medium text-gray-700 dark:text-light mb-4">Update Status</h3>
-                            
-                            <div class="space-y-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-light">Status Baru</label>
-                                    <select id="newStatusSelect" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md dark:bg-darker dark:border-primary">
-                                        <option value="trotol" {{ $anakan->status_pertumbuhan == 'trotol' ? 'selected' : '' }}>Trotol</option>
-                                        <option value="pastol" {{ $anakan->status_pertumbuhan == 'pastol' ? 'selected' : '' }}>Pastol</option>
-                                        <option value="lomba" {{ $anakan->status_pertumbuhan == 'lomba' ? 'selected' : '' }}>Lomba</option>
-                                    </select>
-                                </div>
-                                
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-light">Harga Baru</label>
-                                    <input type="number" id="newPriceInput" value="{{ $anakan->harga ?? 0 }}" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md dark:bg-darker dark:border-primary">
-                                </div>
-                                
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-light">Catatan Perubahan</label>
-                                    <textarea class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 dark:bg-darker dark:border-primary" rows="3" placeholder="Tambahkan catatan perubahan..."></textarea>
-                                </div>
-                                
-                                <button id="updateStatusBtn" class="w-full px-4 py-2 text-sm font-medium text-black bg-primary rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-offset-dark">
-                                    Update Status
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Panel Penjualan -->
-                    @if($anakan->status_penjualan === 'belum_dijual')
-                        <div class="bg-white dark:bg-darker rounded-md shadow-md p-4">
-                            <h2 class="text-xl font-semibold mb-4 text-gray-700 dark:text-light">Penjualan</h2>
-                            
-                            <form id="saleForm" action="{{ route('peternak.anakan.sell', $anakan->id) }}" method="POST">
-                                @csrf
-                                <div class="space-y-4">
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 dark:text-light">Harga Jual</label>
-                                        <input type="number" name="harga_jual" id="salePrice" value="{{ $anakan->harga ?? 0 }}" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md dark:bg-darker dark:border-primary" required>
-                                    </div>
-                                    
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 dark:text-light">Tanggal Penjualan</label>
-                                        <input type="date" name="tanggal_jual" id="saleDate" value="{{ now()->format('Y-m-d') }}" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md dark:bg-darker dark:border-primary" required>
-                                    </div>
-                                    
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 dark:text-light">Catatan Penjualan</label>
-                                        <textarea name="catatan_penjualan" id="saleNotes" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 dark:bg-darker dark:border-primary" rows="3" placeholder="Tambahkan catatan penjualan..."></textarea>
-                                    </div>
-                                    
-                                    <button type="submit" class="w-full px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:focus:ring-offset-dark">
-                                        Konfirmasi Penjualan
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    @else
-                        <div class="bg-white dark:bg-darker rounded-md shadow-md p-4">
-                            <h2 class="text-xl font-semibold mb-4 text-gray-700 dark:text-light">Status Penjualan</h2>
-                            
-                            <div class="space-y-4">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-gray-700 dark:text-light font-medium">Status:</span>
-                                    <span class="px-2 py-1 bg-red-500 text-white text-xs rounded-md">Terjual</span>
-                                </div>
-                                
-                                <div class="flex items-center justify-between">
-                                    <span class="text-gray-700 dark:text-light font-medium">Tanggal Jual:</span>
-                                    <span class="text-gray-600 dark:text-gray-300">{{ $anakan->tanggal_jual ? $anakan->tanggal_jual->format('d F Y') : 'Tidak diketahui' }}</span>
-                                </div>
-                                
-                                @if($anakan->catatan_penjualan)
-                                    <div>
-                                        <span class="text-gray-700 dark:text-light font-medium">Catatan Penjualan:</span>
-                                        <p class="text-gray-600 dark:text-gray-300 mt-1">{{ $anakan->catatan_penjualan }}</p>
-                                    </div>
-                                @endif
-                            </div>
-                        </div>
-                    @endif
-                </div>
-            </div>
-        </div>
-    </main>
-    
-    <!-- Modal Edit Harga -->
-    <div id="editPriceModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
-        <div class="bg-white dark:bg-darker rounded-lg w-full max-w-md mx-4 overflow-hidden">
-            <div class="px-4 py-3 border-b dark:border-primary-darker flex justify-between items-center">
-                <h3 class="text-lg font-medium text-gray-700 dark:text-light">Edit Harga</h3>
-                <button id="closePriceModal" class="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white">
-                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
-            <div class="p-4">
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-light mb-1">Harga Baru</label>
-                    <input type="text" id="newPrice" class="w-full px-3 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary rounded-md dark:bg-darker dark:border-primary" value="2,500,000">
-                </div>
-                
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-light mb-1">Alasan Perubahan</label>
-                    <textarea id="priceChangeReason" class="w-full px-3 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary rounded-md dark:bg-darker dark:border-primary" rows="3"></textarea>
-                </div>
-                
-                <div class="flex justify-end space-x-3">
-                    <button id="cancelPriceChange" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 dark:bg-primary-darker dark:text-light dark:hover:bg-primary-dark">
-                        Batal
-                    </button>
-                    <button id="confirmPriceChange" class="px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-offset-dark">
-                        Simpan
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Modal Upload Foto -->
-    <div id="uploadPhotoModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
-        <div class="bg-white dark:bg-darker rounded-lg w-full max-w-md mx-4 overflow-hidden">
-            <div class="px-4 py-3 border-b dark:border-primary-darker flex justify-between items-center">
-                <h3 class="text-lg font-medium text-gray-700 dark:text-light">Upload Foto Baru</h3>
-                <button id="closePhotoModal" class="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white">
-                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
-            <div class="p-4">
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-light mb-2">Pilih Foto</label>
-                    <div class="border-2 border-dashed dark:border-primary-darker rounded-md px-6 pt-5 pb-6">
-                        <div class="space-y-1 text-center">
-                            <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
-                                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                            </svg>
-                            <div class="flex text-sm text-gray-600">
-                                <label for="file-upload" class="relative cursor-pointer rounded-md font-medium text-primary hover:text-primary-dark focus-within:outline-none">
-                                    <span>Upload a file</span>
-                                    <input id="file-upload" name="file-upload" type="file" class="sr-only">
-                                </label>
-                                <p class="pl-1 text-gray-500 dark:text-gray-400">or drag and drop</p>
-                            </div>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">
-                                PNG, JPG, GIF up to 5MB
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="flex justify-end space-x-3">
-                    <button id="cancelPhotoUpload" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 dark:bg-primary-darker dark:text-light dark:hover:bg-primary-dark">
-                        Batal
-                    </button>
-                    <button id="confirmPhotoUpload" class="px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-offset-dark">
-                        Upload
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Edit Harga
-            const editPriceBtn = document.getElementById('editPriceBtn');
-            const editPriceModal = document.getElementById('editPriceModal');
-            const closePriceModal = document.getElementById('closePriceModal');
-            const cancelPriceChange = document.getElementById('cancelPriceChange');
-            const confirmPriceChange = document.getElementById('confirmPriceChange');
-            
-            editPriceBtn.addEventListener('click', function() {
-                editPriceModal.classList.remove('hidden');
-            });
-            
-            function closePriceEditModal() {
-                editPriceModal.classList.add('hidden');
-            }
-            
-            closePriceModal.addEventListener('click', closePriceEditModal);
-            cancelPriceChange.addEventListener('click', closePriceEditModal);
-            
-            confirmPriceChange.addEventListener('click', function() {
-                const newPrice = document.getElementById('newPrice').value;
-                const reason = document.getElementById('priceChangeReason').value;
-                const anakanId = {{ $anakan->id }};
-                
-                fetch(`/peternak/anakan/${anakanId}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    },
-                    body: JSON.stringify({
-                        jenis_kelamin: document.getElementById('genderSelect').value,
-                        deskripsi_karakteristik: document.getElementById('karakteristikTextarea').value,
-                        harga: parseInt(newPrice)
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Harga berhasil diupdate');
-                        location.reload();
-                    } else {
-                        alert('Gagal mengupdate harga: ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Terjadi kesalahan saat mengupdate harga');
-                });
-            });
-            
-            // Upload Foto
-            const changePhotoBtn = document.getElementById('changePhotoBtn');
-            const uploadPhotoModal = document.getElementById('uploadPhotoModal');
-            const closePhotoModal = document.getElementById('closePhotoModal');
-            const cancelPhotoUpload = document.getElementById('cancelPhotoUpload');
-            const confirmPhotoUpload = document.getElementById('confirmPhotoUpload');
-            const fileUpload = document.getElementById('file-upload');
-            
-            changePhotoBtn.addEventListener('click', function() {
-                uploadPhotoModal.classList.remove('hidden');
-            });
-            
-            function closePhotoUploadModal() {
-                uploadPhotoModal.classList.add('hidden');
-            }
-            
-            closePhotoModal.addEventListener('click', closePhotoUploadModal);
-            cancelPhotoUpload.addEventListener('click', closePhotoUploadModal);
-            
-            fileUpload.addEventListener('change', function(e) {
-                if (e.target.files && e.target.files[0]) {
-                    const reader = new FileReader();
-                    
-                    reader.onload = function(e) {
-                        // Preview file if needed
-                        console.log('File selected:', e.target.result);
-                    }
-                    
-                    reader.readAsDataURL(e.target.files[0]);
-                }
-            });
-            
-            confirmPhotoUpload.addEventListener('click', function() {
-                if (fileUpload.files && fileUpload.files[0]) {
-                    // Simulasi upload foto
-                    alert('Foto berhasil diupload');
-                    closePhotoUploadModal();
-                } else {
-                    alert('Silakan pilih foto terlebih dahulu');
-                }
-            });
-            
-            // Update Status
-            const updateStatusBtn = document.getElementById('updateStatusBtn');
-            
-            updateStatusBtn.addEventListener('click', function() {
-                const newStatus = document.getElementById('newStatusSelect').value;
-                const newPrice = document.getElementById('newPriceInput').value;
-                const anakanId = {{ $anakan->id }};
-                
-                if (!newPrice) {
-                    alert('Silakan masukkan harga baru');
-                    return;
-                }
-                
-                fetch(`/peternak/anakan/${anakanId}/status`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    },
-                    body: JSON.stringify({
-                        status_pertumbuhan: newStatus,
-                        harga: parseInt(newPrice),
-                        catatan_perubahan: ''
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Status berhasil diupdate');
-                        location.reload();
-                    } else {
-                        alert('Gagal mengupdate status: ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Terjadi kesalahan saat mengupdate status');
-                });
-            });
-            
-            // Gender change handler
-            document.getElementById('genderSelect').addEventListener('change', function() {
-                const newGender = this.value;
-                const anakanId = {{ $anakan->id }};
-                
-                fetch(`/peternak/anakan/${anakanId}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    },
-                    body: JSON.stringify({
-                        jenis_kelamin: newGender,
-                        deskripsi_karakteristik: document.getElementById('karakteristikTextarea').value
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Gender berhasil diubah');
-                        location.reload();
-                    } else {
-                        alert('Gagal mengubah gender: ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Terjadi kesalahan saat mengubah gender');
-                });
-            });
-        });
-    </script>
+      <div class="px-4 py-6">
+          <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+              <!-- Informasi Indukan -->
+              <div class="lg:col-span-2">
+                  <div class="bg-white dark:bg-darker rounded-lg shadow p-6">
+                      <h2 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Informasi Indukan</h2>
+                      
+                      <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                          <div>
+                              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Nomor Ring</dt>
+                              <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ $indukan->nomor_ring }}</dd>
+                          </div>
+
+                          <div>
+                              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Jenis Kelamin</dt>
+                              <dd class="mt-1">
+                                  <span class="px-2 py-1 text-xs font-medium rounded-full {{ $indukan->jenis_kelamin === 'jantan' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' : 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200' }}">
+                                      {{ ucfirst($indukan->jenis_kelamin) }}
+                                  </span>
+                              </dd>
+                          </div>
+
+                          @if($indukan->nama)
+                          <div>
+                              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Nama</dt>
+                              <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ $indukan->nama }}</dd>
+                          </div>
+                          @endif
+
+                          @if($indukan->tanggal_lahir)
+                          <div>
+                              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Tanggal Lahir</dt>
+                              <dd class="mt-1 text-sm text-gray-900 dark:text-white">
+                                  {{ $indukan->tanggal_lahir->format('d M Y') }} ({{ $indukan->age['formatted'] }})
+                              </dd>
+                          </div>
+                          @endif
+
+                          <div>
+                              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Jumlah Anakan</dt>
+                              <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ $indukan->getAnakanCount() }} anakan</dd>
+                          </div>
+                      </div>
+
+                      @if($indukan->catatan)
+                      <div class="mt-6">
+                          <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Catatan</dt>
+                          <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ $indukan->catatan }}</dd>
+                      </div>
+                      @endif
+
+                      @if($indukan->prestasi)
+                      <div class="mt-6">
+                          <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Prestasi</dt>
+                          <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ $indukan->prestasi }}</dd>
+                      </div>
+                      @endif
+
+                      @if($indukan->karakteristik)
+                      <div class="mt-6">
+                          <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Karakteristik</dt>
+                          <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ $indukan->karakteristik }}</dd>
+                      </div>
+                      @endif
+                  </div>
+
+                  <!-- Anakan dari Indukan ini -->
+                  <div class="mt-6 bg-white dark:bg-darker rounded-lg shadow p-6">
+                      <div class="flex items-center justify-between mb-4">
+                          <h2 class="text-lg font-medium text-gray-900 dark:text-white">Anakan dari Indukan ini</h2>
+                          <a href="{{ route('peternak.anakan.create') }}?indukan_id={{ $indukan->id }}" 
+                             class="px-3 py-1 text-sm text-white bg-primary rounded-md hover:bg-primary-dark focus:outline-none focus:ring focus:ring-primary focus:ring-offset-1">
+                              Tambah Anakan
+                          </a>
+                      </div>
+
+                      @if($indukan->anakans->count() > 0)
+                          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                              @foreach($indukan->anakans as $anakan)
+                                  <div class="border dark:border-primary-darker rounded-lg p-4">
+                                      <div class="flex items-center justify-between">
+                                          <h3 class="text-sm font-medium text-gray-900 dark:text-white">
+                                              {{ $anakan->nomor_ring ?? 'Belum ada ring' }}
+                                          </h3>
+                                          <span class="px-2 py-1 text-xs font-medium rounded-full {{ $anakan->jenis_kelamin === 'jantan' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' : ($anakan->jenis_kelamin === 'betina' ? 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200' : 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200') }}">
+                                              {{ ucfirst(str_replace('_', ' ', $anakan->jenis_kelamin)) }}
+                                          </span>
+                                      </div>
+                                      @if($anakan->tanggal_lahir)
+                                          <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                              {{ $anakan->tanggal_lahir->format('d M Y') }} ({{ $anakan->age['formatted'] }})
+                                          </p>
+                                      @endif
+                                      <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                          Status: {{ ucfirst(str_replace('_', ' ', $anakan->status_pertumbuhan)) }}
+                                      </p>
+                                      <div class="mt-2">
+                                          <a href="{{ route('peternak.anakan.show', $anakan) }}" 
+                                             class="text-xs text-primary hover:text-primary-dark">Lihat Detail</a>
+                                      </div>
+                                  </div>
+                              @endforeach
+                          </div>
+                      @else
+                          <div class="text-center py-8">
+                              <svg class="mx-auto h-12 w-12 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                              </svg>
+                              <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">Belum ada anakan</h3>
+                              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Indukan ini belum memiliki anakan.</p>
+                          </div>
+                      @endif
+                  </div>
+              </div>
+
+              <!-- Sidebar -->
+              <div class="lg:col-span-1">
+                  <!-- Kandang yang menggunakan indukan ini -->
+                  @if($indukan->kandangsJantan->count() > 0 || $indukan->kandangsBetina->count() > 0)
+                  <div class="bg-white dark:bg-darker rounded-lg shadow p-6 mb-6">
+                      <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Kandang</h3>
+                      
+                      @if($indukan->kandangsJantan->count() > 0)
+                          <div class="mb-4">
+                              <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Sebagai Jantan</h4>
+                              <div class="space-y-2">
+                                  @foreach($indukan->kandangsJantan as $kandang)
+                                      <div class="text-sm">
+                                          <a href="{{ route('peternak.kandang.show', $kandang) }}" 
+                                             class="text-primary hover:text-primary-dark">{{ $kandang->nomor_kandang }}</a>
+                                          <span class="text-gray-500 dark:text-gray-400">({{ ucfirst($kandang->status) }})</span>
+                                      </div>
+                                  @endforeach
+                              </div>
+                          </div>
+                      @endif
+
+                      @if($indukan->kandangsBetina->count() > 0)
+                          <div>
+                              <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Sebagai Betina</h4>
+                              <div class="space-y-2">
+                                  @foreach($indukan->kandangsBetina as $kandang)
+                                      <div class="text-sm">
+                                          <a href="{{ route('peternak.kandang.show', $kandang) }}" 
+                                             class="text-primary hover:text-primary-dark">{{ $kandang->nomor_kandang }}</a>
+                                          <span class="text-gray-500 dark:text-gray-400">({{ ucfirst($kandang->status) }})</span>
+                                      </div>
+                                  @endforeach
+                              </div>
+                          </div>
+                      @endif
+                  </div>
+                  @endif
+
+                  <!-- Statistik -->
+                  <div class="bg-white dark:bg-darker rounded-lg shadow p-6">
+                      <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Statistik</h3>
+                      
+                      <div class="space-y-4">
+                          <div class="flex justify-between">
+                              <span class="text-sm text-gray-500 dark:text-gray-400">Total Anakan</span>
+                              <span class="text-sm font-medium text-gray-900 dark:text-white">{{ $indukan->getAnakanCount() }}</span>
+                          </div>
+                          
+                          <div class="flex justify-between">
+                              <span class="text-sm text-gray-500 dark:text-gray-400">Anakan Jantan</span>
+                              <span class="text-sm font-medium text-gray-900 dark:text-white">
+                                  {{ $indukan->anakans->where('jenis_kelamin', 'jantan')->count() }}
+                              </span>
+                          </div>
+                          
+                          <div class="flex justify-between">
+                              <span class="text-sm text-gray-500 dark:text-gray-400">Anakan Betina</span>
+                              <span class="text-sm font-medium text-gray-900 dark:text-white">
+                                  {{ $indukan->anakans->where('jenis_kelamin', 'betina')->count() }}
+                              </span>
+                          </div>
+                          
+                          <div class="flex justify-between">
+                              <span class="text-sm text-gray-500 dark:text-gray-400">Anakan Aktif</span>
+                              <span class="text-sm font-medium text-gray-900 dark:text-white">
+                                  {{ $indukan->anakans->where('status_penjualan', 'belum_dijual')->count() }}
+                              </span>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </main>
 </x-layout>

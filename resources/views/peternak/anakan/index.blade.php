@@ -5,7 +5,7 @@
           <h1 class="text-2xl font-semibold">Manajemen Anakan</h1>
           <div class="flex items-center space-x-4">
               @if(!$peternak->isPro())
-                  <div class="text-sm text-gray-600 dark:text-gray-400">
+                  <div class="text-sm text-text-secondary dark:text-gray-400">
                       Anakan: {{ $peternak->getActiveAnakanCount() }}/20
                   </div>
               @endif
@@ -44,7 +44,7 @@
               <button id="tab-jantan" class="py-4 text-primary border-b-2 border-primary dark:text-primary-light dark:border-primary-light font-medium">
                   Anakan Jantan ({{ $anakans->where('jenis_kelamin', 'jantan')->count() }})
               </button>
-              <button id="tab-betina" class="py-4 text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-primary-light font-medium">
+              <button id="tab-betina" class="py-4 text-text-tertiary hover:text-primary dark:text-gray-400 dark:hover:text-primary-light font-medium">
                   Anakan Betina ({{ $anakans->where('jenis_kelamin', 'betina')->count() }})
               </button>
           </div>
@@ -109,15 +109,15 @@
                       <div class="p-4">
                           <h3 class="text-lg font-semibold">{{ $anakan->nomor_ring }}</h3>
                           <div class="flex justify-between mt-2">
-                              <p class="text-gray-600 dark:text-gray-300">
+                              <p class="text-text-secondary dark:text-gray-300">
                                   <span class="font-medium">Umur:</span> {{ $anakan->age['formatted'] }}
                               </p>
-                              <p class="text-gray-600 dark:text-gray-300">
+                              <p class="text-text-secondary dark:text-gray-300">
                                   <span class="font-medium">Harga:</span> Rp {{ number_format($anakan->harga ?? 0, 0, ',', '.') }}
                               </p>
                           </div>
                           @if($anakan->perkawinan && $anakan->perkawinan->indukanJantan)
-                              <p class="text-gray-600 dark:text-gray-300 mt-1">
+                              <p class="text-text-secondary dark:text-gray-300 mt-1">
                                   <span class="font-medium">Jantan:</span> {{ $anakan->perkawinan->indukanJantan->nomor_ring }}
                               </p>
                           @endif
@@ -125,7 +125,7 @@
                           <div class="mt-3 flex justify-between">
                               @if($anakan->status_penjualan === 'belum_dijual')
                                   <div class="flex space-x-2">
-                                      <button class="px-2 py-1 text-xs bg-gray-200 text-gray-700 rounded hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600" 
+                                      <button class="px-2 py-1 text-xs bg-gray-200 text-text-primary rounded hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600" 
                                               onclick="event.stopPropagation(); editPrice({{ $anakan->id }})">
                                           Edit Harga
                                       </button>
@@ -139,7 +139,7 @@
                                       Jual
                                   </button>
                               @else
-                                  <span class="text-xs text-gray-500 dark:text-gray-400">
+                                  <span class="text-xs text-text-tertiary dark:text-gray-400">
                                       Terjual pada {{ $anakan->tanggal_jual ? $anakan->tanggal_jual->format('d/m/Y') : '' }}
                                   </span>
                               @endif
@@ -151,8 +151,8 @@
                       <svg class="mx-auto h-12 w-12 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
-                      <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">Tidak ada anakan</h3>
-                      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Mulai dengan menambahkan anakan baru.</p>
+                      <h3 class="mt-2 text-sm font-medium text-text-primary dark:text-gray-100">Tidak ada anakan</h3>
+                      <p class="mt-1 text-sm text-text-tertiary dark:text-gray-400">Mulai dengan menambahkan anakan baru.</p>
                       <div class="mt-6">
                           <a href="{{ route('peternak.anakan.create') }}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-dark">
                               <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">

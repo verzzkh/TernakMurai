@@ -17,7 +17,7 @@
 <body>
     <div x-data="setup()" x-init="$refs.loading.classList.add('hidden');
     setColors(color);" :class="{ 'dark': isDark }">
-        <div class="flex h-screen antialiased text-gray-900 bg-gray-300 dark:bg-dark dark:text-light">
+        <div class="flex h-screen antialiased text-text-primary bg-gray-300 dark:bg-darker dark:text-light">
            
 
             <!-- Sidebar -->
@@ -40,7 +40,7 @@
     </div>
 
     <script>
-      const setup = () => {
+        const setup = () => {
         const getTheme = () => {
           if (window.localStorage.getItem('dark')) {
             return JSON.parse(window.localStorage.getItem('dark'))
@@ -51,6 +51,8 @@
 
         const setTheme = (value) => {
           window.localStorage.setItem('dark', value)
+          // Sync theme across all components
+          document.documentElement.classList.toggle('dark', value)
         }
 
         const getColor = () => {
@@ -115,6 +117,8 @@
           toggleTheme() {
             this.isDark = !this.isDark
             setTheme(this.isDark)
+            // Sync with all toggle buttons
+            this.$dispatch('theme-changed', { isDark: this.isDark })
           },
           setLightTheme() {
             this.isDark = false

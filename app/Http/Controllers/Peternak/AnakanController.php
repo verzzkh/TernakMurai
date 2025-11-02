@@ -73,7 +73,7 @@ class AnakanController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(): View|RedirectResponse
+    public function create(Request $request): View|RedirectResponse
     {
         $peternak = Auth::user()->peternak;
 
@@ -89,7 +89,19 @@ class AnakanController extends Controller
             ->with(['indukanJantan', 'indukanBetina'])
             ->get();
 
-        return view('peternak.anakan.create', compact('kandangs', 'peternak'));
+        // Get indukan if indukan_id is provided
+        $selectedIndukan = null;
+        if ($request->has('indukan_id')) {
+            $selectedIndukan = $peternak->indukans()->find($request->get('indukan_id'));
+        }
+
+        // Get kandang if kandang_id is provided
+        $selectedKandang = null;
+        if ($request->has('kandang_id')) {
+            $selectedKandang = $peternak->kandangs()->find($request->get('kandang_id'));
+        }
+
+        return view('peternak.anakan.create', compact('kandangs', 'peternak', 'selectedIndukan', 'selectedKandang'));
     }
 
     /**

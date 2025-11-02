@@ -14,59 +14,109 @@ use App\Models\Peternak;
 use App\Models\Transaksi;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class TernakEloquentSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        // Create a few peternak with related data
-        Peternak::factory()
-            ->count(5)
-            ->create()
-            ->each(function (Peternak $peternak) {
-                // create admin for first peternak
-                if (rand(1,5) === 1) {
-                    Admin::factory()->create(['user_id' => $peternak->user_id]);
-                }
+        /**
+         * =========================================================
+         * 1. Buat akun user peternak dan semua relasinya
+         * =========================================================
+         */
+        for ($i = 1; $i <= 5; $i++) {
+            $user = User::factory()->create([
+                'name' => fake()->unique()->userName(),
+                'email' => fake()->unique()->safeEmail(),
+                'password' => Hash::make('password'),
+            ]);
 
-                // create indukan
-                $indukans = Indukan::factory()->count(8)->create(['peternak_id' => $peternak->id]);
+            $peternak = Peternak::factory()->create([
+                'user_id' => $user->id,
+            ]);
 
-                // create kandang referencing some indukan
-                $kandangs = Kandang::factory()->count(3)->create(['peternak_id' => $peternak->id]);
-                foreach ($kandangs as $i => $kandang) {
-                    $male = $indukans->random();
-                    $female = $indukans->random();
-                    $kandang->update(['indukan_jantan_id' => $male->id, 'indukan_betina_id' => $female->id]);
+            // Buat data dummy terkait peternak
+            $indukans = Indukan::factory()->count(8)->create(['peternak_id' => $peternak->id]);
 
-                    // create perkawinan
-                    Perkawinan::factory()->create([
-                        'kandang_id' => $kandang->id,
-                        'indukan_jantan_id' => $male->id,
-                        'indukan_betina_id' => $female->id,
-                    ]);
-                }
+            $kandangs = Kandang::factory()->count(3)->create(['peternak_id' => $peternak->id]);
+            foreach ($kandangs as $kandang) {
+                $male = $indukans->random();
+                $female = $indukans->random();
 
-                // create anakan for peternak
-                Anakan::factory()->count(10)->create(['peternak_id' => $peternak->id, 'kandang_id' => $kandangs->random()->id]);
+                $kandang->update([
+                    'indukan_jantan_id' => $male->id,
+                    'indukan_betina_id' => $female->id,
+                ]);
 
-                // create foto for some indukan
-                foreach ($indukans->take(4) as $ind) {
-                    FotoIndukan::factory()->create(['peternak_id' => $peternak->id, 'indukan_id' => $ind->id]);
-                }
+                Perkawinan::factory()->create([
+                    'kandang_id' => $kandang->id,
+                    'indukan_jantan_id' => $male->id,
+                    'indukan_betina_id' => $female->id,
+                ]);
+            }
 
-                // create transaksi and invoices
-                Transaksi::factory()->count(6)->create(['peternak_id' => $peternak->id]);
-                Invoice::factory()->count(2)->create(['peternak_id' => $peternak->id]);
+            Anakan::factory()->count(10)->create([
+                'peternak_id' => $peternak->id,
+                'kandang_id' => $kandangs->random()->id,
+            ]);
 
-                // create some deteksi_penyakit
-                DeteksiPenyakit::factory()->count(3)->create(['peternak_id' => $peternak->id]);
-            });
+            foreach ($indukans->take(4) as $ind) {
+                FotoIndukan::factory()->create([
+                    'peternak_id' => $peternak->id,
+                    'indukan_id' => $ind->id,
+                ]);
+            }
 
-        // Create a known admin user for login testing
-        User::factory()->create(['name' => 'Seeder Admin', 'email' => 'admin@seed.local']);
+            Transaksi::factory()->count(6)->create(['peternak_id' => $peternak->id]);
+            Invoice::factory()->count(2)->create(['peternak_id' => $peternak->id]);
+            DeteksiPenyakit::factory()->count(3)->create(['peternak_id' => $peternak->id]);
+        }
+
+        /**
+         * =========================================================
+         * 2. Buat akun admin
+         * =========================================================
+         */
+        for ($i = 1; $i <= 3; $i++) {
+            $user = User::factory()->create([
+                'name' => fake()->unique()->userName(),
+                'email' => fake()->unique()->safeEmail(),
+                'password' => Hash::make('password'),
+            ]);
+
+            Admin::factory()->create([
+                'user_id' => $user->id,
+                'username' => fake()->unique()->userName(),
+                'nama_lengkap' => fake()->name(),
+            ]);
+        }
+
+        /**
+         * =========================================================
+         * 3. Buat akun login testing manual
+         * =========================================================
+         */
+        $adminUser = User::factory()->create([
+            'name' => 'SeederAdmin',
+            'email' => 'admin@seed.local',
+            'password' => Hash::make('password'),
+        ]);
+        Admin::factory()->create([
+            'user_id' => $adminUser->id,
+            'username' => 'adminseed',
+            'nama_lengkap' => 'Admin Seeder',
+        ]);
+
+        $peternakUser = User::factory()->create([
+            'name' => 'Pak Rakha',
+            'email' => 'rakha@seed.local',
+            'password' => Hash::make('password'),
+        ]);
+        Peternak::factory()->create([
+            'user_id' => $peternakUser->id,
+            'nama_peternakan' => 'Peternakan Rakha Jaya',
+            'nomor_handphone' => '08123456789',
+        ]);
     }
 }

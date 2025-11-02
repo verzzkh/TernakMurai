@@ -41,7 +41,7 @@ class LoginController extends Controller
             $request->session()->regenerate();
 
             $user = Auth::user();
-            $role = $user->getRole();
+            $role = $user->role;
 
             // Pastikan user memiliki role yang valid
             if ($role === 'guest') {

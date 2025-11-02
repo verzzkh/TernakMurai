@@ -1,15 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" x-data="{ isDark: false }" :class="{ 'dark': isDark }">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Ternak Murai</title>
     @vite('resources/css/app.css')
+    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.7.3/dist/alpine.min.js" defer></script>
 </head>
 
-<body class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-    <div class="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 border border-gray-200">
+<body class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center p-4">
+    <div class="max-w-md w-full bg-white dark:bg-darker rounded-2xl shadow-xl p-8 border border-gray-200 dark:border-primary-darker">
         <!-- Header -->
         <div class="text-center mb-8">
             <div class="mx-auto w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mb-4">
@@ -17,8 +18,8 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                 </svg>
             </div>
-            <h1 class="text-3xl font-bold text-gray-900 mb-2">Ternak Murai</h1>
-            <p class="text-gray-600">Sistem Manajemen Peternakan</p>
+            <h1 class="text-3xl font-bold text-text-primary mb-2">Ternak Murai</h1>
+            <p class="text-text-secondary">Sistem Manajemen Peternakan</p>
         </div>
 
         <!-- Success Message -->
@@ -46,7 +47,7 @@
 
             <!-- Input: Email / Name -->
             <div>
-                <label for="login" class="block text-sm font-medium text-gray-700 mb-2">
+                <label for="login" class="block text-sm font-medium text-text-primary mb-2">
                     Email atau Nama
                 </label>
                 <div class="relative">
@@ -58,13 +59,13 @@
                     <input id="login" name="login" type="text" required
                         placeholder="Masukkan email atau nama"
                         value="{{ old('login') }}"
-                        class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition duration-200">
+                        class="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-primary-darker dark:bg-darker dark:text-light rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition duration-200">
                 </div>
             </div>
 
             <!-- Input: Password -->
             <div>
-                <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
+                <label for="password" class="block text-sm font-medium text-text-primary mb-2">
                     Password
                 </label>
                 <div class="relative">
@@ -75,7 +76,7 @@
                     </div>
                     <input id="password" name="password" type="password" required
                         placeholder="Masukkan password Anda"
-                        class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition duration-200">
+                        class="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-primary-darker dark:bg-darker dark:text-light rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition duration-200">
                 </div>
             </div>
 
@@ -84,7 +85,7 @@
                 <label class="flex items-center">
                     <input type="checkbox" name="remember" value="1"
                         class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 focus:ring-2" />
-                    <span class="ml-2 text-sm text-gray-600">Ingat saya</span>
+                    <span class="ml-2 text-sm text-text-secondary dark:text-light">Ingat saya</span>
                 </label>
                 <a href="#" class="text-sm text-blue-600 hover:text-blue-800 hover:underline transition duration-200">
                     Lupa password?
@@ -104,9 +105,9 @@
         </form>
 
         <!-- Role Information -->
-        <div class="mt-8 p-4 bg-gray-50 rounded-lg">
-            <h3 class="text-sm font-medium text-gray-900 mb-2">Akses Berdasarkan Role:</h3>
-            <div class="space-y-1 text-xs text-gray-600">
+        <div class="mt-8 p-4 bg-gray-50 dark:bg-primary-darker rounded-lg">
+            <h3 class="text-sm font-medium text-text-primary mb-2">Akses Berdasarkan Role:</h3>
+            <div class="space-y-1 text-xs text-text-secondary dark:text-light">
                 <div class="flex items-center">
                     <div class="w-2 h-2 bg-red-500 rounded-full mr-2"></div>
                     <span><strong>Admin:</strong> Kelola pengguna, laporan, dan sistem</span>
@@ -120,8 +121,20 @@
 
         <!-- Footer -->
         <div class="mt-8 text-center">
-            <p class="text-xs text-gray-500">© 2024 Ternak Murai. Hak cipta dilindungi.</p>
+            <p class="text-xs text-text-secondary dark:text-light">© 2024 Ternak Murai. Hak cipta dilindungi.</p>
         </div>
+    </div>
+
+    <!-- Dark Mode Toggle -->
+    <div class="fixed top-4 right-4">
+        <button @click="isDark = !isDark" class="p-3 bg-white dark:bg-darker rounded-full shadow-lg border border-gray-200 dark:border-primary-darker hover:shadow-xl transition-all duration-200">
+            <svg x-show="!isDark" class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+            </svg>
+            <svg x-show="isDark" class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+            </svg>
+        </button>
     </div>
 </body>
 

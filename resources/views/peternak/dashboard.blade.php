@@ -2,7 +2,7 @@
     <main>
         <!-- Content header -->
         <div class="flex items-center justify-between px-4 py-4 border-b lg:py-6 dark:border-primary-darker">
-          <h1 class="text-2xl font-semibold">Dashboard</h1>
+          <h1 class="text-2xl font-semibold text-text-primary">Dashboard</h1>
         </div>
       
         <!-- Content -->
@@ -13,11 +13,11 @@
             <div class="flex items-center justify-between p-4 bg-white rounded-md dark:bg-darker">
               <div>
                 <h6
-                  class="text-xs font-medium leading-none tracking-wider text-gray-500 uppercase dark:text-primary-light"
+                  class="text-xs font-medium leading-none tracking-wider text-text-tertiary uppercase dark:text-primary-light"
                 >
                   Keuntungan
                 </h6>
-                <span class="text-xl font-semibold">Rp.25.000.000</span>
+                <span class="text-xl font-semibold text-text-primary">Rp.25.000.000</span>
                 <span class="inline-block px-2 py-px ml-2 text-xs text-green-500 bg-green-100 rounded-md">
                   +4.4%
                 </span>
@@ -46,11 +46,11 @@
             <div class="flex items-center justify-between p-4 bg-white rounded-md dark:bg-darker">
               <div>
                 <h6
-                  class="text-xs font-medium leading-none tracking-wider text-gray-500 uppercase dark:text-primary-light"
+                  class="text-xs font-medium leading-none tracking-wider text-text-tertiary uppercase dark:text-primary-light"
                 >
                   Total Kandang
                 </h6>
-                <span class="text-xl font-semibold">5</span>
+                <span class="text-xl font-semibold text-text-primary">5</span>
                 <span class="inline-block px-2 py-px ml-2 text-xs text-green-500 bg-green-100 rounded-md">
                   1
                 </span>
@@ -79,11 +79,11 @@
             <div class="flex items-center justify-between p-4 bg-white rounded-md dark:bg-darker">
               <div>
                 <h6
-                  class="text-xs font-medium leading-none tracking-wider text-gray-500 uppercase dark:text-primary-light"
+                  class="text-xs font-medium leading-none tracking-wider text-text-tertiary uppercase dark:text-primary-light"
                 >
                   Jumlah Anakan
                 </h6>
-                <span class="text-xl font-semibold">17</span>
+                <span class="text-xl font-semibold text-text-primary">17</span>
                 <span class="inline-block px-2 py-px ml-2 text-xs text-green-500 bg-green-100 rounded-md">
                   2
                 </span>
@@ -112,11 +112,11 @@
             <div class="flex items-center justify-between p-4 bg-white rounded-md dark:bg-darker">
               <div>
                 <h6
-                  class="text-xs font-medium leading-none tracking-wider text-gray-500 uppercase dark:text-primary-light"
+                  class="text-xs font-medium leading-none tracking-wider text-text-tertiary uppercase dark:text-primary-light"
                 >
                   Total Pengeluaran
                 </h6>
-                <span class="text-xl font-semibold">Rp.300.000</span>
+                <span class="text-xl font-semibold text-text-primary">Rp.300.000</span>
                 <span class="inline-block px-2 py-px ml-2 text-xs text-red-500 bg-red-100 rounded-md">
                   Rp.130.000
                 </span>
@@ -148,9 +148,9 @@
             <div class="col-span-2 bg-white rounded-md dark:bg-darker" x-data="{ isOn: false }">
               <!-- Card header -->
               <div class="flex items-center justify-between p-4 border-b dark:border-primary">
-                <h4 class="text-lg font-semibold text-gray-500 dark:text-light">Jumlah Anakan per Kandang</h4>
+                <h4 class="text-lg font-semibold text-text-primary dark:text-light">Jumlah Anakan per Kandang</h4>
                 <div class="flex items-center space-x-2">
-                  <span class="text-sm text-gray-500 dark:text-light">Terbaru</span>
+                  <span class="text-sm text-text-tertiary dark:text-light">Terbaru</span>
                   <button
                     class="relative focus:outline-none"
                     x-cloak
@@ -176,7 +176,7 @@
             <div class="bg-white rounded-md dark:bg-darker" x-data="{ isOn: false }">
               <!-- Card header -->
               <div class="flex items-center justify-between p-4 border-b dark:border-primary">
-                <h4 class="text-lg font-semibold text-gray-500 dark:text-light">Status Kandang</h4>
+                <h4 class="text-lg font-semibold text-text-primary dark:text-light">Status Kandang</h4>
                 <div class="flex items-center">
                   <button
                     class="relative focus:outline-none"
@@ -205,7 +205,7 @@
             <div class="bg-white rounded-md" x-data="{ isOn: false }">
               <!-- Card header -->
               <div class="flex items-center justify-between p-4 border-b">
-                <h4 class="text-lg font-semibold text-gray-500">Tren Keuangan</h4>
+                <h4 class="text-lg font-semibold text-text-tertiary">Tren Keuangan</h4>
                 <div class="flex items-center">
                   <button
                     class="relative focus:outline-none"

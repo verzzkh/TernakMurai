@@ -66,14 +66,14 @@ class User extends Authenticatable
         return $this->peternak()->exists();
     }
 
-    public function getRole(): string
+    public function getRoleAttribute(): string
     {
         if ($this->isAdmin()) {
             return 'admin';
         } elseif ($this->isPeternak()) {
             return 'peternak';
         }
-
+    
         return 'guest';
     }
 }

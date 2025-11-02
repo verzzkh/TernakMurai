@@ -1,5 +1,5 @@
 <header class="relative bg-white dark:bg-darker">
-    <div class="flex items-center justify-between p-2 border-b dark:border-primary-darker" x-data="{ isMobileMainMenuOpen: false, isMobileSubMenuOpen: false, isDark: false }">
+    <div class="flex items-center justify-between p-2 border-b dark:border-primary-darker" x-data="{ isMobileMainMenuOpen: false, isMobileSubMenuOpen: false, isDark: false }" @theme-changed.window="isDark = $event.detail.isDark">
         <!-- Mobile menu button -->
         <button @click="isMobileMainMenuOpen = !isMobileMainMenuOpen"
             class="p-1 transition-colors duration-200 rounded-md text-primary-lighter bg-primary-50 hover:text-primary hover:bg-primary-100 dark:hover:text-light dark:hover:bg-primary-dark dark:bg-dark md:hidden focus:outline-none focus:ring">
@@ -11,7 +11,7 @@
                 </svg>
             </span>
         </button>
-
+   
         <!-- Mobile main menu (hidden by default) -->
 
         <div class="border-b md:hidden dark:border-primary-darker" x-show="isMobileMainMenuOpen"
@@ -20,7 +20,7 @@
                 <!-- Dashboard link -->
                 <div x-data="{ isActive: false, open: false }">
                     <a href="/"
-                        class="flex items-center p-2 text-gray-500 transition-colors rounded-md dark:text-light hover:bg-primary-100 dark:hover:bg-primary"
+                        class="flex items-center p-2 text-text-tertiary transition-colors rounded-md dark:text-light hover:bg-primary-100 dark:hover:bg-primary"
                         :class="{ 'bg-primary-100 dark:bg-primary': isActive || open }">
                         <span aria-hidden="true">
                             <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -36,7 +36,7 @@
                 <!-- Kandang link -->
                 <div x-data="{ isActive: false, open: false }">
                     <a href="/kandang"
-                        class="flex items-center p-2 text-gray-500 transition-colors rounded-md dark:text-light hover:bg-primary-100 dark:hover:bg-primary"
+                        class="flex items-center p-2 text-text-tertiary transition-colors rounded-md dark:text-light hover:bg-primary-100 dark:hover:bg-primary"
                         :class="{ 'bg-primary-100 dark:bg-primary': isActive || open }">
                         <span aria-hidden="true">
                             <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -52,7 +52,7 @@
                 <!-- Anakan link -->
                 <div x-data="{ isActive: false, open: false }">
                     <a href="/anakan"
-                        class="flex items-center p-2 text-gray-500 transition-colors rounded-md dark:text-light hover:bg-primary-100 dark:hover:bg-primary"
+                        class="flex items-center p-2 text-text-tertiary transition-colors rounded-md dark:text-light hover:bg-primary-100 dark:hover:bg-primary"
                         :class="{ 'bg-primary-100 dark:bg-primary': isActive || open }">
                         <span aria-hidden="true">
                             <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -68,7 +68,7 @@
                 <!-- Pencatatan link -->
                 <div x-data="{ isActive: false, open: false }">
                     <a href="/pencatatan"
-                        class="flex items-center p-2 text-gray-500 transition-colors rounded-md dark:text-light hover:bg-primary-100 dark:hover:bg-primary"
+                        class="flex items-center p-2 text-text-tertiary transition-colors rounded-md dark:text-light hover:bg-primary-100 dark:hover:bg-primary"
                         :class="{ 'bg-primary-100 dark:bg-primary': isActive || open }">
                         <span aria-hidden="true">
                             <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -105,7 +105,7 @@
         <!-- Desktop Right buttons -->
         <nav aria-label="Secondary" class="hidden space-x-2 md:flex md:items-center">
             <!-- Toggle dark theme button -->
-            <button aria-hidden="true" class="relative focus:outline-none" x-cloak @click="toggleTheme">
+            <button aria-hidden="true" class="relative focus:outline-none" x-cloak @click="$parent.toggleTheme">
                 <div class="w-12 h-6 transition rounded-full outline-none bg-primary-100 dark:bg-primary-lighter">
                 </div>
                 <div class="absolute top-0 left-0 inline-flex items-center justify-center w-6 h-6 transition-all duration-150 transform scale-110 rounded-full shadow-sm"
@@ -148,11 +148,11 @@
                     class="absolute right-0 w-48 py-1 bg-white rounded-md shadow-lg top-12 ring-1 ring-black ring-opacity-5 dark:bg-dark focus:outline-none"
                     tabindex="-1" role="menu" aria-orientation="vertical" aria-label="User menu">
                     <a href="#" role="menuitem"
-                        class="block px-4 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-100 dark:text-light dark:hover:bg-primary">
+                        class="block px-4 py-2 text-sm text-text-primary transition-colors hover:bg-gray-100 dark:text-light dark:hover:bg-primary">
                         Your Profile
                     </a>
                     <a href="#" role="menuitem"
-                        class="block px-4 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-100 dark:text-light dark:hover:bg-primary">
+                        class="block px-4 py-2 text-sm text-text-primary transition-colors hover:bg-gray-100 dark:text-light dark:hover:bg-primary">
                         Settings
                     </a>
                     <!-- Logout menggunakan POST -->
@@ -162,7 +162,7 @@
 
                     <a href="#" role="menuitem"
                         onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
-                        class="block px-4 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-100 dark:text-light dark:hover:bg-primary">
+                        class="block px-4 py-2 text-sm text-text-primary transition-colors hover:bg-gray-100 dark:text-light dark:hover:bg-primary">
                         Logout
                     </a>
                 </div>
@@ -179,7 +179,7 @@
             aria-label="Secondary">
             <div class="space-x-2">
                 <!-- Toggle dark theme button -->
-                <button aria-hidden="true" class="relative focus:outline-none" x-cloak @click="toggleTheme">
+                <button aria-hidden="true" class="relative focus:outline-none" x-cloak @click="$parent.toggleTheme">
                     <div class="w-12 h-6 transition rounded-full outline-none bg-primary-100 dark:bg-primary-lighter">
                     </div>
                     <div class="absolute top-0 left-0 inline-flex items-center justify-center w-6 h-6 transition-all duration-200 transform scale-110 rounded-full shadow-sm"
@@ -222,15 +222,15 @@
                     class="absolute right-0 w-48 py-1 origin-top-right bg-white rounded-md shadow-lg top-12 ring-1 ring-black ring-opacity-5 dark:bg-dark"
                     role="menu" aria-orientation="vertical" aria-label="User menu">
                     <a href="#" role="menuitem"
-                        class="block px-4 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-100 dark:text-light dark:hover:bg-primary">
+                        class="block px-4 py-2 text-sm text-text-primary transition-colors hover:bg-gray-100 dark:text-light dark:hover:bg-primary">
                         Your Profile
                     </a>
                     <a href="#" role="menuitem"
-                        class="block px-4 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-100 dark:text-light dark:hover:bg-primary">
+                        class="block px-4 py-2 text-sm text-text-primary transition-colors hover:bg-gray-100 dark:text-light dark:hover:bg-primary">
                         Settings
                     </a>
                     <a href="#" role="menuitem"
-                        class="block px-4 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-100 dark:text-light dark:hover:bg-primary">
+                        class="block px-4 py-2 text-sm text-text-primary transition-colors hover:bg-gray-100 dark:text-light dark:hover:bg-primary">
                         Logout
                     </a>
                 </div>

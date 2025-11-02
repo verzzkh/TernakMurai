@@ -4,21 +4,11 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Peternak\AnakanController;
 use App\Http\Controllers\Peternak\DashboardController;
 use App\Http\Controllers\Peternak\DeteksiPenyakitController;
+use App\Http\Controllers\Peternak\IndukanController;
 use App\Http\Controllers\Peternak\KandangController;
 use App\Http\Controllers\Peternak\KeuanganController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
 
 // ============================================================================
 // GUEST ROUTES (Tidak perlu login)
@@ -35,8 +25,7 @@ Route::middleware('guest')->group(function () {
 // UNIFIED DASHBOARD ROUTE (Redirects based on user role)
 // ============================================================================
 Route::middleware('auth')->get('/dashboard', function () {
-    $user = Auth::user();
-    $role = $user->getRole();
+    $role = Auth::user()->role;
 
     return match ($role) {
         'admin' => redirect()->route('admin.dashboard'),
@@ -77,15 +66,26 @@ Route::middleware(['auth', 'peternak'])->prefix('peternak')->name('peternak.')->
     // Dashboard Peternak
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+    // Indukan Management
+    Route::prefix('indukan')->name('indukan.')->group(function () {
+        Route::get('/', [IndukanController::class, 'index'])->name('index');
+        Route::get('/create', [IndukanController::class, 'create'])->name('create');
+        Route::post('/', [IndukanController::class, 'store'])->name('store');
+        Route::get('/{indukan}', [IndukanController::class, 'show'])->name('show');
+        Route::get('/{indukan}/edit', [IndukanController::class, 'edit'])->name('edit');
+        Route::put('/{indukan}', [IndukanController::class, 'update'])->name('update');
+        Route::delete('/{indukan}', [IndukanController::class, 'destroy'])->name('destroy');
+    });
+
     // Kandang Management
     Route::prefix('kandang')->name('kandang.')->group(function () {
         Route::get('/', [KandangController::class, 'index'])->name('index');
         Route::get('/create', [KandangController::class, 'create'])->name('create');
         Route::post('/', [KandangController::class, 'store'])->name('store');
-        Route::get('/{id}', [KandangController::class, 'show'])->name('show');
-        Route::get('/{id}/edit', [KandangController::class, 'edit'])->name('edit');
-        Route::put('/{id}', [KandangController::class, 'update'])->name('update');
-        Route::delete('/{id}', [KandangController::class, 'destroy'])->name('destroy');
+        Route::get('/{kandang}', [KandangController::class, 'show'])->name('show');
+        Route::get('/{kandang}/edit', [KandangController::class, 'edit'])->name('edit');
+        Route::put('/{kandang}', [KandangController::class, 'update'])->name('update');
+        Route::delete('/{kandang}', [KandangController::class, 'destroy'])->name('destroy');
     });
 
     // Anakan Management
