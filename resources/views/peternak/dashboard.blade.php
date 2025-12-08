@@ -1,284 +1,199 @@
 <x-layout>
     <main>
-        <!-- Content header -->
+        <!-- Header -->
         <div class="flex items-center justify-between px-4 py-4 border-b lg:py-6 dark:border-primary-darker">
-          <h1 class="text-2xl font-semibold text-text-primary">Dashboard</h1>
+            <h1 class="text-2xl font-semibold text-text-primary">Dashboard</h1>
         </div>
-      
-        <!-- Content -->
-        <div class="mt-2">
-          <!-- State cards -->
-          <div class="grid grid-cols-1 gap-8 p-4 lg:grid-cols-2 xl:grid-cols-4">
-            <!-- Value card -->
-            <div class="flex items-center justify-between p-4 bg-white rounded-md dark:bg-darker">
-              <div>
-                <h6
-                  class="text-xs font-medium leading-none tracking-wider text-text-tertiary uppercase dark:text-primary-light"
-                >
-                  Keuntungan
-                </h6>
-                <span class="text-xl font-semibold text-text-primary">Rp.25.000.000</span>
-                <span class="inline-block px-2 py-px ml-2 text-xs text-green-500 bg-green-100 rounded-md">
-                  +4.4%
-                </span>
-              </div>
-              <div>
-                <span>
-                  <svg
-                    class="w-12 h-12 text-gray-300 dark:text-primary-dark"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                </span>
-              </div>
-            </div>
-      
-            <!-- Users card -->
-            <div class="flex items-center justify-between p-4 bg-white rounded-md dark:bg-darker">
-              <div>
-                <h6
-                  class="text-xs font-medium leading-none tracking-wider text-text-tertiary uppercase dark:text-primary-light"
-                >
-                  Total Kandang
-                </h6>
-                <span class="text-xl font-semibold text-text-primary">5</span>
-                <span class="inline-block px-2 py-px ml-2 text-xs text-green-500 bg-green-100 rounded-md">
-                  1
-                </span>
-              </div>
-              <div>
-                <span>
-                  <svg
-                    class="w-12 h-12 text-gray-300 dark:text-primary-dark"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
-                    />
-                  </svg>
-                </span>
-              </div>
-            </div>
-      
-            <!-- Orders card -->
-            <div class="flex items-center justify-between p-4 bg-white rounded-md dark:bg-darker">
-              <div>
-                <h6
-                  class="text-xs font-medium leading-none tracking-wider text-text-tertiary uppercase dark:text-primary-light"
-                >
-                  Jumlah Anakan
-                </h6>
-                <span class="text-xl font-semibold text-text-primary">17</span>
-                <span class="inline-block px-2 py-px ml-2 text-xs text-green-500 bg-green-100 rounded-md">
-                  2
-                </span>
-              </div>
-              <div>
-                <span>
-                  <svg
-                    class="w-12 h-12 text-gray-300 dark:text-primary-dark"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
-                    />
-                  </svg>
-                </span>
-              </div>
-            </div>
-      
-            <!-- Tickets card -->
-            <div class="flex items-center justify-between p-4 bg-white rounded-md dark:bg-darker">
-              <div>
-                <h6
-                  class="text-xs font-medium leading-none tracking-wider text-text-tertiary uppercase dark:text-primary-light"
-                >
-                  Total Pengeluaran
-                </h6>
-                <span class="text-xl font-semibold text-text-primary">Rp.300.000</span>
-                <span class="inline-block px-2 py-px ml-2 text-xs text-red-500 bg-red-100 rounded-md">
-                  Rp.130.000
-                </span>
-              </div>
-              <div>
-                <span>
-                  <svg
-                    class="w-12 h-12 text-gray-300 dark:text-primary-dark"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"
-                    />
-                  </svg>
-                </span>
-              </div>
-            </div>
-          </div>
-      
-          <!-- Charts -->
-          <div class="grid grid-cols-1 p-4 space-y-8 lg:gap-8 lg:space-y-0 lg:grid-cols-3">
-            <!-- Bar chart card -->
-            <div class="col-span-2 bg-white rounded-md dark:bg-darker" x-data="{ isOn: false }">
-              <!-- Card header -->
-              <div class="flex items-center justify-between p-4 border-b dark:border-primary">
-                <h4 class="text-lg font-semibold text-text-primary dark:text-light">Jumlah Anakan per Kandang</h4>
-                <div class="flex items-center space-x-2">
-                  <span class="text-sm text-text-tertiary dark:text-light">Terbaru</span>
-                  <button
-                    class="relative focus:outline-none"
-                    x-cloak
-                    @click="isOn = !isOn; $parent.updateBarChart(isOn)"
-                  >
-                    <div
-                      class="w-12 h-6 transition rounded-full outline-none bg-primary-100 dark:bg-primary-darker"
-                    ></div>
-                    <div
-                      class="absolute top-0 left-0 inline-flex items-center justify-center w-6 h-6 transition-all duration-200 ease-in-out transform scale-110 rounded-full shadow-sm"
-                      :class="{ 'translate-x-0  bg-white dark:bg-primary-100': !isOn, 'translate-x-6 bg-primary-light dark:bg-primary': isOn }"
-                    ></div>
-                  </button>
-                </div>
-              </div>
-              <!-- Chart -->
-              <div class="relative p-4 h-72">
-                <canvas id="barChart"></canvas>
-              </div>
-            </div>
-      
-            <!-- Doughnut chart card -->
-            <div class="bg-white rounded-md dark:bg-darker" x-data="{ isOn: false }">
-              <!-- Card header -->
-              <div class="flex items-center justify-between p-4 border-b dark:border-primary">
-                <h4 class="text-lg font-semibold text-text-primary dark:text-light">Status Kandang</h4>
-                <div class="flex items-center">
-                  <button
-                    class="relative focus:outline-none"
-                    x-cloak
-                    @click="isOn = !isOn; $parent.updateDoughnutChart(isOn)"
-                  >
-                    <div
-                      class="w-12 h-6 transition rounded-full outline-none bg-primary-100 dark:bg-primary-darker"
-                    ></div>
-                    <div
-                      class="absolute top-0 left-0 inline-flex items-center justify-center w-6 h-6 transition-all duration-200 ease-in-out transform scale-110 rounded-full shadow-sm"
-                      :class="{ 'translate-x-0  bg-white dark:bg-primary-100': !isOn, 'translate-x-6 bg-primary-light dark:bg-primary': isOn }"
-                    ></div>
-                  </button>
-                </div>
-              </div>
-              <!-- Chart -->
-              <div class="relative p-4 h-72">
-                <canvas id="doughnutChart"></canvas>
-              </div>
-            </div>
-          </div>
-      
-          <div class="p-4">
-            <!-- Line chart card -->
-            <div class="bg-white rounded-md" x-data="{ isOn: false }">
-              <!-- Card header -->
-              <div class="flex items-center justify-between p-4 border-b">
-                <h4 class="text-lg font-semibold text-text-tertiary">Tren Keuangan</h4>
-                <div class="flex items-center">
-                  <button
-                    class="relative focus:outline-none"
-                    x-cloak
-                    @click="isOn = !isOn; $parent.updateLineChart()"
-                  >
-                    <div class="w-12 h-6 transition rounded-full outline-none bg-primary-100"></div>
-                    <div
-                      class="absolute top-0 left-0 inline-flex items-center justify-center w-6 h-6 transition-all duration-200 ease-in-out transform scale-110 rounded-full shadow-sm"
-                      :class="{ 'translate-x-0  bg-white': !isOn, 'translate-x-6 bg-primary-light': isOn }"
-                    ></div>
-                  </button>
-                </div>
-              </div>
-              <!-- Chart -->
-              <div class="relative p-4 h-72">
-                <canvas id="lineChart"></canvas>
-              </div>
-            </div>
-          </div>
-          
-        </div>
-      </main>
-      
-       <!-- All javascript code in this project for now is just for demo DON'T RELY ON IT  -->
-       <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.bundle.min.js"></script>
-       <script src="build/js/script.js"></script>
-       <script>
-          // charts.js
-      const setupCharts = () => {
-          const updateBarChart = (on) => {
-              const data = {
-                  data: randomData(),
-                  backgroundColor: 'rgb(207, 250, 254)',
-              };
-              if (on) {
-                  barChart.data.datasets.push(data);
-                  barChart.update();
-              } else {
-                  barChart.data.datasets.splice(1);
-                  barChart.update();
-              }
-          };
-      
-          const updateDoughnutChart = (on) => {
-              const data = random();
-              const color = 'rgb(207, 250, 254)';
-              if (on) {
-                  doughnutChart.data.labels.unshift('Seb');
-                  doughnutChart.data.datasets[0].data.unshift(data);
-                  doughnutChart.data.datasets[0].backgroundColor.unshift(color);
-                  doughnutChart.update();
-              } else {
-                  doughnutChart.data.labels.splice(0, 1);
-                  doughnutChart.data.datasets[0].data.splice(0, 1);
-                  doughnutChart.data.datasets[0].backgroundColor.splice(0, 1);
-                  doughnutChart.update();
-              }
-          };
-      
-          const updateLineChart = () => {
-              lineChart.data.datasets[0].data.reverse();
-              lineChart.update();
-          };
-      
-          return {
-              updateBarChart,
-              updateDoughnutChart,
-              updateLineChart,
-          };
-      };
 
-      
-      
-       </script>
+        <div class="mt-2">
+
+            <!-- ========================================================= -->
+<!-- 1️⃣ STATISTIK UTAMA (Versi Premium) -->
+<!-- ========================================================= -->
+<div class="grid grid-cols-1 gap-6 p-4 md:grid-cols-2 xl:grid-cols-4">
+
+    <!-- Keuntungan Bulan Ini -->
+    <div class="group flex items-center justify-between p-5 bg-white rounded-xl shadow-md dark:bg-darker transition-all hover:-translate-y-1 hover:shadow-lg">
+        <div>
+            <p class="text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-primary-light">
+                Keuntungan Bulan Ini
+            </p>
+            <p class="text-2xl font-bold text-gray-800 dark:text-light">
+                Rp {{ number_format($profitMonth, 0, ',', '.') }}
+            </p>
+        </div>
+
+        <div class="flex items-center justify-center w-14 h-14 rounded-full bg-green-100 dark:bg-green-900/30">
+            <svg class="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor"
+                 viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2
+                      m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1
+                      M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+        </div>
+    </div>
+
+    <!-- Total Kandang -->
+    <div class="group flex items-center justify-between p-5 bg-white rounded-xl shadow-md dark:bg-darker transition-all hover:-translate-y-1 hover:shadow-lg">
+        <div>
+            <p class="text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-primary-light">
+                Total Kandang
+            </p>
+            <p class="text-2xl font-bold text-gray-800 dark:text-light">
+                {{ $totalKandang }}
+            </p>
+        </div>
+
+        <div class="flex items-center justify-center w-14 h-14 rounded-full bg-blue-100 dark:bg-blue-900/30">
+           <svg class="w-8 h-8 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+  <path stroke-linecap="round" stroke-linejoin="round"
+    d="M3 12l9-9 9 9M4 10v10h6V14h4v6h6V10" />
+</svg>
+
+        </div>
+    </div>
+
+    <!-- Total Indukan -->
+    <div class="group flex items-center justify-between p-5 bg-white rounded-xl shadow-md dark:bg-darker transition-all hover:-translate-y-1 hover:shadow-lg">
+        <div>
+            <p class="text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-primary-light">
+                Total Indukan
+            </p>
+            <p class="text-2xl font-bold text-gray-800 dark:text-light">{{ $totalIndukan }}</p>
+        </div>
+
+        <div class="flex items-center justify-center w-14 h-14 rounded-full bg-yellow-100 dark:bg-yellow-900/30">
+          <svg class="w-8 h-8 text-yellow-600 dark:text-yellow-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+  <path stroke-linecap="round" stroke-linejoin="round"
+    d="M17 20h5v-1a4 4 0 00-4-4h-1m-4 5v-1a4 4 0 014-4h1m-7 5H3v-1a4 4 0 014-4h1m3-4a4 4 0 110-8 4 4 0 010 8z" />
+</svg>
+
+        </div>
+    </div>
+
+    <!-- Total Anakan -->
+    <div class="group flex items-center justify-between p-5 bg-white rounded-xl shadow-md dark:bg-darker transition-all hover:-translate-y-1 hover:shadow-lg">
+        <div>
+            <p class="text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-primary-light">
+                Total Anakan
+            </p>
+            <p class="text-2xl font-bold text-gray-800 dark:text-light">{{ $totalAnakan }}</p>
+        </div>
+
+        <div class="flex items-center justify-center w-14 h-14 rounded-full bg-purple-100 dark:bg-purple-900/30">
+       <div class="flex items-center justify-center w-14 h-14 rounded-full bg-purple-100 dark:bg-purple-900/30">
+    <svg class="w-8 h-8 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round"
+              d="M12 3v4m0 0a4 4 0 100 8m0-8a4 4 0 110 8m0 4v-4m8-4h-4m-4 0H4" />
+    </svg>
+</div>
+
+
+        </div>
+    </div>
+
+</div>
+
+
+            <!-- ========================================================= -->
+            <!-- 2️⃣ GRAFIK -->
+            <!-- ========================================================= -->
+            <div class="grid grid-cols-1 p-4 space-y-8 lg:gap-8 lg:space-y-0 lg:grid-cols-3">
+
+                <!-- Bar Chart: Populasi per kandang -->
+                <div class="col-span-2 bg-white rounded-md shadow dark:bg-darker p-4">
+                    <h4 class="text-lg font-semibold mb-2">Jumlah Populasi per Kandang</h4>
+                    <div class="h-72"><canvas id="barKandangChart"></canvas></div>
+                </div>
+
+                <!-- Pie Chart: Status Kandang -->
+                <div class="bg-white rounded-md shadow dark:bg-darker p-4">
+                    <h4 class="text-lg font-semibold mb-2">Status Kandang</h4>
+                    <div class="h-72"><canvas id="pieKandangChart"></canvas></div>
+                </div>
+
+            </div>
+
+
+
+            <!-- ========================================================= -->
+            <!-- 3️⃣ AKTIVITAS TERBARU -->
+            <!-- ========================================================= -->
+            <div class="p-4">
+                <div class="bg-white rounded-md shadow dark:bg-darker">
+                    <div class="flex items-center justify-between p-4 border-b dark:border-primary">
+                        <h4 class="text-lg font-semibold">Aktivitas Terbaru</h4>
+                    </div>
+
+                    <ul class="divide-y dark:divide-primary">
+                        @forelse ($recentActivities as $a)
+                            <li class="p-4 flex justify-between">
+                                <div>
+                                    <p class="font-medium">
+                                        {{ ucfirst($a->tipe) }} — {{ $a->kategori }}
+                                    </p>
+                                    <p class="text-sm text-gray-500">
+                                        {{ $a->tanggal->format('d M Y') }}
+                                    </p>
+                                </div>
+                                <span class="font-semibold {{ $a->tipe == 'pemasukan' ? 'text-green-600' : 'text-red-600' }}">
+                                    Rp {{ number_format($a->jumlah, 0, ',', '.') }}
+                                </span>
+                            </li>
+                        @empty
+                            <li class="p-4 text-center text-gray-500">Belum ada aktivitas</li>
+                        @endforelse
+                    </ul>
+                </div>
+            </div>
+
+
+
+            <!-- ========================================================= -->
+            <!-- 4️⃣ STATUS PAKET -->
+            <!-- ========================================================= -->
+            <div class="p-4">
+                <div class="bg-white rounded-md shadow dark:bg-darker p-4">
+                    <h4 class="text-lg font-semibold mb-4">Status Paket</h4>
+
+                    <p class="text-sm mb-2">
+                        Paket Anda:
+                        <span class="font-semibold uppercase {{ $paket === 'pro' ? 'text-green-600' : 'text-blue-600' }}">
+                            {{ $paket }}
+                        </span>
+                    </p>
+
+                    @if($paket === 'pro')
+                        <p class="text-sm mb-2">
+                            Masa aktif sampai:
+                            <span class="font-medium">
+                                {{ \Carbon\Carbon::parse($masaAktif)->format('d M Y') }}
+                            </span>
+                        </p>
+                    @endif
+
+                    <p class="text-sm mb-1">Kuota Deteksi: <b>{{ $kuota }}</b> / bulan</p>
+                    <p class="text-sm mb-1">Dipakai: <b>{{ $dipakai }}</b></p>
+                    <p class="text-sm mb-3">Sisa: <b>{{ $sisa }}</b></p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Chart Script -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+
+    <script>
+        window.kandangChart = @json($kandangChart);
+        window.kandangStatus = @json($kandangStatus);
+    </script>
+  @push('scripts')
+    @vite('resources/js/dashboard-charts.js')
+@endpush
+
+
+
 </x-layout>

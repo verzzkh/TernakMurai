@@ -22,9 +22,11 @@ class UpdateAnakanRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'jenis_kelamin' => 'required|in:jantan,betina,tidak_diketahui',
-            'deskripsi_karakteristik' => 'nullable|string|max:2000',
-            'foto_anakan' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
+        'jenis_kelamin' => 'sometimes|in:jantan,betina,tidak_diketahui',
+        'nomor_ring' => 'sometimes|nullable|string|max:50',
+        'harga' => 'sometimes|nullable|integer|min:0',
+        'deskripsi_karakteristik' => 'sometimes|nullable|string|max:2000',
+        'foto_anakan' => 'sometimes|nullable|image|mimes:jpeg,jpg,png|max:2048',
         ];
     }
 

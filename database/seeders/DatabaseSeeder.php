@@ -29,5 +29,8 @@ class DatabaseSeeder extends Seeder
     // php artisan db:seed --class=Database\\Seeders\\TernakEloquentSeeder
     // Uncomment the next line to run it automatically.
         $this->call(TernakEloquentSeeder::class);
+
+        // Create default admin account (username: admin, password: admin1)
+        $this->call(AdminSeeder::class);
     }
 }

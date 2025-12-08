@@ -3,10 +3,15 @@
       <!-- Content header -->
       <div class="flex items-center justify-between px-4 py-4 border-b lg:py-6 dark:border-primary-darker">
           <h1 class="text-2xl font-semibold">Tambah Kandang Baru</h1>
-          <a href="{{ route('peternak.kandang.index') }}" 
-             class="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring focus:ring-gray-500 focus:ring-offset-1">
-              Kembali
-          </a>
+          <a href="{{ route('peternak.kandang.index') }}"
+   class="px-4 py-2 text-sm font-medium
+          text-white bg-indigo-600
+          hover:bg-indigo-700
+          dark:bg-indigo-500 dark:hover:bg-indigo-600
+          rounded-md focus:outline-none">
+    Kembali
+</a>
+
       </div>
 
       <!-- Form -->
@@ -75,7 +80,7 @@
                               </label>
                               <select name="indukan_jantan_id" id="indukan_jantan_id"
                                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary dark:bg-darker dark:border-primary-darker dark:text-white sm:text-sm @error('indukan_jantan_id') border-red-300 @enderror">
-                                  <option value="">Pilih Indukan Jantan (Opsional)</option>
+                                  <option value="">Pilih Indukan Jantan</option>
                                   @foreach($indukan['jantan'] as $jantan)
                                       <option value="{{ $jantan->id }}" {{ old('indukan_jantan_id') == $jantan->id ? 'selected' : '' }}>
                                           {{ $jantan->nomor_ring }} @if($jantan->nama) - {{ $jantan->nama }} @endif
@@ -94,7 +99,7 @@
                               </label>
                               <select name="indukan_betina_id" id="indukan_betina_id"
                                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary dark:bg-darker dark:border-primary-darker dark:text-white sm:text-sm @error('indukan_betina_id') border-red-300 @enderror">
-                                  <option value="">Pilih Indukan Betina (Opsional)</option>
+                                  <option value="">Pilih Indukan Betina</option>
                                   @foreach($indukan['betina'] as $betina)
                                       <option value="{{ $betina->id }}" {{ old('indukan_betina_id') == $betina->id ? 'selected' : '' }}>
                                           {{ $betina->nomor_ring }} @if($betina->nama) - {{ $betina->nama }} @endif
@@ -134,10 +139,14 @@
                          class="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring focus:ring-gray-500 focus:ring-offset-1">
                           Batal
                       </a>
-                      <button type="submit" 
-                              class="px-4 py-2 text-white bg-primary rounded-md hover:bg-primary-dark focus:outline-none focus:ring focus:ring-primary focus:ring-offset-1 focus:ring-offset-white dark:focus:ring-offset-dark">
-                          Simpan Kandang
-                      </button>
+                    <button type="submit"
+    class="px-4 py-2 text-white bg-cyan-600
+           hover:bg-cyan-700
+           dark:bg-cyan-500 dark:hover:bg-cyan-600
+           rounded-md focus:outline-none focus:ring focus:ring-cyan-400 focus:ring-offset-1">
+    Simpan Kandang
+</button>
+
                   </div>
               </form>
           </div>

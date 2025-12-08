@@ -33,6 +33,8 @@ class StoreIndukanRequest extends FormRequest
             'catatan' => 'nullable|string',
             'prestasi' => 'nullable|string',
             'karakteristik' => 'nullable|string',
+            'foto_indukan' => ['nullable', 'image', 'mimes:jpeg,jpg,png', 'max:2048'],
+
         ];
     }
 

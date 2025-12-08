@@ -6,6 +6,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class UpdateIndukanRequest extends FormRequest
 {
@@ -16,16 +17,26 @@ class UpdateIndukanRequest extends FormRequest
 
     public function rules(): array
     {
-        $indukanId = $this->route('indukan');
+        $indukan = $this->route('indukan'); // Ini akan berisi model, bukan ID
+        $peternakId = Auth::user()->peternak->id;
 
         return [
-            'nomor_ring' => 'required|string|max:50|unique:indukan,nomor_ring,'.$indukanId.',id,peternak_id,'.Auth::user()->peternak->id,
-            'nama' => 'nullable|string|max:100',
-            'jenis_kelamin' => 'required|in:jantan,betina',
-            'tanggal_lahir' => 'nullable|date|before_or_equal:today',
-            'catatan' => 'nullable|string',
-            'prestasi' => 'nullable|string',
-            'karakteristik' => 'nullable|string',
+            'nomor_ring' => [
+                'required',
+                'string',
+                'max:50',
+                Rule::unique('indukan', 'nomor_ring')
+                    ->ignore($indukan->id) // abaikan diri sendiri
+                    ->where('peternak_id', $peternakId), // batasi per peternak
+            ],
+            'nama' => ['nullable', 'string', 'max:100'],
+            'jenis_kelamin' => ['required', 'in:jantan,betina'],
+            'tanggal_lahir' => ['nullable', 'date', 'before_or_equal:today'],
+            'catatan' => ['nullable', 'string'],
+            'prestasi' => ['nullable', 'string'],
+            'karakteristik' => ['nullable', 'string'],
+            'foto_indukan' => ['nullable', 'image', 'mimes:jpeg,jpg,png', 'max:2048'],
+
         ];
     }
 

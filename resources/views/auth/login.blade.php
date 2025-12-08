@@ -104,24 +104,13 @@
             </button>
         </form>
 
-        <!-- Role Information -->
-        <div class="mt-8 p-4 bg-gray-50 dark:bg-primary-darker rounded-lg">
-            <h3 class="text-sm font-medium text-text-primary mb-2">Akses Berdasarkan Role:</h3>
-            <div class="space-y-1 text-xs text-text-secondary dark:text-light">
-                <div class="flex items-center">
-                    <div class="w-2 h-2 bg-red-500 rounded-full mr-2"></div>
-                    <span><strong>Admin:</strong> Kelola pengguna, laporan, dan sistem</span>
-                </div>
-                <div class="flex items-center">
-                    <div class="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                    <span><strong>Peternak:</strong> Kelola kandang, anakan, dan pencatatan</span>
-                </div>
-            </div>
-        </div>
 
         <!-- Footer -->
         <div class="mt-8 text-center">
-            <p class="text-xs text-text-secondary dark:text-light">© 2024 Ternak Murai. Hak cipta dilindungi.</p>
+            <p class="text-xs text-text-secondary dark:text-light">© 2025 Ternak Murai.</p>
+            <div class="mt-2">
+                <a href="{{ route('register') }}" class="inline-block px-4 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700">Daftar Peternak</a>
+            </div>
         </div>
     </div>
 

@@ -8,10 +8,14 @@
                  class="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring focus:ring-gray-500 focus:ring-offset-1">
                   Batal
               </a>
-              <a href="{{ route('peternak.indukan.index') }}" 
-                 class="px-4 py-2 text-white bg-primary rounded-md hover:bg-primary-dark focus:outline-none focus:ring focus:ring-primary focus:ring-offset-1 focus:ring-offset-white dark:focus:ring-offset-dark">
-                  Kembali
-              </a>
+            <a href="{{ route('peternak.indukan.index') }}"
+   class="px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 
+          rounded-lg
+          focus:outline-none focus:ring focus:ring-blue-600 
+          focus:ring-offset-1 focus:ring-offset-white dark:focus:ring-offset-dark">
+    Kembali
+</a>
+
           </div>
       </div>
 
@@ -130,13 +134,29 @@
                          class="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring focus:ring-gray-500 focus:ring-offset-1">
                           Batal
                       </a>
-                      <button type="submit" 
-                              class="px-4 py-2 text-white bg-primary rounded-md hover:bg-primary-dark focus:outline-none focus:ring focus:ring-primary focus:ring-offset-1 focus:ring-offset-white dark:focus:ring-offset-dark">
-                          Update Indukan
-                      </button>
+                     <button type="submit"
+    class="px-4 py-2 text-white bg-cyan-700 hover:bg-cyan-800 
+           rounded-lg
+           focus:outline-none focus:ring focus:ring-cyan-700 
+           focus:ring-offset-1 focus:ring-offset-white dark:focus:ring-offset-dark">
+    Update Indukan
+</button>
+
                   </div>
               </form>
           </div>
       </div>
   </main>
+
+  <script>
+    document.getElementById('foto_indukan')?.addEventListener('change', function (e) {
+        const preview = document.getElementById('foto-preview');
+        const img = document.getElementById('preview-image');
+
+        if (this.files && this.files[0]) {
+            preview.classList.remove('hidden');
+            img.src = URL.createObjectURL(this.files[0]);
+        }
+    });
+</script>
 </x-layout>

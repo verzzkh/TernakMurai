@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade')->onUpdate('cascade');
             $table->string('username', 50)->unique();
+            $table->string('password', 255)->nullable();
             $table->string('nama_lengkap', 100)->nullable();
             $table->timestamps();
 

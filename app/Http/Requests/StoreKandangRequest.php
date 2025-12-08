@@ -6,6 +6,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class StoreKandangRequest extends FormRequest
 {
@@ -14,29 +15,28 @@ class StoreKandangRequest extends FormRequest
         return true;
     }
 
-    public function rules(): array
-    {
-        $peternakId = Auth::user()?->peternak?->id;
+public function rules(): array
+{
+    $peternakId = Auth::user()?->peternak?->id;
 
-        return [
-            'nomor_kandang' => 'required|string|max:30|unique:kandang,nomor_kandang,NULL,id,peternak_id,'.$peternakId,
-            'deskripsi_kandang' => 'nullable|string',
-            'status' => 'required|in:kosong,bertelur,mengeram,menetas',
-            'indukan_jantan_id' => 'nullable|exists:indukan,id',
-            'indukan_betina_id' => 'nullable|exists:indukan,id',
-        ];
-    }
-
-    public function messages(): array
-    {
-        return [
-            'nomor_kandang.required' => 'Nomor kandang harus diisi.',
-            'nomor_kandang.unique' => 'Nomor kandang sudah digunakan.',
-            'nomor_kandang.max' => 'Nomor kandang maksimal 30 karakter.',
-            'status.required' => 'Status kandang harus dipilih.',
-            'status.in' => 'Status kandang tidak valid.',
-            'indukan_jantan_id.exists' => 'Indukan jantan tidak ditemukan.',
-            'indukan_betina_id.exists' => 'Indukan betina tidak ditemukan.',
-        ];
-    }
+    return [
+        'nomor_kandang' => 'required|string|max:30|unique:kandang,nomor_kandang,NULL,id,peternak_id,'.$peternakId,
+        'deskripsi_kandang' => 'nullable|string',
+        'status' => 'required|in:kosong,bertelur,mengeram,menetas',
+        'indukan_jantan_id' => [
+            'nullable',
+            'exists:indukan,id',
+            Rule::unique('kandang', 'indukan_jantan_id')
+                ->where('peternak_id', $peternakId)
+                ->whereNull('deleted_at'),
+        ],
+        'indukan_betina_id' => [
+            'nullable',
+            'exists:indukan,id',
+            Rule::unique('kandang', 'indukan_betina_id')
+                ->where('peternak_id', $peternakId)
+                ->whereNull('deleted_at'),
+        ],
+    ];
+}
 }

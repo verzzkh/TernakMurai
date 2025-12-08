@@ -87,7 +87,7 @@ class Peternak extends Model
             return true;
         }
 
-        return $this->anakans()->where('status_penjualan', 'belum_dijual')->count() < 20;
+        return $this->anakans()->where('status_penjualan', 'belum_dijual')->count() < 30;
     }
 
     /**
@@ -107,6 +107,6 @@ class Peternak extends Model
             return -1; // Unlimited
         }
 
-        return max(0, 20 - $this->getActiveAnakanCount());
+        return max(0, 30 - $this->getActiveAnakanCount());
     }
 }

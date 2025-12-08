@@ -16,14 +16,21 @@ class UpdateKandangRequest extends FormRequest
 
     public function rules(): array
     {
-        $kandangId = $this->route('kandang');
+        $kandang = $this->route('kandang');
+        $kandangId = is_object($kandang) ? $kandang->id : $kandang;
+        $peternakId = Auth::user()->peternak->id;
 
         return [
-            'nomor_kandang' => 'required|string|max:30|unique:kandang,nomor_kandang,'.$kandangId.',id,peternak_id,'.Auth::user()->peternak->id,
-            'deskripsi_kandang' => 'nullable|string',
-            'status' => 'required|in:kosong,bertelur,mengeram,menetas',
-            'indukan_jantan_id' => 'nullable|exists:indukan,id',
-            'indukan_betina_id' => 'nullable|exists:indukan,id',
+            'nomor_kandang' => [
+                'sometimes',
+                'string',
+                'max:30',
+                'unique:kandang,nomor_kandang,' . $kandangId . ',id,peternak_id,' . $peternakId,
+            ],
+            'deskripsi_kandang' => ['nullable', 'string'],
+            'status' => ['required', 'in:kosong,bertelur,mengeram,menetas'],
+            'indukan_jantan_id' => ['nullable', 'exists:indukan,id'],
+            'indukan_betina_id' => ['nullable', 'exists:indukan,id'],
         ];
     }
 

@@ -17,6 +17,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Log;
 
 class AnakanController extends Controller
 {
@@ -61,13 +62,15 @@ class AnakanController extends Controller
         $anakans = $query->paginate(12);
 
         // Add age calculation to each anakan
-        $anakans->getCollection()->transform(function ($anakan) {
+        $anakans->getCollection()->each(function ($anakan) {
             $anakan->age = $this->anakanService->calculateAge($anakan->tanggal_lahir);
-
-            return $anakan;
         });
 
-        return view('peternak.anakan.index', compact('anakans', 'peternak'));
+
+        $stats = $this->anakanService->getAnakanStats($peternak);
+
+return view('peternak.anakan.index', compact('anakans', 'peternak', 'stats'));
+
     }
 
     /**
@@ -78,30 +81,19 @@ class AnakanController extends Controller
         $peternak = Auth::user()->peternak;
 
         // Check if can add anakan (free account limit)
-        if (! $peternak->canAddAnakan()) {
+        $totalAktif = $peternak->anakans()
+            ->where('status_penjualan', 'belum_dijual')
+            ->count();
+
+        if (! $peternak->isPro() && $totalAktif >= 30) {
             return redirect()->route('peternak.anakan.index')
-                ->with('error', 'Akun gratis hanya dapat menambah maksimal 20 anakan aktif. Upgrade ke Pro untuk menambah lebih banyak.');
+                ->with('error', 'Akun gratis hanya dapat menambah maksimal 30 anakan aktif. Upgrade ke Pro untuk menambah lebih banyak.');
         }
 
-        // Get kandangs with status 'menetas'
-        $kandangs = $peternak->kandangs()
-            ->where('status', 'menetas')
-            ->with(['indukanJantan', 'indukanBetina'])
-            ->get();
+        $indukanJantan = $peternak->indukans()->where('jenis_kelamin', 'jantan')->get();
+        $indukanBetina = $peternak->indukans()->where('jenis_kelamin', 'betina')->get();
 
-        // Get indukan if indukan_id is provided
-        $selectedIndukan = null;
-        if ($request->has('indukan_id')) {
-            $selectedIndukan = $peternak->indukans()->find($request->get('indukan_id'));
-        }
-
-        // Get kandang if kandang_id is provided
-        $selectedKandang = null;
-        if ($request->has('kandang_id')) {
-            $selectedKandang = $peternak->kandangs()->find($request->get('kandang_id'));
-        }
-
-        return view('peternak.anakan.create', compact('kandangs', 'peternak', 'selectedIndukan', 'selectedKandang'));
+        return view('peternak.anakan.create', compact('indukanJantan', 'indukanBetina'));
     }
 
     /**
@@ -111,37 +103,101 @@ class AnakanController extends Controller
     {
         $peternak = Auth::user()->peternak;
 
-        // Check limit for free accounts
-        if (! $peternak->canAddAnakan()) {
-            return redirect()->back()
-                ->with('error', 'Akun gratis hanya dapat menambah maksimal 20 anakan aktif. Upgrade ke Pro untuk menambah lebih banyak.');
-        }
-
         try {
             $sumberAnakan = $request->input('sumber_anakan');
+            $jumlahBaru = (int) $request->input('jumlah_anakan', 1);
 
-            if ($sumberAnakan === 'peternakan') {
-                $validatedData = app(StoreAnakanDariKandangRequest::class)->validated();
+            // 🔒 Validasi kuota akun Free
+            if (! $peternak->isPro()) {
+                $totalAktif = $peternak->anakans()
+                    ->where('status_penjualan', 'belum_dijual')
+                    ->count();
+
+                if (($totalAktif + $jumlahBaru) > 30) {
+                    return back()
+                        ->withInput()
+                        ->with('error', "Akun gratis hanya dapat menambah maksimal 30 anakan aktif. Saat ini sudah ada {$totalAktif} anakan.");
+                }
+            }
+
+            // 🧩 Proses validasi dan simpan sesuai sumber anakan
+            if ($sumberAnakan === 'peternakan' || $sumberAnakan === 'internal') {
+                // ✅ Tambah dari dalam (kandang)
+                $validatedData = $request->validate(
+                    (new StoreAnakanDariKandangRequest())->rules(),
+                    (new StoreAnakanDariKandangRequest())->messages()
+                );
+
+                $validatedData['sumber_anakan'] = 'internal';
+                $validatedData['peternak_id'] = $peternak->id;
+
+                // Ensure kandang_id is passed to service (hidden input in form)
+                $validatedData['kandang_id'] = $request->input('kandang_id');
+
+                // 🔍 Cek pasangan indukan
+                $indukanJantanId = $request->input('indukan_jantan_id');
+                $indukanBetinaId = $request->input('indukan_betina_id');
+
+                $perkawinan = null;
+                if ($indukanJantanId && $indukanBetinaId) {
+                    $perkawinan = \App\Models\Perkawinan::firstOrCreate(
+                        [
+                            'indukan_jantan_id' => $indukanJantanId,
+                            'indukan_betina_id' => $indukanBetinaId,
+                        ],
+                        [
+                            'nomor_trip' => 'AUTO-' . strtoupper(\Illuminate\Support\Str::random(5)),
+                            'tanggal_kawin' => now(),
+                            'catatan' => 'Perkawinan otomatis dibuat saat tambah anakan.',
+                        ]
+                    );
+
+                    $validatedData['perkawinan_id'] = $perkawinan->id;
+                }
+
+                // 🔁 Buat anakan via service (service sudah menangani multiple, file uploads, dan normalisasi)
                 $result = $this->anakanService->storeFromKandang($validatedData, $peternak->id);
 
                 if (is_array($result)) {
-                    $message = "Berhasil menambahkan {$result[0]->jumlah_anakan} anakan dari kandang.";
+                    $message = 'Berhasil menambahkan ' . count($result) . ' anakan dari pasangan indukan.';
                 } else {
-                    $message = 'Berhasil menambahkan anakan dari kandang.';
+                    $message = 'Berhasil menambahkan anakan dari pasangan indukan.';
                 }
-            } else {
-                $validatedData = app(StoreAnakanDariLuarRequest::class)->validated();
+            }
+
+            // 🧩 Tambahkan kembali bagian untuk sumber eksternal
+            elseif ($sumberAnakan === 'eksternal' || $sumberAnakan === 'luar') {
+                $validatedData = $request->validate(
+                    (new StoreAnakanDariLuarRequest())->rules(),
+                    (new StoreAnakanDariLuarRequest())->messages()
+                );
+
+                $validatedData['sumber_anakan'] = 'eksternal'; // pastikan tidak tertimpa
+
+                // Gunakan service yang sudah ada
                 $this->anakanService->storeFromLuar($validatedData, $peternak->id);
+
                 $message = 'Berhasil menambahkan anakan dari luar.';
             }
 
-            return redirect()->route('peternak.anakan.index')
-                ->with('success', $message);
-
+            // ✅ Redirect sukses
+            return redirect()
+                ->route('peternak.anakan.index')
+                ->with('success', $message ?? 'Anakan berhasil ditambahkan.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Validation failed - redirect back with validation messages and old input
+            return back()
+                ->withErrors($e->errors())
+                ->withInput();
         } catch (\Exception $e) {
-            return redirect()->back()
-                ->withInput()
-                ->with('error', 'Terjadi kesalahan saat menyimpan anakan: '.$e->getMessage());
+            // Log unexpected exception and return friendly error
+            Log::error('[AnakanController::store] Unexpected error when storing anakan', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'user_id' => Auth::id(),
+            ]);
+
+            return back()->with('error', 'Terjadi kesalahan saat menyimpan anakan. Silakan coba lagi.')->withInput();
         }
     }
 
