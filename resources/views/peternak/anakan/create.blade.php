@@ -3,15 +3,7 @@
         <!-- Content header -->
         <div class="flex items-center justify-between px-4 py-4 border-b lg:py-6 dark:border-primary-darker">
             <div class="flex items-center">
-                <a href="{{ url('/anakan') }}" class="mr-4">
-                    <button
-                        class="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-primary focus:outline-none focus:ring focus:ring-primary-lighter">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 dark:text-primary-light"
-                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                        </svg>
-                    </button>
-                </a>
+                
                 <h1 class="text-2xl font-semibold">Tambah Anakan Baru</h1>
             </div>
         </div>

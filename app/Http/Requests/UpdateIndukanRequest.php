@@ -36,6 +36,12 @@ class UpdateIndukanRequest extends FormRequest
             'prestasi' => ['nullable', 'string'],
             'karakteristik' => ['nullable', 'string'],
             'foto_indukan' => ['nullable', 'image', 'mimes:jpeg,jpg,png', 'max:2048'],
+            'aktif_kicau' => ['nullable', 'boolean'],
+'mendekati_betina' => ['nullable', 'boolean'],
+'nafsu_makan_meningkat' => ['nullable', 'boolean'],
+'aktif_buat_sarang' => ['nullable', 'boolean'],
+'temperamen' => ['nullable', Rule::in(['jinak','sedang','fighter'])],
+
 
         ];
     }

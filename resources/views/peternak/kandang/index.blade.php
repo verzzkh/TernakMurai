@@ -285,7 +285,8 @@
 
                 <!-- Pagination -->
                 <div class="mt-6">
-                    {{ $kandangs->links() }}
+                   {{ $kandangs->appends(request()->query())->links() }}
+
                 </div>
             @else
                 <!-- Empty State -->

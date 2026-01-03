@@ -6,197 +6,372 @@ namespace App\Http\Controllers\Peternak;
 
 use App\Http\Controllers\Controller;
 use App\Models\Indukan;
-use App\Models\Perkawinan;
 use App\Models\Anakan;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Perkawinan;
+use App\Models\HasilAnalisaBreeding;
+
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use OpenAI;
 
 class AnalisaBreedingController extends Controller
 {
     /**
-     * Tampilkan form pemilihan indukan jantan × betina
+     * Form pemilihan indukan
      */
     public function form()
     {
         $peternakId = Auth::user()->peternak->id;
 
-        $jantan = Indukan::where('peternak_id', $peternakId)
-            ->where('jenis_kelamin', 'jantan')
-            ->orderBy('nomor_ring')
-            ->get();
+        return view('peternak.kandang.formAnalisa', [
+            'jantan' => Indukan::where('peternak_id', $peternakId)
+                ->where('jenis_kelamin', 'jantan')
+                ->orderBy('nomor_ring')
+                ->get(),
 
-        $betina = Indukan::where('peternak_id', $peternakId)
-            ->where('jenis_kelamin', 'betina')
-            ->orderBy('nomor_ring')
-            ->get();
-
-        return view('peternak.kandang.formAnalisa', compact('jantan', 'betina'));
+            'betina' => Indukan::where('peternak_id', $peternakId)
+                ->where('jenis_kelamin', 'betina')
+                ->orderBy('nomor_ring')
+                ->get(),
+        ]);
     }
 
+        /**
+     * Riwayat Penyimpanan Analisa
+     */
+    public function riwayat()
+    {
+        $riwayat = HasilAnalisaBreeding::where('peternak_id',Auth::user()->peternak->id)
+                    ->with(['jantan','betina'])
+                    ->latest('tanggal_analisa')
+                    ->get();
+
+        return view('peternak.kandang.riwayatAnalisa', compact('riwayat'));
+    }
 
     /**
-     * Proses analisis kecocokan indukan
+     * Simpan hasil analisa ke riwayat
      */
-    public function analisa(Request $request)
-    {
-        $request->validate([
-            'jantan_id' => 'required|exists:indukan,id',
-            'betina_id' => 'required|exists:indukan,id',
+
+public function save(Request $request)
+{
+    $request->validate([
+        'jantan_id' => 'required|exists:indukan,id',
+        'betina_id' => 'required|exists:indukan,id',
+        'hasil_ai'  => 'required',
+        'rekomendasi' => 'required|in:uji_coba,lanjut,stop'
+    ]);
+
+    $peternakId = Auth::user()->peternak->id;
+
+    HasilAnalisaBreeding::create([
+        'peternak_id' => $peternakId,
+        'jantan_id'   => $request->jantan_id,
+        'betina_id'   => $request->betina_id,
+        'hasil_ai'    => $request->hasil_ai,
+        'rekomendasi' => $request->rekomendasi,
+        'tanggal_analisa' => now(),
+    ]);
+
+    return redirect()
+            ->route('peternak.analisaBreeding.riwayat')
+            ->with('success', 'Hasil analisa berhasil disimpan ke riwayat.');
+}
+
+public function hapus($id)
+{
+    $peternakId = Auth::user()->peternak->id;
+
+    $data = HasilAnalisaBreeding::where('peternak_id', $peternakId)->findOrFail($id);
+    $data->delete();
+
+    return redirect()
+        ->route('peternak.analisaBreeding.riwayat')
+        ->with('success', 'Riwayat analisa berhasil dihapus.');
+}
+
+
+public function detail($id)
+{
+    $peternakId = Auth::user()->peternak->id;
+
+    $data = HasilAnalisaBreeding::with(['jantan','betina'])
+        ->where('peternak_id', $peternakId)
+        ->findOrFail($id);
+
+    return view('peternak.kandang.detailAnalisa', compact('data'));
+}
+
+public function updateCatatan(Request $request, $id)
+{
+    $request->validate([
+        'catatan_user' => 'nullable|string|max:5000',
+    ]);
+
+    $peternakId = Auth::user()->peternak->id;
+
+    $analisa = HasilAnalisaBreeding::where('peternak_id', $peternakId)
+                ->findOrFail($id);
+
+    $analisa->update([
+        'catatan_user' => $request->catatan_user,
+    ]);
+
+    return redirect()
+            ->back()
+            ->with('success', 'Catatan berhasil disimpan.');
+}
+
+    
+
+    /**
+     * Proses analisis breeding
+     */
+   public function analisa(Request $request)
+{
+    $request->validate([
+        'jantan_id' => 'required|exists:indukan,id',
+        'betina_id' => 'required|exists:indukan,id',
+    ]);
+
+    $peternakId = Auth::user()->peternak->id;
+
+    $jantan = Indukan::where('peternak_id', $peternakId)->findOrFail($request->jantan_id);
+    $betina = Indukan::where('peternak_id', $peternakId)->findOrFail($request->betina_id);
+
+    $anakansPasangan = Anakan::where('peternak_id', $peternakId)
+        ->where('indukan_jantan_id', $jantan->id)
+        ->where('indukan_betina_id', $betina->id)
+        ->get();
+
+    $anakansJantanGlobal = $jantan->anakansSebagaiJantan;
+    $anakansBetinaGlobal = $betina->anakansSebagaiBetina;
+
+    $perkawinanPasangan = Perkawinan::where('peternak_id', $peternakId)
+        ->where('indukan_jantan_id', $jantan->id)
+        ->where('indukan_betina_id', $betina->id)
+        ->orderByDesc('tanggal_kawin')
+        ->get();
+
+    $payloadJurnal = [
+        'putranto_2018_reproduksi' => [
+            'aturan' => [
+                'jumlah_telur_normal' => '2–4 butir',
+                'rata_rata_telur'     => 2.9,
+                'daya_tetas'          => '±94%',
+                'durasi_eram'         => '12–14 hari',
+                'umur_sapih'          => '±30 hari',
+            ]
+        ],
+        'saputro_2016_perilaku' => [
+            'indikator_jantan' => ['aktif_berkicau','mendekati_betina'],
+            'indikator_betina' => ['nafsu_makan_meningkat','aktif_membuat_sarang'],
+        ],
+        'simatupang_2022_risiko' => [
+            'risiko_umum' => ['stres lingkungan','adaptasi awal','produktif rendah'],
+        ],
+    ];
+
+    $prompt = $this->generatePrompt(
+        $jantan,$betina,
+        $anakansPasangan,$anakansJantanGlobal,$anakansBetinaGlobal,
+        $perkawinanPasangan,$payloadJurnal
+    );
+
+    try {
+        $client = OpenAI::client(env('OPENAI_API_KEY'));
+
+        $response = $client->chat()->create([
+            'model'=>env('OPENAI_MODEL','gpt-4o-mini'),
+            'messages'=>[
+                ['role'=>'system','content'=>'Anda adalah sistem SPK breeding Murai Batu.'],
+                ['role'=>'user','content'=>$prompt]
+            ],
+            'temperature'=>0.2,
         ]);
 
-        $peternakId = Auth::user()->peternak->id;
+        $hasilAnalisa = $response->choices[0]->message->content;
 
-        // Pastikan indukan milik peternak yang login
-        $jantan = Indukan::where('peternak_id', $peternakId)
-            ->with(['perkawinansJantan.anakans'])
-            ->findOrFail($request->jantan_id);
-
-        $betina = Indukan::where('peternak_id', $peternakId)
-            ->with(['perkawinansBetina.anakans'])
-            ->findOrFail($request->betina_id);
-
-        /*
-        |--------------------------------------------------------------------------
-        | Ambil riwayat perkawinan bersama (jantan × betina ini)
-        |--------------------------------------------------------------------------
-        */
-        $riwayatPerkawinan = Perkawinan::where('peternak_id', $peternakId)
-            ->where('indukan_jantan_id', $jantan->id)
-            ->where('indukan_betina_id', $betina->id)
-            ->with('anakans')
-            ->get();
-
-        /*
-        |--------------------------------------------------------------------------
-        | Ambil semua anakan yang berasal dari kedua indukan ini
-        |--------------------------------------------------------------------------
-        */
-        $anakans = Anakan::where('peternak_id', $peternakId)
-            ->where('indukan_jantan_id', $jantan->id)
-            ->where('indukan_betina_id', $betina->id)
-            ->get();
-
-        /*
-        |--------------------------------------------------------------------------
-        | Susun payload untuk AI
-        |--------------------------------------------------------------------------
-        */
-        $payload = [
-            'indukan_jantan' => [
-                'id'           => $jantan->id,
-                'nomor_ring'   => $jantan->nomor_ring,
-                'nama'         => $jantan->nama,
-                'umur'         => $jantan->age['formatted'] ?? null,
-                'karakteristik'=> $jantan->karakteristik,
-                'prestasi'     => $jantan->prestasi,
-                'catatan'      => $jantan->catatan,
-                'total_trip'   => $jantan->perkawinansJantan->count(),
-                'total_anakan' => $jantan->anakansSebagaiJantan->count(),
-            ],
-
-            'indukan_betina' => [
-                'id'           => $betina->id,
-                'nomor_ring'   => $betina->nomor_ring,
-                'nama'         => $betina->nama,
-                'umur'         => $betina->age['formatted'] ?? null,
-                'karakteristik'=> $betina->karakteristik,
-                'prestasi'     => $betina->prestasi,
-                'catatan'      => $betina->catatan,
-                'total_trip'   => $betina->perkawinansBetina->count(),
-                'total_anakan' => $betina->anakansSebagaiBetina->count(),
-            ],
-
-            'riwayat_perkawinan' => $riwayatPerkawinan->map(function ($p) {
-                return [
-                    'nomor_trip'     => $p->nomor_trip,
-                    'tanggal_kawin'  => optional($p->tanggal_kawin)->toDateString(),
-                    'total_anakan'   => $p->anakans->count(),
-                ];
-            }),
-
-            'riwayat_anakan' => $anakans->map(function ($a) {
-                return [
-                    'nomor_ring'        => $a->nomor_ring,
-                    'tanggal_lahir'     => optional($a->tanggal_lahir)->toDateString(),
-                    'jenis_kelamin'     => $a->jenis_kelamin,
-                    'status_pertumbuhan'=> $a->status_pertumbuhan,
-                    'karakteristik'     => $a->deskripsi_karakteristik,
-                    'harga'             => $a->harga,
-                ];
-            }),
-        ];
-
-        $prompt = $this->generatePrompt($payload);
-
-        /*
-        |--------------------------------------------------------------------------
-        | Panggil OpenAI
-        |--------------------------------------------------------------------------
-        */
-        try {
-            $client = OpenAI::client(env('OPENAI_API_KEY'));
-
-            $response = $client->chat()->create([
-                'model' => env('OPENAI_MODEL', 'gpt-4o-mini'),
-                'messages' => [
-                    [
-                        'role' => 'system',
-                        'content' => 'Anda adalah ahli breeding Murai Batu. Analisis harus berbasis data riil dari catatan peternakan.'
-                    ],
-                    [
-                        'role' => 'user',
-                        'content' => $prompt
-                    ]
-                ]
-            ]);
-        } catch (\Exception $e) {
-            return back()->with('error', 'Gagal menghubungi AI: ' . $e->getMessage());
-        }
-
-        $hasilAnalisa = $response->choices[0]->message->content ?? 'Tidak ada hasil analisa.';
-
-        return view('peternak.kandang.hasilAnalisa', compact('hasilAnalisa', 'jantan', 'betina'));
+    } catch (\OpenAI\Exceptions\RateLimitException $e) {
+        $hasilAnalisa = $this->fallbackAnalisa($jantan,$betina); // 🔥 anti putus
+    } catch (\Exception $e) {
+        $hasilAnalisa = $this->fallbackAnalisa($jantan,$betina);
     }
+
+    return redirect()->route('peternak.analisaBreeding.hasil')->with([
+        'hasilAnalisa' => $hasilAnalisa,
+        'jantan_id'    => $jantan->id,
+        'betina_id'    => $betina->id,
+    ]);
+}
+
+
+    public function hasil()
+{
+    if (!session('hasilAnalisa')) {
+        return redirect()->route('peternak.analisaBreeding.form')
+            ->with('error', 'Silakan lakukan analisa terlebih dahulu.');
+    }
+
+    $jantan = Indukan::find(session('jantan_id'));
+    $betina = Indukan::find(session('betina_id'));
+    $hasilAnalisa = session('hasilAnalisa');
+
+    return view('peternak.kandang.hasilAnalisa', compact(
+        'hasilAnalisa','jantan','betina'
+    ));
+}
+
 
     /**
-     * Prompt AI untuk analisa breeding
+     * Prompt AI (SPK Akademis)
      */
-    private function generatePrompt(array $payload): string
-    {
-        $json = json_encode($payload, JSON_PRETTY_PRINT);
+ private function generatePrompt(
+    Indukan $jantan,
+    Indukan $betina,
+    $anakansPasangan,
+    $anakansJantanGlobal,
+    $anakansBetinaGlobal,
+    $perkawinanPasangan,
 
-        return <<<PROMPT
-Berikut data dua indukan Murai Batu yang akan dianalisis:
+    array $payloadJurnal
+): string {
 
-$json
+    $jumlahPerkawinan = $perkawinanPasangan->count();
+    $perkawinanTerakhir = $perkawinanPasangan->first();
 
-Tugas Anda:
+    $ringkasanAnakanJantan = $anakansJantanGlobal
+        ->pluck('deskripsi_karakteristik')
+        ->filter()
+        ->take(5)
+        ->implode('; ') ?: 'Belum tersedia';
 
-1. Analisis Kecocokan Jantan × Betina
-   - Kesesuaian karakteristik
-   - Kesesuaian genetik & sifat dominan
-   - Potensi masalah (overfighter, terlalu jinak, agresif, dll)
+    $ringkasanAnakanBetina = $anakansBetinaGlobal
+        ->pluck('deskripsi_karakteristik')
+        ->filter()
+        ->take(5)
+        ->implode('; ') ?: 'Belum tersedia';
 
-2. Analisis Riwayat Breeding
-   - Jika mereka pernah kawin sebelumnya, bagaimana hasilnya?
-   - Kualitas & konsistensi anak sebelumnya
+    $jurnalJson = json_encode($payloadJurnal, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 
-3. Prediksi Kualitas Anak
-   - Potensi mental
-   - Potensi fisik (postur, warna, ekor)
-   - Potensi harga
+    /*  🔥 Masukkan ini DI SINI sebelum heredoc return */
+    $perilakuJantan = 
+        "- Aktif Kicau: " . ($jantan->aktif_kicau ? "Ya" : "Tidak") . "\n" .
+        "- Mendekati Betina: " . ($jantan->mendekati_betina ? "Ya" : "Tidak") . "\n" .
+        "- Temperamen: " . ($jantan->temperamen ?: "-");
 
-4. Risiko & Catatan Penting
-   - Risiko kesehatan
-   - Risiko inbreeding
+    $perilakuBetina = 
+        "- Nafsu Makan Meningkat: " . ($betina->nafsu_makan_meningkat ? "Ya" : "Tidak") . "\n" .
+        "- Aktif Membuat Sarang: " . ($betina->aktif_buat_sarang ? "Ya" : "Tidak") . "\n" .
+        "- Temperamen: " . ($betina->temperamen ?: "-");
+    /*  🔥 END BLOCK  */
 
-5. Rekomendasi
-   - Layak dikawinkan? (YA/TIDAK)
-   - Tingkat kecocokan (0–100%)
-   - Ringkasan alasan yang mudah dipahami
+    return <<<PROMPT
 
-Gunakan bahasa Indonesia yang rapi dan sistematis.
+========================
+TUGAS ANDA
+========================
+
+Susun laporan analisis breeding sesuai format berikut, lengkap, rinci,
+dan gunakan bahasa objektif berbasis data:
+
+A. Ringkasan Data Indukan  
+- A. Ringkasan Singkat
+- Jantan: {$jantan->nomor_ring} ({$jantan->nama})
+- Betina: {$betina->nomor_ring} ({$betina->nama})
+- Sertakan perilaku dalam bullet point  
+- Tidak membuat interpretasi
+
+B. Evaluasi Kecocokan Jantan × Betina  
+- Hubungkan perilaku jantan & betina dalam konteks kesiapan  
+- Hindari klaim genetik/hasil anakan  
+- Tegaskan bahwa evaluasi berbasis rule, bukan prediksi  
+
+C. Evaluasi Riwayat Breeding & Anakan  
+1. Status pasangan:
+   - Jika jumlah anakan > 0 → "Pasangan telah memiliki bukti reproduksi"
+   - Jika jumlah anakan = 0 → "Belum memiliki bukti reproduksi"
+
+2. Pengalaman indukan secara global:
+   - Sebutkan jumlah & karakter anakan dari pasangan lain (jika ada)
+   - Tegaskan bahwa ini hanya konteks, bukan bukti kecocokan pasangan ini
+
+3. Kesimpulan bagian ini → jelaskan status reproduksi pasangan ini
+
+D. Evaluasi Standar Reproduksi (berdasarkan jurnal Putranto 2018)  
+- Jika ada anakan → bandingkan dengan standar 2–4 telur, daya tetas, dsb  
+- Jika tidak ada anakan → tulis "belum dapat dievaluasi terhadap standar"
+
+E. Evaluasi Kesiapan Produksi Berdasarkan Perilaku (Saputro 2016)  
+- Jika jantan aktif kicau + mendekati betina → catat sebagai indikator kesiapan  
+- Jika betina nafsu makan meningkat + membuat sarang → catat indikator kesiapan  
+- Jika salah satu tidak ada → tulis "indikator belum lengkap"  
+
+F. Risiko & Catatan Manajemen  
+- Sebutkan potensi risiko realistis (dominansi, stres, adaptasi kandang)  
+- Tanpa klaim ekstrem atau prediksi biologis pasti  
+
+G. Rekomendasi Akhir Sistem (WAJIB MEMILIH SALAH SATU)
+
+Gunakan rule:
+- Jika belum pernah menghasilkan anakan → **Rekomendasi: UJI COBA TERBATAS**
+- Jika pernah menghasilkan anakan → **Rekomendasi: LAYAK DILANJUTKAN**
+- Jika temuan risiko serius → **TIDAK DIREKOMENDASIKAN SEMENTARA**
+
+Tambahkan alasan berbasis data singkat dan jelas.
+
+H. Rekomendasi Tindakan Praktis  
+- Langkah yang harus dilakukan peternak  
+- Hal yang dihindari  
+- Waktu evaluasi ulang yang disarankan  
+
+I. Potensi Tantangan Awal
+Berikan daftar kendala awal yang mungkin terjadi berdasarkan perilaku dan riwayat breeding.
+Gunakan pendekatan rule-based, contoh:
+- betina belum membuat sarang → adaptasi awal
+- jantan terlalu dominan → potensi agresi
+- belum ada riwayat pasangan → butuh waktu observasi
+
+J. Early Warning – Kondisi Stop Pairing
+Berikan batasan kapan breeder harus menghentikan pairing sementara.
+Contoh rule:
+- terjadi agresivitas jantan berulang
+- betina drop konsumsi atau terlihat stress
+- tidak ada respon interaksi 30 hari
+- luka fisik atau tanda teror/kecemasan pada salah satu indukan
+
+
+Gunakan bahasa operasional, tidak berspekulasi, tanpa kata mungkin/probabilitas.
+Fokus pada keputusan berbasis aturan jurnal & fakta data sistem.
+
+========================
+BATASAN BAHASA
+========================
+Gunakan bahasa profesional, objektif, dan instruktif.
+Hindari prediksi genetika, hindari klaim hasil anakan.
+Tujuan laporan adalah **memandu keputusan**, bukan memprediksi
+
+
 PROMPT;
     }
+
+    private function fallbackAnalisa($jantan,$betina)
+{
+    return "# Laporan Analisis Breeding (Fallback Mode — AI Limit)
+A. Ringkasan Singkat
+- Jantan: {$jantan->nomor_ring} ({$jantan->nama})
+- Betina: {$betina->nomor_ring} ({$betina->nama})
+
+B. AI tidak bisa diakses karena batas penggunaan (rate limit).
+Namun sistem tetap memberikan rekomendasi awal berdasarkan aturan breeding.
+
+C. Rekomendasi Awal
+- Lakukan uji coba perkawinan terbatas 14-30 hari.
+- Pantau interaksi, kesiapan sarang & kondisi fisik harian.
+
+D. Catatan
+Ini bukan analisa AI penuh — hanya mode darurat untuk memastikan fitur tetap berjalan.
+";
+}
+
 }

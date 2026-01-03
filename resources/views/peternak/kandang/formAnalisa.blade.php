@@ -1,13 +1,21 @@
 <x-layout>
     <main>
         <!-- HEADER -->
-        <div class="flex items-center justify-between px-4 py-4 border-b lg:py-6 dark:border-primary-darker">
-            <h1 class="text-2xl font-semibold">Analisis Kecocokan Indukan</h1>
-            <a href="{{ route('peternak.kandang.index') }}"
-                class="px-4 py-2 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded-lg">
-                Kembali
-            </a>
-        </div>
+       <div class="flex items-center justify-between px-4 py-4 border-b lg:py-6 dark:border-primary-darker">
+    <h1 class="text-2xl font-semibold">Analisis Kecocokan Indukan</h1>
+
+    <div class="flex gap-3">
+        <a href="{{ route('peternak.analisaBreeding.riwayat') }}"
+            class="px-4 py-2 text-sm text-white bg-green-600 hover:bg-green-700 rounded-lg">
+            Riwayat Analisa
+        </a>
+
+        <a href="{{ route('peternak.kandang.index') }}"
+            class="px-4 py-2 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded-lg">
+            Kembali
+        </a>
+    </div>
+</div>
 
         <!-- FORM -->
         <div class="p-4 max-w-3xl mx-auto">
@@ -66,7 +74,9 @@
            bg-cyan-600 rounded-md 
            hover:bg-cyan-700
            focus:outline-none focus:ring focus:ring-cyan-600 focus:ring-offset-1
-           dark:bg-cyan-500 dark:hover:bg-cyan-600">
+           dark:bg-cyan-500 dark:hover:bg-cyan-600"
+           onclick="this.disabled=true; this.innerText='Memproses...'; this.form.submit();">
+              
     Proses Analisis
 </button>
 

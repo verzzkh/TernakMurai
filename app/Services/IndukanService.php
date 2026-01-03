@@ -76,6 +76,10 @@ public function createIndukan(Peternak $peternak, array $data): Indukan
         $data['foto_path'] = $this->uploadPhoto($data['foto_indukan'], $peternak->id);
         unset($data['foto_indukan']);
     }
+        $data['aktif_kicau']            = request()->boolean('aktif_kicau');
+    $data['mendekati_betina']       = request()->boolean('mendekati_betina');
+    $data['nafsu_makan_meningkat']  = request()->boolean('nafsu_makan_meningkat');
+    $data['aktif_buat_sarang']      = request()->boolean('aktif_buat_sarang');
     return $this->indukan->create($data);
 }
 
@@ -116,6 +120,10 @@ public function updateFotoIndukan(Indukan $indukan, $file): bool
                 $indukan->peternak_id
             );
         }
+          $data['aktif_kicau']              = request()->boolean('aktif_kicau');
+    $data['mendekati_betina']         = request()->boolean('mendekati_betina');
+    $data['nafsu_makan_meningkat']    = request()->boolean('nafsu_makan_meningkat');
+    $data['aktif_buat_sarang']        = request()->boolean('aktif_buat_sarang');
 
         return $indukan->update($data);
     }

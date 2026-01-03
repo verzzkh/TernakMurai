@@ -3,21 +3,22 @@
         <!-- Content header -->
         <div class="flex items-center justify-between px-4 py-4 border-b lg:py-6 dark:border-primary-darker">
             <h1 class="text-2xl font-semibold">Tambah Indukan Baru</h1>
-           <a href="{{ route('peternak.indukan.index') }}"
-   class="px-4 py-2 text-sm font-medium
+            <a href="{{ route('peternak.indukan.index') }}"
+                class="px-4 py-2 text-sm font-medium
           text-white bg-indigo-600
           hover:bg-indigo-700
           dark:bg-indigo-500 dark:hover:bg-indigo-600
           rounded-md focus:outline-none">
-    Kembali
-</a>
+                Kembali
+            </a>
 
         </div>
 
         <!-- Form -->
         <div class="px-4 py-6">
             <div class="max-w-2xl mx-auto">
-                <form action="{{ route('peternak.indukan.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+                <form action="{{ route('peternak.indukan.store') }}" method="POST" enctype="multipart/form-data"
+                    class="space-y-6">
                     @csrf
 
                     <div class="bg-white dark:bg-darker rounded-lg shadow p-6">
@@ -167,6 +168,53 @@
                             </div>
                         </div>
                     </div>
+                    <!-- PERILAKU BREEDING -->
+<div class="bg-white dark:bg-darker rounded-lg shadow p-6">
+    <h2 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Perilaku Breeding</h2>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+        <!-- JANTAN -->
+        <div id="breeding-jantan" class="{{ old('jenis_kelamin')=='jantan' ? '' : 'hidden' }}">
+            <label class="block mb-2">
+                <input type="checkbox" name="aktif_kicau" value="1" {{ old('aktif_kicau')?'checked':'' }}>
+                Aktif Kicau
+            </label>
+
+            <label class="block">
+                <input type="checkbox" name="mendekati_betina" value="1" {{ old('mendekati_betina')?'checked':'' }}>
+                Mendekati Betina
+            </label>
+        </div>
+
+        <!-- BETINA -->
+        <div id="breeding-betina" class="{{ old('jenis_kelamin')=='betina' ? '' : 'hidden' }}">
+            <label class="block mb-2">
+                <input type="checkbox" name="nafsu_makan_meningkat" value="1" {{ old('nafsu_makan_meningkat')?'checked':'' }}>
+                Nafsu Makan Meningkat
+            </label>
+
+            <label class="block">
+                <input type="checkbox" name="aktif_buat_sarang" value="1" {{ old('aktif_buat_sarang')?'checked':'' }}>
+                Aktif Membuat Sarang
+            </label>
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium">Temperamen</label>
+            <select name="temperamen"
+                class="mt-1 block w-full px-2 py-1 border rounded dark:bg-darker dark:text-white">
+                <option value="">-</option>
+                <option value="jinak">Jinak</option>
+                <option value="sedang">Sedang</option>
+                <option value="fighter">Fighter</option>
+            </select>
+        </div>
+
+    </div>
+</div>
+
+
 
                     <!-- Form Actions -->
                     <div class="flex justify-end space-x-3">
@@ -174,17 +222,32 @@
                             class="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring focus:ring-gray-500 focus:ring-offset-1">
                             Batal
                         </a>
-                      <button type="submit"
-    class="px-4 py-2 text-white bg-cyan-600
+                        <button type="submit"
+                            class="px-4 py-2 text-white bg-cyan-600
            hover:bg-cyan-700
            dark:bg-cyan-500 dark:hover:bg-cyan-600
            rounded-md focus:outline-none focus:ring focus:ring-cyan-400 focus:ring-offset-1">
-    Simpan Indukan
-</button>
+                            Simpan Indukan
+                        </button>
 
                     </div>
                 </form>
             </div>
         </div>
     </main>
+    <script>
+document.getElementById('jenis_kelamin').addEventListener('change', function(){
+    let jk = this.value;
+
+    document.getElementById('breeding-jantan').classList.add('hidden');
+    document.getElementById('breeding-betina').classList.add('hidden');
+
+    if(jk === 'jantan'){
+        document.getElementById('breeding-jantan').classList.remove('hidden');
+    }else if(jk === 'betina'){
+        document.getElementById('breeding-betina').classList.remove('hidden');
+    }
+});
+</script>
+
 </x-layout>

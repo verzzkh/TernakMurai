@@ -14,67 +14,82 @@
         </button>
 
         <!-- BRAND -->
-        <a href="/"
+        <a
             class="inline-block text-2xl font-bold tracking-wider uppercase text-primary-dark dark:text-light">
             Ternak Jawara
         </a>
 
-        <!-- Mobile Sub-menu Button -->
-        <button @click="isMobileSubMenuOpen = !isMobileSubMenuOpen"
-            class="p-1 transition-colors duration-200 rounded-md text-primary-lighter bg-primary-50 hover:text-primary hover:bg-primary-100 dark:hover:text-light dark:hover:bg-primary-dark dark:bg-dark md:hidden focus:outline-none focus:ring">
-            <span class="sr-only">Open sub menu</span>
-            <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-            </svg>
+        <!-- Desktop Right Buttons -->
+<div class="flex items-center space-x-2">
+
+    <!-- Avatar Mobile -->
+    <div class="relative md:hidden" x-data="{ open: false }">
+        <button @click="open = !open"
+            class="rounded-full focus:outline-none focus:ring">
+            <img
+    class="w-10 h-10 rounded-full object-cover"
+    src="{{ auth()->user()->peternak && auth()->user()->peternak->foto_profil
+        ? asset('storage/' . auth()->user()->peternak->foto_profil)
+        : asset('build/images/avatar.jpg') }}"
+    alt="Avatar"
+/>
+
         </button>
 
-        <!-- Desktop Right Buttons -->
-        <nav class="hidden space-x-2 md:flex md:items-center">
-            <!-- Theme Toggle -->
-            <button aria-hidden="true" class="relative focus:outline-none" x-cloak @click="$parent.toggleTheme">
-                <div class="w-12 h-6 transition rounded-full outline-none bg-primary-100 dark:bg-primary-lighter"></div>
-                <div class="absolute top-0 left-0 inline-flex items-center justify-center w-6 h-6 transition-all duration-150 transform scale-110 rounded-full shadow-sm"
-                    :class="{
-                        'translate-x-0 -translate-y-px bg-white text-primary-dark': !isDark,
-                        'translate-x-6 bg-primary-darker text-primary-100': isDark
-                    }">
-                    <svg x-show="!isDark" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                    </svg>
-                    <svg x-show="isDark" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                    </svg>
-                </div>
+        <div x-show="open" @click.away="open=false"
+            class="absolute right-0 z-50 w-48 py-1 mt-2 bg-white dark:bg-dark rounded-md shadow-lg">
+
+            <a href="{{ route('peternak.profile.show') }}"
+                class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700">
+                Your Profile
+            </a>
+
+            <form id="logout-form-mobile" action="{{ route('logout') }}" method="POST">
+                @csrf
+            </form>
+
+            <a onclick="event.preventDefault(); document.getElementById('logout-form-mobile').submit()"
+                class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
+                Logout
+            </a>
+        </div>
+    </div>
+
+    <!-- Avatar Desktop -->
+    <nav class="hidden space-x-2 md:flex md:items-center">
+        <div class="relative" x-data="{ open: false }">
+            <button @click="open = !open"
+                class="transition-opacity rounded-full dark:opacity-75 dark:hover:opacity-100 focus:outline-none focus:ring">
+                <img
+    class="w-10 h-10 rounded-full object-cover"
+    src="{{ auth()->user()->peternak && auth()->user()->peternak->foto_profil
+        ? asset('storage/' . auth()->user()->peternak->foto_profil)
+        : asset('build/images/avatar.jpg') }}"
+    alt="Avatar"
+/>
+
             </button>
 
-            <!-- Avatar Desktop -->
-            <div class="relative" x-data="{ open: false }">
-                <button @click="open = !open"
-                    class="transition-opacity rounded-full dark:opacity-75 dark:hover:opacity-100 focus:outline-none focus:ring">
-                    <img class="w-10 h-10 rounded-full" src="build/images/avatar.jpg">
-                </button>
+            <div x-show="open" @click.away="open=false"
+                class="absolute right-0 w-48 py-1 mt-2 bg-white dark:bg-dark rounded-md shadow-lg">
 
-                <div x-show="open" @click.away="open=false"
-                    class="absolute right-0 w-48 py-1 mt-2 bg-white dark:bg-dark rounded-md shadow-lg">
+                <a href="{{ route('peternak.profile.show') }}"
+                    class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700">
+                    Your Profile
+                </a>
 
-                    <a href="{{ route('peternak.profile.show') }}"
-                        class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700">
-                        Your Profile
-                    </a>
+                <form id="logout-form" action="{{ route('logout') }}" method="POST">@csrf</form>
 
-                    <form id="logout-form" action="{{ route('logout') }}" method="POST">@csrf</form>
-
-                    <a onclick="event.preventDefault(); document.getElementById('logout-form').submit()"
-                        class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700">
-                        Logout
-                    </a>
-                </div>
+                <a onclick="event.preventDefault(); document.getElementById('logout-form').submit()"
+                    class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700">
+                    Logout
+                </a>
             </div>
+        </div>
+    </nav>
 
-        </nav>
+</div>
+
     </div>
 
 
@@ -247,44 +262,6 @@
     </div>
 
     <!-- ========== MOBILE SUB MENU (tetap absolute) ========== -->
-    <nav x-show="isMobileSubMenuOpen" @click.away="isMobileSubMenuOpen = false"
-        class="absolute flex items-center p-4 bg-white rounded-md shadow-lg dark:bg-darker top-16 inset-x-4 md:hidden">
-
-        <!-- Theme toggle -->
-        <button aria-hidden="true" class="relative focus:outline-none" x-cloak @click="$parent.toggleTheme">
-            <div class="w-12 h-6 transition rounded-full outline-none bg-primary-100 dark:bg-primary-lighter"></div>
-            <div class="absolute top-0 left-0 inline-flex items-center justify-center w-6 h-6 transition-all duration-200 transform scale-110 rounded-full shadow-sm"
-                :class="{
-                    'translate-x-0 -translate-y-px bg-white text-primary-dark': !isDark,
-                    'translate-x-6 bg-primary-darker text-primary-100': isDark
-                }">
-            </div>
-        </button>
-
-        <!-- Avatar Mobile -->
-        <div class="relative ml-auto" x-data="{ open: false }">
-            <!-- Avatar Button -->
-            <button @click="open = !open" class="rounded-full focus:outline-none focus:ring">
-                <img class="w-10 h-10 rounded-full" src="build/images/avatar.jpg">
-            </button>
-
-            <!-- Dropdown -->
-            <div x-show="open" @click.away="open=false"
-                class="absolute right-0 w-48 py-1 mt-2 bg-white rounded-md shadow-lg dark:bg-dark">
-
-                <!-- FORM LOGOUT (harus ada) -->
-                <form id="logout-form-mobile" action="{{ route('logout') }}" method="POST">
-                    @csrf
-                </form>
-
-                <!-- Tombol Logout -->
-                <a onclick="event.preventDefault(); document.getElementById('logout-form-mobile').submit();"
-                    class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
-                    Logout
-                </a>
-            </div>
-        </div>
-
-    </nav>
+   
 
 </header>

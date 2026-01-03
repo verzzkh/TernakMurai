@@ -295,15 +295,21 @@
                                                 Total Anakan: <span class="text-primary">{{ $totalAnakan }}</span>
                                             </p>
                                         </div>
-                                        <button
-                                            class="toggle-pair px-3 py-1 text-xs font-semibold text-gray-800 dark:text-gray-100 bg-gray-100 dark:bg-gray-800 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition"
-                                            data-target="pair-{{ $loop->index }}">
-                                            🚫 Sembunyikan
-                                        </button>
+                                       <button
+    type="button"
+    onclick="togglePair('pair-{{ $loop->index }}', this)"
+    class="px-3 py-1 text-xs font-semibold 
+           text-gray-800 dark:text-gray-100 
+           bg-gray-100 dark:bg-gray-800 
+           rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition">
+    👁️ Lihat Riwayat
+</button>
+
                                     </div>
 
-                                    <!-- Daftar Trip -->
-                                    <div id="pair-{{ $loop->index }}" class="mt-3 space-y-4">
+                                    <!-- Daftar Trip (default tertutup) -->
+<div id="pair-{{ $loop->index }}" class="mt-3 space-y-4 hidden">
+
                                         @foreach ($perkawinanGroup->values() as $index => $perkawinan)
                                             @php
                                                 $anakans = $perkawinan->anakans;
@@ -466,40 +472,45 @@
 
                     <!-- Status Actions -->
                     <div class="mt-6 bg-white dark:bg-darker rounded-lg shadow p-6">
-                        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Ubah Status</h3>
+    <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Ubah Status</h3>
 
-                        <form action="{{ route('peternak.kandang.update', $kandang) }}" method="POST"
-                            class="space-y-3">
-                            @csrf
-                            @method('PUT')
+    @php
+        $bolehUbah = $kandang->indukanBetina ? true : false; // hanya boleh jika ada betina
+    @endphp
 
-                            <div>
-                                <select name="status"
-                                    class="block w-full px-3 py-2 border border-gray-300 rounded-md bg-white dark:bg-darker dark:border-primary-darker dark:text-white focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
-                                    <option value="kosong" {{ $kandang->status === 'kosong' ? 'selected' : '' }}>
-                                        Kosong
-                                    </option>
-                                    <option value="bertelur" {{ $kandang->status === 'bertelur' ? 'selected' : '' }}>
-                                        Bertelur</option>
-                                    <option value="mengeram" {{ $kandang->status === 'mengeram' ? 'selected' : '' }}>
-                                        Mengeram</option>
-                                    <option value="menetas">Menetas </option>
-                                </select>
-                            </div>
-                            <button type="submit"
-                                class="w-full px-3 py-2 text-sm text-white 
-           bg-cyan-700 hover:bg-cyan-800
-           rounded-lg
-           focus:outline-none focus:ring focus:ring-cyan-700 focus:ring-offset-1">
-                                Update Status
-                            </button>
+    @if(!$bolehUbah)
+        <div class="p-3 mb-3 text-sm rounded bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200">
+            Status hanya dapat diubah jika terdapat <b>Indukan Betina</b> di kandang.
+        </div>
+    @endif
 
-                            <p class="text-xs text-gray-500 dark:text-gray-400">
-                                Catatan: Jika memilih "Menetas", sistem akan otomatis membuka form penambahan anakan dan
-                                mengosongkan status kandang.
-                            </p>
-                        </form>
-                    </div>
+    <form action="{{ route('peternak.kandang.update', $kandang) }}" method="POST" class="space-y-3">
+        @csrf
+        @method('PUT')
+
+        <div>
+            <select name="status"
+                @if(!$bolehUbah) disabled @endif
+                class="block w-full px-3 py-2 border border-gray-300 rounded-md bg-white dark:bg-darker 
+                       dark:border-primary-darker dark:text-white focus:outline-none">
+
+                <option value="kosong" {{ $kandang->status === 'kosong' ? 'selected' : '' }}>Kosong</option>
+                <option value="bertelur" {{ $kandang->status === 'bertelur' ? 'selected' : '' }}>Bertelur</option>
+                <option value="mengeram" {{ $kandang->status === 'mengeram' ? 'selected' : '' }}>Mengeram</option>
+                <option value="menetas">Menetas</option>
+            </select>
+        </div>
+
+        <button type="submit"
+            @if(!$bolehUbah) disabled @endif
+            class="w-full px-3 py-2 text-sm text-white bg-cyan-700 hover:bg-cyan-800 rounded-lg 
+                  disabled:bg-gray-400 disabled:cursor-not-allowed">
+            Update Status
+        </button>
+    </form>
+
+</div>
+
                 </div>
             </div>
         </div>
@@ -626,5 +637,21 @@
             };
         });
     </script>
+    <script>
+function togglePair(id, btn) {
+    const el = document.getElementById(id);
+
+    if (!el) return;
+
+    el.classList.toggle('hidden');
+
+    if (el.classList.contains('hidden')) {
+        btn.innerText = '👁️ Lihat Riwayat';
+    } else {
+        btn.innerText = '🚫 Sembunyikan';
+    }
+}
+</script>
+
 
 </x-layout>

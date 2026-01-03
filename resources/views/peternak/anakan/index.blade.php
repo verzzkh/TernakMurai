@@ -4,11 +4,11 @@
         <div class="flex items-center justify-between px-4 py-4 border-b lg:py-6 dark:border-primary-darker">
             <h1 class="text-2xl font-semibold">Manajemen Anakan</h1>
             <div class="flex items-center space-x-4">
-                @if (!$peternak->isPro())
+                {{-- @if (!$peternak->isPro())
                     <div class="text-sm text-text-secondary dark:text-gray-400">
                         Anakan: {{ $peternak->getActiveAnakanCount() }}/20
                     </div>
-                @endif
+                @endif --}}
                 <a href="{{ route('peternak.anakan.create') }}"
                     class="px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 
           rounded-lg
@@ -20,7 +20,7 @@
             </div>
         </div>
 
-        <!-- Account limit warning for free accounts -->
+        {{-- <!-- Account limit warning for free accounts -->
         @if (!$peternak->isPro() && $peternak->getActiveAnakanCount() >= 18)
             <div
                 class="mx-4 mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-md dark:bg-yellow-900/20 dark:border-yellow-800">
@@ -48,7 +48,7 @@
                     </div>
                 </div>
             </div>
-        @endif
+        @endif --}}
 
 
 
@@ -71,9 +71,9 @@
                         </span>
                     </div>
                 </div>
-                <div class="flex space-x-3">
+                <div class="w-full flex flex-col gap-3 md:flex-row md:w-auto md:space-x-3">
                     <select name="jenis_kelamin"
-                        class="px-4 py-2 rounded-md border dark:border-primary-darker dark:bg-darker focus:outline-none focus:ring focus:ring-primary-light">
+                        class="w-full md:w-auto px-4 py-2 rounded-md border dark:border-primary-darker dark:bg-darker focus:outline-none focus:ring focus:ring-primary-light">
                         <option value="">Semua Gender</option>
                         <option value="jantan" {{ request('jenis_kelamin') == 'jantan' ? 'selected' : '' }}>Jantan
                         </option>
@@ -84,7 +84,7 @@
                         </option>
                     </select>
                     <select name="status_pertumbuhan"
-                        class="px-4 py-2 rounded-md border dark:border-primary-darker dark:bg-darker focus:outline-none focus:ring focus:ring-primary-light">
+                        class="w-full md:w-auto px-4 py-2 rounded-md border dark:border-primary-darker dark:bg-darker focus:outline-none focus:ring focus:ring-primary-light">
                         <option value="">Semua Status</option>
                         <option value="trotol" {{ request('status_pertumbuhan') == 'trotol' ? 'selected' : '' }}>Trotol
                         </option>
@@ -94,14 +94,15 @@
                         </option>
                     </select>
                     <select name="status_penjualan"
-                        class="px-4 py-2 rounded-md border dark:border-primary-darker dark:bg-darker focus:outline-none focus:ring focus:ring-primary-light">
+                        class="w-full md:w-auto px-4 py-2 rounded-md border dark:border-primary-darker dark:bg-darker focus:outline-none focus:ring focus:ring-primary-light">
                         <option value="">Semua</option>
                         <option value="belum_dijual"
                             {{ request('status_penjualan') == 'belum_dijual' ? 'selected' : '' }}>Aktif</option>
                         <option value="terjual" {{ request('status_penjualan') == 'terjual' ? 'selected' : '' }}>
                             Terjual</option>
                     </select>
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                    <button type="submit"
+                        class="w-full md:w-auto px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
                         Filter
                     </button>
 
@@ -199,6 +200,18 @@
                                         {{ $anakan->tanggal_jual ? $anakan->tanggal_jual->format('d/m/Y') : '' }}
                                     </span>
                                 @endif
+                                {{-- 🔥 BTN DELETE BARU --}}
+                                <form id="deleteAnakanForm-{{ $anakan->id }}"
+                                    action="{{ route('peternak.anakan.destroy', $anakan->id) }}" method="POST">
+                                    @csrf
+                                    @method('DELETE')
+
+                                    <button type="button"
+                                        onclick="event.stopPropagation(); confirmDeleteAnakan({{ $anakan->id }})"
+                                        class="px-2 py-1 text-xs bg-red-600 text-white rounded hover:bg-red-700 transition">
+                                        Hapus
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -228,14 +241,34 @@
             <!-- Pagination -->
             @if ($anakans->hasPages())
                 <div class="px-4 py-3">
-                    {{ $anakans->links() }}
+                    {{ $anakans->appends(request()->query())->links() }}
+
                 </div>
             @endif
         </div>
     </main>
 
     <!-- JavaScript for AJAX operations -->
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
+        function confirmDeleteAnakan(id) {
+            Swal.fire({
+                title: "Hapus anakan?",
+                text: "Data tidak dapat dikembalikan.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Ya, hapus",
+                cancelButtonText: "Batal",
+            }).then(result => {
+                if (result.isConfirmed) {
+                    document.getElementById("deleteAnakanForm-" + id).submit();
+                }
+            });
+        }
+
+
         // Edit price function
         function editPrice(anakanId) {
             const newPrice = prompt('Masukkan harga baru:');

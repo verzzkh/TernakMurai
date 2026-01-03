@@ -28,12 +28,21 @@ class Indukan extends Model
         'prestasi',
         'karakteristik',
         'foto_path',
+            'aktif_kicau',
+    'mendekati_betina',
+    'nafsu_makan_meningkat',
+    'aktif_buat_sarang',
+    'temperamen',
     ];
 
     protected function casts(): array
     {
         return [
             'tanggal_lahir' => 'date',
+                'aktif_kicau' => 'boolean',
+        'mendekati_betina' => 'boolean',
+        'nafsu_makan_meningkat' => 'boolean',
+        'aktif_buat_sarang' => 'boolean',
         ];
     }
 

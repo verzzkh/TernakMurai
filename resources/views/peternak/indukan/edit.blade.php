@@ -125,6 +125,59 @@
                                   <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                               @enderror
                           </div>
+                          <!-- Perilaku Breeding -->
+<div class="bg-white dark:bg-darker rounded-lg shadow p-6">
+    <h2 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Perilaku Breeding</h2>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+        @if($indukan->jenis_kelamin=='jantan')
+            <div>
+                <label class="block mb-2">
+                    <input type="checkbox" name="aktif_kicau" value="1"
+                        {{ old('aktif_kicau',$indukan->aktif_kicau) ? 'checked' : '' }}>
+                    Aktif Kicau
+                </label>
+
+                <label class="block">
+                    <input type="checkbox" name="mendekati_betina" value="1"
+                        {{ old('mendekati_betina',$indukan->mendekati_betina) ? 'checked' : '' }}>
+                    Mendekati Betina
+                </label>
+            </div>
+        @endif
+
+        @if($indukan->jenis_kelamin=='betina')
+            <div>
+                <label class="block mb-2">
+                    <input type="checkbox" name="nafsu_makan_meningkat" value="1"
+                        {{ old('nafsu_makan_meningkat',$indukan->nafsu_makan_meningkat) ? 'checked' : '' }}>
+                    Nafsu Makan Meningkat
+                </label>
+
+                <label class="block">
+                    <input type="checkbox" name="aktif_buat_sarang" value="1"
+                        {{ old('aktif_buat_sarang',$indukan->aktif_buat_sarang) ? 'checked' : '' }}>
+                    Aktif Membuat Sarang
+                </label>
+            </div>
+        @endif
+
+        <div>
+            <label class="block text-sm font-medium">Temperamen</label>
+            <select name="temperamen"
+                class="mt-1 block w-full px-2 py-1 border rounded dark:bg-darker dark:text-white">
+
+                <option value="">-</option>
+                <option value="jinak"   {{ old('temperamen',$indukan->temperamen)=='jinak'?'selected':'' }}>Jinak</option>
+                <option value="sedang"  {{ old('temperamen',$indukan->temperamen)=='sedang'?'selected':'' }}>Sedang</option>
+                <option value="fighter" {{ old('temperamen',$indukan->temperamen)=='fighter'?'selected':'' }}>Fighter</option>
+            </select>
+        </div>
+
+    </div>
+</div>
+
                       </div>
                   </div>
 

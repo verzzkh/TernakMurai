@@ -3,33 +3,37 @@
     <div class="flex flex-col h-full">
         <!-- Sidebar header -->
         <div class="flex items-center justify-between px-4 py-3 border-b dark:border-primary-darker">
-            <div class="flex items-center">
-                <svg class="w-8 h-8 text-primary-dark dark:text-primary" xmlns="http://www.w3.org/2000/svg" fill="none"
-                    viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                </svg>
-                <span class="ml-2 text-lg font-semibold text-text-primary dark:text-light">Murai Batu</span>
-            </div>
-            <button id="toggle-sidebar-mobile"
-                class="md:hidden p-2 rounded-md text-text-primary dark:text-light hover:bg-gray-100 dark:hover:bg-primary-dark">
-                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
-        </div>
+
+    <!-- Logo + Brand -->
+    <div class="flex items-center gap-3">
+   <img 
+    src="{{ asset('images/logo/LogoMurai.png') }}"
+    class="w-14 h-14 object-cover"
+    alt="Ternak Jawara"
+>
+
+
+        <span class="text-lg font-bold whitespace-nowrap">
+            Ternak Jawara
+        </span>
+    </div>
+
+    <!-- Close button (mobile) -->
+    <button id="toggle-sidebar-mobile"
+        class="md:hidden p-2 rounded-md text-text-primary dark:text-light 
+               hover:bg-gray-100 dark:hover:bg-primary-dark">
+        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none"
+            viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+    </button>
+
+</div>
+
 
         <!-- User profile -->
         <div class="flex items-center px-4 py-3 border-b dark:border-primary-darker">
-            <div
-                class="w-10 h-10 overflow-hidden rounded-full bg-gray-200 dark:bg-primary-darker flex items-center justify-center">
-                <svg class="w-6 h-6 text-text-tertiary dark:text-primary-light" xmlns="http://www.w3.org/2000/svg"
-                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-            </div>
             <div class="ml-3">
                 <h4 class="text-sm font-semibold text-text-primary dark:text-light">
                     {{ auth()->user()->name ?? 'Peternak' }}</h4>
@@ -192,28 +196,6 @@
         </nav>
 
         <!-- Sidebar footer -->
-        <div class="flex-shrink-0 px-2 py-4 space-y-2">
-            <div class="flex items-center justify-between px-2 py-2 text-sm text-text-secondary dark:text-light">
-                <span>Dark Mode</span>
-                <button id="theme-toggle"
-                    class="relative inline-flex items-center w-10 h-5 rounded-full bg-gray-200 dark:bg-primary-dark focus:outline-none"
-                    @click="$parent.toggleTheme()">
-                    <span
-                        class="absolute w-4 h-4 transition-transform duration-300 transform bg-white rounded-full translate-x-0.5 dark:translate-x-5"
-                        :class="{ 'translate-x-5': isDark, 'translate-x-0.5': !isDark }"></span>
-                </button>
-            </div>
-            <button id="settings-panel-btn" type="button"
-                class="flex items-center justify-center w-full px-4 py-2 text-sm text-white rounded-md bg-primary hover:bg-primary-dark focus:outline-none focus:ring focus:ring-primary-dark focus:ring-offset-1 focus:ring-offset-white dark:focus:ring-offset-dark">
-                <span aria-hidden="true">
-                    <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                    </svg>
-                </span>
-                <span>Pengaturan</span>
-            </button>
-        </div>
+
     </div>
 </aside>

@@ -26,7 +26,7 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('register') }}" class="space-y-4">
+        <form method="POST" action="{{ route('register') }}" enctype="multipart/form-data" class="space-y-4">
             @csrf
 
             <div>
@@ -71,6 +71,17 @@
                 <input id="nomor_handphone" name="nomor_handphone" type="text" value="{{ old('nomor_handphone') }}"
                     class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
+
+            <div>
+    <label class="block text-sm font-medium text-text-primary mb-2">
+        Foto Profil (opsional)
+    </label>
+    <input type="file" name="foto_profil"
+        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+    <p class="text-xs text-gray-500 mt-1">
+        JPG / PNG, maksimal 2MB
+    </p>
+</div>
 
             <button type="submit" class="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-blue-700">
                 Daftar Sekarang

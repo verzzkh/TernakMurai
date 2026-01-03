@@ -293,23 +293,19 @@ return view('peternak.anakan.index', compact('anakans', 'peternak', 'stats'));
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id): JsonResponse
-    {
-        $peternak = Auth::user()->peternak;
-        $anakan = $peternak->anakans()->findOrFail($id);
+    public function destroy(string $id)
+{
+    $peternak = Auth::user()->peternak;
 
-        $success = $this->anakanService->deleteAnakan($anakan);
+    $anakan = $peternak->anakans()->findOrFail($id);
 
-        if ($success) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Anakan berhasil dihapus.',
-            ]);
-        }
+    try{
+        $this->anakanService->deleteAnakan($anakan);
 
-        return response()->json([
-            'success' => false,
-            'message' => 'Gagal menghapus anakan.',
-        ], 500);
+        return redirect()->back()->with('success', 'Anakan berhasil dihapus.');
+    }catch(\Exception $e){
+        return redirect()->back()->with('error','Gagal menghapus anakan: '.$e->getMessage());
     }
+}
+
 }

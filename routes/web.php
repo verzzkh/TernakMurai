@@ -145,10 +145,40 @@ Route::prefix('analisa-breeding')->name('analisaBreeding.')->group(function () {
         [\App\Http\Controllers\Peternak\AnalisaBreedingController::class, 'form']
     )->name('form');
 
-    // Proses Analisis — HARUS 'analisa', BUKAN 'process'
     Route::post('/analisa', 
         [\App\Http\Controllers\Peternak\AnalisaBreedingController::class, 'analisa']
     )->name('analisa');
+
+    // halaman hasil khusus (GET)
+Route::get('/hasil', 
+    [\App\Http\Controllers\Peternak\AnalisaBreedingController::class, 'hasil']
+)->name('hasil');
+
+     // ➤ Simpan hasil AI ke database (POST dari tombol Simpan)
+    Route::post('/save', 
+        [\App\Http\Controllers\Peternak\AnalisaBreedingController::class, 'save']
+    )->name('save');
+
+    // ➤ Riwayat semua analisa yang pernah disimpan
+    Route::get('/riwayat', 
+        [\App\Http\Controllers\Peternak\AnalisaBreedingController::class, 'riwayat']
+    )->name('riwayat');
+
+    // ➤ Detail 1 analisa + halaman untuk memberikan catatan lapangan
+    Route::get('/detail/{id}', 
+        [\App\Http\Controllers\Peternak\AnalisaBreedingController::class, 'detail']
+    )->name('detail');
+
+    // ➤ Simpan catatan setelah breeding (UPDATE)
+Route::post('/update-catatan/{id}',
+    [\App\Http\Controllers\Peternak\AnalisaBreedingController::class,'updateCatatan']
+)->name('updateCatatan');
+
+Route::delete('/hapus/{id}',
+    [\App\Http\Controllers\Peternak\AnalisaBreedingController::class, 'hapus']
+)->name('hapus');
+
+
 });
 
 

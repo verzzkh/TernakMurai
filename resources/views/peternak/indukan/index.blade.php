@@ -4,19 +4,13 @@
         <div class="flex items-center justify-between px-4 py-4 border-b lg:py-6 dark:border-primary-darker">
             <h1 class="text-2xl font-semibold">Manajemen Indukan</h1>
             <div class="flex items-center space-x-4">
-            <a href="{{ route('peternak.indukan.create') }}"
-   class="px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 
+                <a href="{{ route('peternak.indukan.create') }}"
+                    class="px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 
           rounded-lg
           focus:outline-none focus:ring focus:ring-blue-600 
           focus:ring-offset-1 focus:ring-offset-white dark:focus:ring-offset-dark">
-    Tambah Indukan
-    <a href="{{ route('peternak.indukan.analisaSemua') }}"
-   class="px-4 py-2 text-white bg-green-600 hover:bg-green-700
-          rounded-lg">
-   Analisa Semua Indukan
-</a>
-
-</a>
+                    Tambah Indukan
+                </a>
 
             </div>
         </div>
@@ -128,13 +122,13 @@
                 </div>
 
                 <!-- Search Button -->
-           <button type="submit"
-    class="px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 
+                <button type="submit"
+                    class="px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 
            rounded-lg
            focus:outline-none focus:ring focus:ring-blue-600 
            focus:ring-offset-1 focus:ring-offset-white dark:focus:ring-offset-dark">
-    Cari
-</button>
+                    Cari
+                </button>
 
             </form>
         </div>
@@ -176,31 +170,48 @@
                         </div>
 
                         <!-- ACTION BUTTONS -->
-                       <div class="mt-4 flex justify-between">
-    <!-- DETAIL (Primary Button) -->
-    <a href="{{ route('peternak.indukan.show', $indukan->id) }}"
-        class="px-2 py-1 text-xs font-medium
+                        <div class="mt-4 flex justify-between">
+                            <!-- DETAIL (Primary Button) -->
+                            <a href="{{ route('peternak.indukan.show', $indukan->id) }}"
+                                class="px-2 py-1 text-xs font-medium
                text-white bg-indigo-600 
                hover:bg-indigo-700
                dark:bg-indigo-500 dark:hover:bg-indigo-600
                rounded">
-        Detail
-    </a>
+                                Detail
+                            </a>
 
-    <div class="flex space-x-2">
-        <!-- EDIT (Secondary Button) -->
-        <a href="{{ route('peternak.indukan.edit', $indukan->id) }}"
-            onclick="event.stopPropagation()"
-            class="px-2 py-1 text-xs font-medium
+                            <div class="flex space-x-2">
+                                <!-- EDIT (Secondary Button) -->
+                                <a href="{{ route('peternak.indukan.edit', $indukan->id) }}"
+                                    onclick="event.stopPropagation()"
+                                    class="px-2 py-1 text-xs font-medium
                    text-indigo-700 bg-indigo-300
                    hover:bg-indigo-400
                    dark:text-indigo-100 dark:bg-indigo-700 
                    dark:hover:bg-indigo-600
                    rounded">
-            Edit
-        </a>
-    </div>
-</div>
+                                    Edit
+                                </a>
+
+                             <form id="deleteIndukanForm-{{ $indukan->id }}"
+      action="{{ route('peternak.indukan.destroy', $indukan->id) }}"
+      method="POST">
+    @csrf
+    @method('DELETE')
+
+    <button type="button"
+        onclick="event.stopPropagation(); confirmDeleteIndukan({{ $indukan->id }})"
+        class="px-2 py-1 bg-red-600 text-white text-xs rounded">
+        Hapus
+    </button>
+</form>
+
+
+
+
+                            </div>
+                        </div>
 
 
                     </div>
@@ -230,10 +241,31 @@
                 </div>
             @endforelse
         </div>
-            
+
         <div class="px-4 py-6">
-    {{ $indukans->links() }}
-</div>
+            {{ $indukans->appends(request()->query())->links() }}
+
+        </div>
 
     </main>
+    {{-- SweetAlert2 CDN --}}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+function confirmDeleteIndukan(id) {
+    Swal.fire({
+        title: "Hapus indukan?",
+        text: "Data tidak dapat dikembalikan.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Ya, hapus",
+        cancelButtonText: "Batal",
+    }).then(result => {
+        if (result.isConfirmed) {
+            document.getElementById("deleteIndukanForm-" + id).submit();
+        }
+    });
+}
+</script>
+
 </x-layout>

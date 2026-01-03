@@ -34,6 +34,11 @@ class StoreIndukanRequest extends FormRequest
             'prestasi' => 'nullable|string',
             'karakteristik' => 'nullable|string',
             'foto_indukan' => ['nullable', 'image', 'mimes:jpeg,jpg,png', 'max:2048'],
+'aktif_kicau' => ['nullable', 'boolean'],
+'mendekati_betina' => ['nullable', 'boolean'],
+'nafsu_makan_meningkat' => ['nullable', 'boolean'],
+'aktif_buat_sarang' => ['nullable', 'boolean'],
+'temperamen' => ['nullable', Rule::in(['jinak','sedang','fighter'])],
 
         ];
     }
@@ -51,4 +56,14 @@ class StoreIndukanRequest extends FormRequest
             'tanggal_lahir.before_or_equal' => 'Tanggal lahir tidak boleh lebih dari hari ini.',
         ];
     }
+    public function prepareForValidation()
+{
+    $this->merge([
+        'aktif_kicau' => $this->boolean('aktif_kicau'),
+        'mendekati_betina' => $this->boolean('mendekati_betina'),
+        'nafsu_makan_meningkat' => $this->boolean('nafsu_makan_meningkat'),
+        'aktif_buat_sarang' => $this->boolean('aktif_buat_sarang'),
+    ]);
+}
+
 }

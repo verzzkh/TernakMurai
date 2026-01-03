@@ -130,9 +130,9 @@
                         @forelse ($recentActivities as $a)
                             <li class="p-4 flex justify-between">
                                 <div>
-                                    <p class="font-medium">
-                                        {{ ucfirst($a->tipe) }} — {{ $a->kategori }}
-                                    </p>
+                                 <p class="font-medium">
+    {{ ucfirst($a->tipe) }} — {{ $a->kategori_label }}
+</p>
                                     <p class="text-sm text-gray-500">
                                         {{ $a->tanggal->format('d M Y') }}
                                     </p>
@@ -145,37 +145,6 @@
                             <li class="p-4 text-center text-gray-500">Belum ada aktivitas</li>
                         @endforelse
                     </ul>
-                </div>
-            </div>
-
-
-
-            <!-- ========================================================= -->
-            <!-- 4️⃣ STATUS PAKET -->
-            <!-- ========================================================= -->
-            <div class="p-4">
-                <div class="bg-white rounded-md shadow dark:bg-darker p-4">
-                    <h4 class="text-lg font-semibold mb-4">Status Paket</h4>
-
-                    <p class="text-sm mb-2">
-                        Paket Anda:
-                        <span class="font-semibold uppercase {{ $paket === 'pro' ? 'text-green-600' : 'text-blue-600' }}">
-                            {{ $paket }}
-                        </span>
-                    </p>
-
-                    @if($paket === 'pro')
-                        <p class="text-sm mb-2">
-                            Masa aktif sampai:
-                            <span class="font-medium">
-                                {{ \Carbon\Carbon::parse($masaAktif)->format('d M Y') }}
-                            </span>
-                        </p>
-                    @endif
-
-                    <p class="text-sm mb-1">Kuota Deteksi: <b>{{ $kuota }}</b> / bulan</p>
-                    <p class="text-sm mb-1">Dipakai: <b>{{ $dipakai }}</b></p>
-                    <p class="text-sm mb-3">Sisa: <b>{{ $sisa }}</b></p>
                 </div>
             </div>
 

@@ -129,7 +129,7 @@ public function updateFoto(Request $request, Indukan $indukan)
 
         $this->indukanService->deleteIndukan($indukan);
 
-        return redirect()->route('peternak.indukan.index')
-            ->with('success', 'Indukan berhasil dihapus.');
+     return redirect()->back()->with('success', 'Indukan berhasil dihapus.');
+
     }
 }

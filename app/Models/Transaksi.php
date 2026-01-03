@@ -49,4 +49,8 @@ class Transaksi extends Model
     {
         return $this->belongsTo(Indukan::class);
     }
+    public function getKategoriLabelAttribute(): string
+{
+    return ucwords(str_replace('_', ' ', $this->kategori));
+}
 }
