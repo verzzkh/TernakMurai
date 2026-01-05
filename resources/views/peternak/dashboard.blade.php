@@ -123,7 +123,7 @@
             <div class="p-4">
                 <div class="bg-white rounded-md shadow dark:bg-darker">
                     <div class="flex items-center justify-between p-4 border-b dark:border-primary">
-                        <h4 class="text-lg font-semibold">Aktivitas Terbaru</h4>
+                        <h4 class="text-lg font-semibold">Aktivitas terbaru</h4>
                     </div>
 
                     <ul class="divide-y dark:divide-primary">
