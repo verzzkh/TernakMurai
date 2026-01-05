@@ -1,0 +1,130 @@
+<?php
+
+namespace App\Http\Controllers\Peternak;
+
+use App\Http\Controllers\Controller;
+use App\Models\Indukan;
+use App\Models\Anakan;
+use App\Models\Perkawinan;
+use App\Models\HasilAnalisaBreeding;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+class AnalisaBreedingController extends Controller
+{
+    /**
+     * Form Pemilihan Indukan
+     */
+    public function form()
+    {
+        $peternakId = Auth::user()->peternak->id;
+
+        return view('peternak.kandang.formAnalisa', [
+            'jantan' => Indukan::where('peternak_id', $peternakId)->where('jenis_kelamin', 'jantan')->get(),
+            'betina' => Indukan::where('peternak_id', $peternakId)->where('jenis_kelamin', 'betina')->get(),
+        ]);
+    }
+
+    /**
+     * Analisa Breeding (sementara MOCK karena rate limit)
+     */
+    public function analisa(Request $request)
+    {
+        $request->validate([
+            'jantan_id' => 'required|exists:indukan,id',
+            'betina_id' => 'required|exists:indukan,id',
+        ]);
+
+        $peternakId = Auth::user()->peternak->id;
+
+        $jantan = Indukan::where('peternak_id',$peternakId)->findOrFail($request->jantan_id);
+        $betina = Indukan::where('peternak_id',$peternakId)->findOrFail($request->betina_id);
+
+        // 🔥 MOCK HASIL AI UNTUK TESTING (sementara)
+        $hasilAnalisa = "
+# Laporan Analisis Breeding (MOCK)
+Mode test tanpa AI — hasil hanya untuk cek penyimpanan.
+
+A. Ringkasan Data
+- Jantan : {$jantan->nama}
+- Betina : {$betina->nama}
+
+B. Evaluasi
+- Belum ada riwayat pembuktian reproduksi.
+- Rekomendasi awal **Uji Coba Terbatas**
+
+C. Tindakan
+- Observasi 14–30 hari
+- Monitor interaksi harian
+";
+
+        return view('peternak.kandang.hasilAnalisa', compact('hasilAnalisa','jantan','betina'));
+    }
+
+    /**
+     * Simpan Hasil Analisa ke Database
+     */
+    public function save(Request $request)
+    {
+        $request->validate([
+            'jantan_id' => 'required|exists:indukan,id',
+            'betina_id' => 'required|exists:indukan,id',
+            'hasil_ai'  => 'required',
+        ]);
+
+        HasilAnalisaBreeding::create([
+            'peternak_id' => Auth::user()->peternak->id,
+            'jantan_id'   => $request->jantan_id,
+            'betina_id'   => $request->betina_id,
+            'hasil_ai'    => $request->hasil_ai,
+            'rekomendasi' => 'uji_coba', // default sementara
+            'tanggal_analisa' => now(),
+        ]);
+
+        return redirect()->route('peternak.analisaBreeding.riwayat')
+            ->with('success','Hasil analisa tersimpan.');
+    }
+
+    public function detail($id)
+{
+    $peternakId = Auth::user()->peternak->id;
+
+    $data = HasilAnalisaBreeding::with(['jantan','betina'])
+        ->where('peternak_id', $peternakId)
+        ->findOrFail($id);
+
+    return view('peternak.kandang.detailAnalisa', compact('data'));
+}
+public function updateCatatan(Request $request, $id)
+{
+    $request->validate([
+        'catatan_user' => 'nullable|string|max:5000',
+    ]);
+
+    $peternakId = Auth::user()->peternak->id;
+
+    $analisa = HasilAnalisaBreeding::where('peternak_id', $peternakId)
+                ->findOrFail($id);
+
+    $analisa->update([
+        'catatan_user' => $request->catatan_user,
+    ]);
+
+    return redirect()
+            ->back()
+            ->with('success', 'Catatan berhasil disimpan.');
+}
+
+    /**
+     * Riwayat Penyimpanan Analisa
+     */
+    public function riwayat()
+    {
+        $riwayat = HasilAnalisaBreeding::where('peternak_id',Auth::user()->peternak->id)
+                    ->with(['jantan','betina'])
+                    ->latest('tanggal_analisa')
+                    ->get();
+
+        return view('peternak.kandang.riwayatAnalisa', compact('riwayat'));
+    }
+}
