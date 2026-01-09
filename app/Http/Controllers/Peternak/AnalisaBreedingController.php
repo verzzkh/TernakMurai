@@ -280,6 +280,15 @@ $ringkasanGlobalText = $ringkasanGlobalText
         ->take(5)
         ->implode('; ') ?: 'Belum tersedia';
 
+        $tanggalKawinTerakhir = $perkawinanTerakhir
+    ? $perkawinanTerakhir->tanggal_kawin
+    : 'Tidak ada data';
+
+$hasilPerkawinanTerakhir = $perkawinanTerakhir
+    ? ($perkawinanTerakhir->hasil ?? 'Tidak ada data')
+    : 'Tidak ada data';
+
+
     $jurnalJson = json_encode($payloadJurnal, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 
     /*  🔥 Masukkan ini DI SINI sebelum heredoc return */
@@ -292,6 +301,27 @@ $ringkasanGlobalText = $ringkasanGlobalText
         "- Nafsu Makan Meningkat: " . ($betina->nafsu_makan_meningkat ? "Ya" : "Tidak") . "\n" .
         "- Aktif Membuat Sarang: " . ($betina->aktif_buat_sarang ? "Ya" : "Tidak") . "\n" .
         "- Temperamen: " . ($betina->temperamen ?: "-");
+
+        $aktifKicauText = $jantan->aktif_kicau ? 'Ya' : 'Tidak';
+$mendekatiBetinaText = $jantan->mendekati_betina ? 'Ya' : 'Tidak';
+
+$nafsuMakanText = $betina->nafsu_makan_meningkat ? 'Ya' : 'Tidak';
+$buatSarangText = $betina->aktif_buat_sarang ? 'Ya' : 'Tidak';
+
+/**
+ * Evaluasi rule-based (BUKAN AI)
+ */
+$indikatorJantanLengkap = $jantan->aktif_kicau && $jantan->mendekati_betina;
+$indikatorBetinaLengkap = $betina->nafsu_makan_meningkat && $betina->aktif_buat_sarang;
+
+$kesimpulanJantan = $indikatorJantanLengkap
+    ? 'Indikator kesiapan jantan terpenuhi.'
+    : 'Indikator kesiapan jantan belum terpenuhi.';
+
+$kesimpulanBetina = $indikatorBetinaLengkap
+    ? 'Indikator kesiapan betina terpenuhi.'
+    : 'Indikator kesiapan betina belum terpenuhi.';
+
     /*  🔥 END BLOCK  */
 
     return <<<PROMPT
@@ -299,31 +329,56 @@ $ringkasanGlobalText = $ringkasanGlobalText
 ========================
 TUGAS ANDA
 ========================
-
 Susun laporan analisis breeding sesuai format berikut, lengkap, rinci,
 dan gunakan bahasa objektif berbasis data:
 
 A. Ringkasan Data Indukan  
 - A. Ringkasan Singkat
 - Jantan: {$jantan->nomor_ring} ({$jantan->nama})
+Perilaku jantan:
+{$perilakuJantan}
+
 - Betina: {$betina->nomor_ring} ({$betina->nama})
-- Sertakan perilaku dalam bullet point  
-- Tidak membuat interpretasi
+Perilaku betina:
+{$perilakuBetina}
+ATURAN PERILAKU:
+- Gunakan nilai Ya/Tidak persis seperti data sistem.
+- DILARANG mengubah atau menyimpulkan ulang perilaku indukan.
+- Jika nilai = Tidak, tuliskan sebagai Tidak.
+- Jangan menambahkan perilaku yang tidak tercantum.
 
 B. Evaluasi Kecocokan Jantan × Betina  
-- Hubungkan perilaku jantan & betina dalam konteks kesiapan  
-- Hindari klaim genetik/hasil anakan  
-- Tegaskan bahwa evaluasi berbasis rule, bukan prediksi  
+
+Evaluasi berbasis aturan sistem:
+- Kesiapan jantan:
+  {$kesimpulanJantan}
+- Kesiapan betina:
+  {$kesimpulanBetina}
+
+Catatan:
+Evaluasi dilakukan berdasarkan aturan perilaku yang telah ditetapkan sistem.
+Tidak dilakukan interpretasi ulang terhadap data perilaku indukan.
+Evaluasi ini bukan prediksi hasil anakan atau genetika.
 
 C. Evaluasi Riwayat Breeding & Anakan  
-
 1. Data sistem pasangan ini:
 - Jumlah anakan dari pasangan ini: {$jumlahAnakanPasangan}
 - Rincian anakan:
 {$ringkasanAnakanPasangan}
 
-2. Pengalaman indukan secara global (BERDASARKAN DATA SISTEM):
+2. Riwayat produksi indukan secara keseluruhan:
 {$ringkasanGlobalText}
+
+Ringkasan karakteristik anakan (konteks historis):
+- Jantan: {$ringkasanAnakanJantan}
+- Betina: {$ringkasanAnakanBetina}
+
+Riwayat perkawinan pasangan:
+- Jumlah perkawinan tercatat: {$jumlahPerkawinan}
+- Perkawinan terakhir:
+  - Tanggal kawin: {$tanggalKawinTerakhir}
+  - Hasil: {$hasilPerkawinanTerakhir}
+
 
 Catatan penting:
 - Gunakan HANYA data yang tertulis di atas.
@@ -374,6 +429,18 @@ Contoh rule:
 - betina drop konsumsi atau terlihat stress
 - tidak ada respon interaksi 30 hari
 - luka fisik atau tanda teror/kecemasan pada salah satu indukan
+
+K. Rekomendasi Perawatan & Pemulihan (Jika Diperlukan)
+
+Jika pada evaluasi ditemukan indikator yang belum terpenuhi atau risiko:
+- Berikan saran perawatan atau adaptasi bersifat umum.
+- Sertakan durasi pemantauan (misalnya 7–14 hari).
+- Sertakan hal yang perlu dihindari.
+- Tekankan bahwa evaluasi ulang tetap diperlukan.
+
+Jika semua indikator terpenuhi, tuliskan:
+"Tidak diperlukan perawatan tambahan saat ini."
+
 
 
 Gunakan bahasa operasional, tidak berspekulasi, tanpa kata mungkin/probabilitas.

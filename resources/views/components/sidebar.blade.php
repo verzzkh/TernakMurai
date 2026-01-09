@@ -37,8 +37,7 @@
             <div class="ml-3">
                 <h4 class="text-sm font-semibold text-text-primary dark:text-light">
                     {{ auth()->user()->name ?? 'Peternak' }}</h4>
-                <p class="text-xs text-text-tertiary dark:text-primary-light">
-                    {{ auth()->user()->peternak->jenis_akun === 'pro' ? 'Peternak Pro' : 'Peternak Free' }}</p>
+                
             </div>
         </div>
 
