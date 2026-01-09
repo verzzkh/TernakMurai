@@ -103,7 +103,7 @@
 
                 <!-- Bar Chart: Populasi per kandang -->
                 <div class="col-span-2 bg-white rounded-md shadow dark:bg-darker p-4">
-                    <h4 class="text-lg font-semibold mb-2">Jumlah Populasi per Kandang</h4>
+                    <h4 class="text-lg font-semibold mb-2">Total Riwayat Anakan per Kandang</h4>
                     <div class="h-72"><canvas id="barKandangChart"></canvas></div>
                 </div>
 

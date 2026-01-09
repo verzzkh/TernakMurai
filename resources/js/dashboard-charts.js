@@ -3,14 +3,13 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("🔥 Data Kandang:", window.kandangChart);
     console.log("🔥 Status Kandang:", window.kandangStatus);
 
-   /* ============================================================
- * 1️⃣ BAR CHART — POPULASI PER KANDANG (PREMIUM)
+  /* ============================================================
+ * BAR CHART — TOTAL RIWAYAT PRODUKSI ANAKAN PER KANDANG
  * ============================================================ */
 const barCtx = document.getElementById("barKandangChart");
 
 if (barCtx && window.kandangChart) {
 
-    // 12 warna keren agar tiap bar beda warna
     const barColors = [
         "#3B82F6", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6",
         "#06B6D4", "#84CC16", "#D946EF", "#F97316", "#0EA5E9",
@@ -22,32 +21,35 @@ if (barCtx && window.kandangChart) {
         data: {
             labels: window.kandangChart.map(k => `Kandang ${k.nama}`),
             datasets: [{
-                label: 'Jumlah Anakan',
-                data: window.kandangChart.map(k => k.jumlah),
-                backgroundColor: window.kandangChart.map((_, i) => barColors[i % barColors.length]),
-                borderColor: "#00000022",
-                borderWidth: 1.2,
+                label: 'Total Riwayat Anakan',
+                data: window.kandangChart.map(k => k.jumlah), // TOTAL RIWAYAT
+                backgroundColor: window.kandangChart.map(
+                    (_, i) => barColors[i % barColors.length]
+                ),
                 borderRadius: 8,
-                hoverBackgroundColor: window.kandangChart.map((_, i) => barColors[i % barColors.length] + "CC")
+                borderWidth: 1
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { display: false }
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => `${ctx.raw} ekor (riwayat produksi)`
+                    }
+                }
             },
             scales: {
-               y: {
-    beginAtZero: true,
-    ticks: {
-        stepSize: 1,       
-        precision: 0,      
-        callback: v => v + " ekor"
-    },
-    grid: { color: "#E5E7EB" }
-},
-
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1,
+                        precision: 0,
+                        callback: v => v + " ekor"
+                    }
+                },
                 x: {
                     grid: { display: false }
                 }
@@ -55,7 +57,6 @@ if (barCtx && window.kandangChart) {
         }
     });
 }
-
 
 
   /* ============================================================

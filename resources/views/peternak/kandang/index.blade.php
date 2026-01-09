@@ -202,7 +202,15 @@
                                                     d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                             </svg>
                                             <span class="font-medium">Jantan:</span>
-                                            {{ $kandang->indukanJantan->nomor_ring }}
+                                            @if ($kandang->indukanJantan)
+                                                {{ $kandang->indukanJantan->nomor_ring }}
+                                                <span class="text-gray-500 dark:text-gray-400">
+                                                    ({{ $kandang->indukanJantan->nama }})
+                                                </span>
+                                            @else
+                                                <span class="italic text-gray-400">Belum ditentukan</span>
+                                            @endif
+
                                         </div>
                                     @endif
 
@@ -214,7 +222,15 @@
                                                     d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                             </svg>
                                             <span class="font-medium">Betina:</span>
-                                            {{ $kandang->indukanBetina->nomor_ring }}
+                                            @if ($kandang->indukanBetina)
+                                                {{ $kandang->indukanBetina->nomor_ring }}
+                                                <span class="text-gray-500 dark:text-gray-400">
+                                                    ({{ $kandang->indukanBetina->nama }})
+                                                </span>
+                                            @else
+                                                <span class="italic text-gray-400">Belum ditentukan</span>
+                                            @endif
+
                                         </div>
                                     @endif
 
@@ -285,7 +301,7 @@
 
                 <!-- Pagination -->
                 <div class="mt-6">
-                   {{ $kandangs->appends(request()->query())->links() }}
+                    {{ $kandangs->appends(request()->query())->links() }}
 
                 </div>
             @else

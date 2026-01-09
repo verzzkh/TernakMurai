@@ -41,7 +41,7 @@
 
             <a href="{{ route('peternak.profile.show') }}"
                 class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700">
-                Your Profile
+                Profil Kamu
             </a>
 
             <form id="logout-form-mobile" action="{{ route('logout') }}" method="POST">
@@ -75,7 +75,7 @@
 
                 <a href="{{ route('peternak.profile.show') }}"
                     class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700">
-                    Your Profile
+                    Profil Kamu
                 </a>
 
                 <form id="logout-form" action="{{ route('logout') }}" method="POST">@csrf</form>
