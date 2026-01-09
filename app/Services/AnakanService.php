@@ -131,13 +131,14 @@ class AnakanService
         $anakan->asal_penjual = $validatedData['asal_penjual'];
         $anakan->harga = $validatedData['harga'];
         $anakan->status_penjualan = 'belum_dijual';
-        $anakan->deskripsi_karakteristik = $validatedData['catatan_luar'] ?? null;
+       $anakan->deskripsi_karakteristik = $validatedData['deskripsi_karakteristik'] ?? null;
+
 
         // ✅ Tambahkan baris ini:
         $anakan->sumber_anakan = 'eksternal';
 
         // Handle photo upload
-        if (isset($validatedData['foto_anakan_luar'])) {
+        if (!empty($validatedData['foto_anakan_luar'])) {
             $anakan->foto_path = $this->uploadPhoto($validatedData['foto_anakan_luar'], $peternakId);
         }
 
@@ -323,19 +324,26 @@ class AnakanService
      * Calculate age from birth date
      */
     public function calculateAge(Carbon $tanggalLahir): array
-    {
-        $now = Carbon::now();
-        $days = $tanggalLahir->diffInDays($now);
-        $months = $tanggalLahir->diffInMonths($now);
+{
+    $now = Carbon::now();
 
-        $formatted = $days < 30 ? "{$days} hari" : "{$months} bulan";
+    $months = $tanggalLahir->diffInMonths($now);
 
-        return [
-            'days' => $days,
-            'months' => $months,
-            'formatted' => $formatted,
-        ];
+    if ($months < 12) {
+        $formatted = "{$months} bulan";
+    } else {
+        $years = round($months / 12, 1); // 1 desimal
+        // ganti titik ke koma (format Indonesia)
+        $yearsFormatted = str_replace('.', ',', (string) $years);
+        $formatted = "{$yearsFormatted} tahun";
     }
+
+    return [
+        'months' => $months,
+        'formatted' => $formatted,
+    ];
+}
+
 
     /**
      * Delete anakan (soft delete)

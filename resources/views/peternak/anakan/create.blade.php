@@ -3,7 +3,7 @@
         <!-- Content header -->
         <div class="flex items-center justify-between px-4 py-4 border-b lg:py-6 dark:border-primary-darker">
             <div class="flex items-center">
-                
+
                 <h1 class="text-2xl font-semibold">Tambah Anakan Baru</h1>
             </div>
         </div>
@@ -157,26 +157,35 @@
                             <!-- Will be populated dynamically by JavaScript -->
                         </div>
 
-                      <!-- Foto Anakan -->
+                        <!-- Foto Anakan -->
                         <div class="mt-4">
                             <label for="foto_anakan" class="text-gray-700 dark:text-gray-200">Foto Anakan</label>
                             <div
                                 class="mt-2 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md dark:border-gray-600">
                                 <div class="space-y-1 text-center">
                                     <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none"
-                                        v  iewBox="0 0 48 48" aria-hidden="true">
+                                        v iewBox="0 0 48 48" aria-hidden="true">
                                         <path
                                             d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
                                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                     </svg>
                                     <div class="flex text-sm text-gray-600">
                                         <label for="foto_anakan"
-                                            class="relative cursor-pointer bg-white rounded-md font-medium text-primary hover:text-primary-dark focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary">
-                                            <span class="px-2 py-1 dark:bg-darker dark:text-gray-300">Pilih foto</span>
+                                            class="relative cursor-pointer bg-blue-600 rounded-md font-medium
+           text-white hover:bg-blue-700
+           dark:bg-blue-500 dark:hover:bg-blue-600
+           focus-within:outline-none focus-within:ring-2
+           focus-within:ring-offset-2 focus-within:ring-blue-500">
+
+                                            <span class="px-2 py-1">
+                                                Pilih foto
+                                            </span>
+
                                             <!-- Use array-style name so server consistently receives files as foto_anakan[] -->
                                             <input id="foto_anakan" name="foto_anakan[]" type="file"
                                                 class="sr-only" accept="image/*">
                                         </label>
+
                                         <p class="pl-1 dark:text-gray-400">atau seret dan lepas</p>
                                     </div>
                                     <p class="text-xs text-gray-500 dark:text-gray-400">
@@ -241,8 +250,7 @@
 
                         <!-- Foto Anakan -->
                         <div class="mt-4">
-                            <label for="foto_anakan_luar" class="text-gray-700 dark:text-gray-200">Foto Anakan <span
-                                    class="text-red-500">*</span></label>
+                            <label for="foto_anakan_luar" class="text-gray-700 dark:text-gray-200">Foto Anakan</label>
                             <div
                                 class="mt-2 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md dark:border-gray-600">
                                 <div class="space-y-1 text-center">
@@ -253,12 +261,21 @@
                                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                     </svg>
                                     <div class="flex text-sm text-gray-600">
-                                        <label for="foto_anakan_luar"
-                                            class="relative cursor-pointer bg-white rounded-md font-medium text-primary hover:text-primary-dark focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary">
-                                            <span class="px-2 py-1 dark:bg-darker dark:text-gray-300">Pilih foto</span>
-                                            <input id="foto_anakan_luar" name="foto_anakan_luar" type="file"
-                                                class="sr-only" accept="image/*" required>
-                                        </label>
+                                       <label for="foto_anakan_luar"
+    class="relative cursor-pointer bg-blue-600 rounded-md font-medium
+           text-white hover:bg-blue-700
+           dark:bg-blue-500 dark:hover:bg-blue-600
+           focus-within:outline-none focus-within:ring-2
+           focus-within:ring-offset-2 focus-within:ring-blue-500">
+
+    <span class="px-2 py-1">
+        Pilih foto
+    </span>
+
+    <input id="foto_anakan_luar" name="foto_anakan_luar" type="file"
+        class="sr-only" accept="image/*">
+</label>
+
                                         <p class="pl-1 dark:text-gray-400">atau seret dan lepas</p>
                                     </div>
                                     <p class="text-xs text-gray-500 dark:text-gray-400">
@@ -339,22 +356,25 @@
 
                         <!-- Harga -->
                         <div class="mt-4">
-                            <label for="harga" class="text-gray-700 dark:text-gray-200">Harga <span
+                            <label for="harga" class="text-gray-700 dark:text-gray-200">Harga Beli<span
                                     class="text-red-500">*</span></label>
                             <div class="relative">
                                 <span
                                     class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-700 dark:text-gray-300">Rp</span>
-                                <input type="number" id="harga" name="harga" required min="0"
-                                    step="1000" value="{{ old('harga') }}"
-                                    class="block w-full px-10 py-2 mt-2 text-gray-700 bg-white border border-gray-300 rounded-md dark:bg-darker dark:text-gray-300 dark:border-gray-600 focus:border-primary dark:focus:border-primary focus:outline-none focus:ring focus:ring-primary focus:ring-opacity-40">
-                            </div>
+                               <input type="text" id="harga" name="harga" required
+    inputmode="numeric"
+    value="{{ old('harga') }}"
+    class="block w-full px-10 py-2 mt-2 text-gray-700 bg-white border border-gray-300 rounded-md
+           dark:bg-darker dark:text-gray-300 dark:border-gray-600
+           focus:border-primary focus:outline-none focus:ring focus:ring-primary focus:ring-opacity-40">
+  </div>
                             @error('harga')
                                 <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                             @enderror
                         </div>
 
                         <!-- Harga Beli -->
-                        <div class="mt-4">
+                        {{-- <div class="mt-4">
                             <label for="harga_beli" class="text-gray-700 dark:text-gray-200">Harga Beli <span
                                     class="text-red-500">*</span></label>
                             <div class="relative">
@@ -367,16 +387,16 @@
                             @error('harga_beli')
                                 <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                             @enderror
-                        </div>
+                        </div> --}}
 
                         <!-- Catatan Tambahan -->
                         <div class="mt-6">
-                            <label for="catatan_luar" class="text-gray-700 dark:text-gray-200">Catatan
+                            <label for="deskripsi_karakteristik" class="text-gray-700 dark:text-gray-200">Catatan
                                 Tambahan</label>
-                            <textarea id="catatan_luar" name="catatan_luar" rows="3"
+                            <textarea id="deskripsi_karakteristik" name="deskripsi_karakteristik" rows="3"
                                 class="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-300 rounded-md dark:bg-darker dark:text-gray-300 dark:border-gray-600 focus:border-primary dark:focus:border-primary focus:outline-none focus:ring focus:ring-primary focus:ring-opacity-40"
-                                placeholder="Informasi tambahan tentang anakan">{{ old('catatan_luar') }}</textarea>
-                            @error('catatan_luar')
+                                placeholder="Informasi tambahan tentang anakan">{{ old('deskripsi_karakteristik') }}</textarea>
+                            @error('deskripsi_karakteristik')
                                 <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                             @enderror
                         </div>
@@ -389,14 +409,14 @@
                             class="px-4 py-2 mr-2 text-gray-700 bg-white border rounded-md dark:text-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-darker-2 focus:outline-none focus:ring focus:ring-primary-lighter">
                             Batal
                         </a>
-                     <button type="submit"
-    class="px-4 py-2 text-white 
+                        <button type="submit"
+                            class="px-4 py-2 text-white 
            bg-cyan-600 hover:bg-cyan-700
            dark:bg-cyan-500 dark:hover:bg-cyan-600
            rounded-md focus:outline-none
            focus:ring focus:ring-cyan-400 focus:ring-offset-1">
-    Simpan
-</button>
+                            Simpan
+                        </button>
 
                     </div>
                 </form>
@@ -458,51 +478,52 @@
             }
 
             // Kandang selection
-         const kandangSelect = document.getElementById('kandang_id');
-const infoKandang = document.getElementById('info-kandang');
+            const kandangSelect = document.getElementById('kandang_id');
+            const infoKandang = document.getElementById('info-kandang');
 
-if (kandangSelect && infoKandang) {
-    kandangSelect.addEventListener('change', function() {
-        if (this.value) {
-            infoKandang.classList.remove('hidden');
-        } else {
-            infoKandang.classList.add('hidden');
-        }
-    });
-}
-
-            // Multiple anakan logic
-            // Multiple anakan logic
-const jumlahAnakanSelect = document.getElementById('jumlah_anakan');
-const jenisSingle = document.getElementById('jenis-kelamin-single');
-const multipleForm = document.getElementById('multiple-anakan-form');
-
-// perbaikan: cari section foto dengan cara lebih aman
-const singlePhotoSection = document.getElementById('foto_anakan').closest('div.mt-4') || document.querySelector('[for="foto_anakan"]').closest('div');
-
-    jumlahAnakanSelect.addEventListener('change', function () {
-    const count = parseInt(this.value);
-
-    // jika lebih dari 1 -> tampilkan form dinamis
-        if (count > 1) {
-        // sembunyikan form tunggal
-        jenisSingle.classList.add('hidden');
-        singlePhotoSection.classList.add('hidden');
-        multipleForm.classList.remove('hidden');
-
-            // remove name from single photo input so it doesn't submit an empty entry
-            const singleFoto = document.getElementById('foto_anakan');
-            if (singleFoto && singleFoto.hasAttribute('name')) {
-                singleFoto.removeAttribute('name');
+            if (kandangSelect && infoKandang) {
+                kandangSelect.addEventListener('change', function() {
+                    if (this.value) {
+                        infoKandang.classList.remove('hidden');
+                    } else {
+                        infoKandang.classList.add('hidden');
+                    }
+                });
             }
 
-            // kosongkan dan isi ulang form multiple
-        multipleForm.innerHTML = '';
+            // Multiple anakan logic
+            // Multiple anakan logic
+            const jumlahAnakanSelect = document.getElementById('jumlah_anakan');
+            const jenisSingle = document.getElementById('jenis-kelamin-single');
+            const multipleForm = document.getElementById('multiple-anakan-form');
 
-        for (let i = 1; i <= count; i++) {
-            const anakanItem = document.createElement('div');
-            anakanItem.className = 'p-4 border rounded-md dark:border-primary-darker space-y-3';
-            anakanItem.innerHTML = `
+            // perbaikan: cari section foto dengan cara lebih aman
+            const singlePhotoSection = document.getElementById('foto_anakan').closest('div.mt-4') || document
+                .querySelector('[for="foto_anakan"]').closest('div');
+
+            jumlahAnakanSelect.addEventListener('change', function() {
+                const count = parseInt(this.value);
+
+                // jika lebih dari 1 -> tampilkan form dinamis
+                if (count > 1) {
+                    // sembunyikan form tunggal
+                    jenisSingle.classList.add('hidden');
+                    singlePhotoSection.classList.add('hidden');
+                    multipleForm.classList.remove('hidden');
+
+                    // remove name from single photo input so it doesn't submit an empty entry
+                    const singleFoto = document.getElementById('foto_anakan');
+                    if (singleFoto && singleFoto.hasAttribute('name')) {
+                        singleFoto.removeAttribute('name');
+                    }
+
+                    // kosongkan dan isi ulang form multiple
+                    multipleForm.innerHTML = '';
+
+                    for (let i = 1; i <= count; i++) {
+                        const anakanItem = document.createElement('div');
+                        anakanItem.className = 'p-4 border rounded-md dark:border-primary-darker space-y-3';
+                        anakanItem.innerHTML = `
                 <h3 class="font-medium text-gray-800 dark:text-gray-200 mb-3">Anakan #${i}</h3>
                 
                 <div>
@@ -547,21 +568,21 @@ const singlePhotoSection = document.getElementById('foto_anakan').closest('div.m
                     </div>
                 </div>
             `;
-            multipleForm.appendChild(anakanItem);
-        }
-    } else {
-        // kembali ke form tunggal
-        jenisSingle.classList.remove('hidden');
-        singlePhotoSection.classList.remove('hidden');
-        multipleForm.classList.add('hidden');
-        multipleForm.innerHTML = '';
-        // restore name on single photo input so it will submit when using single mode
-        const singleFoto = document.getElementById('foto_anakan');
-        if (singleFoto && !singleFoto.hasAttribute('name')) {
-            singleFoto.setAttribute('name', 'foto_anakan[]');
-        }
-    }
-});
+                        multipleForm.appendChild(anakanItem);
+                    }
+                } else {
+                    // kembali ke form tunggal
+                    jenisSingle.classList.remove('hidden');
+                    singlePhotoSection.classList.remove('hidden');
+                    multipleForm.classList.add('hidden');
+                    multipleForm.innerHTML = '';
+                    // restore name on single photo input so it will submit when using single mode
+                    const singleFoto = document.getElementById('foto_anakan');
+                    if (singleFoto && !singleFoto.hasAttribute('name')) {
+                        singleFoto.setAttribute('name', 'foto_anakan[]');
+                    }
+                }
+            });
 
 
             // Photo preview logic
@@ -718,4 +739,25 @@ const singlePhotoSection = document.getElementById('foto_anakan').closest('div.m
             });
         });
     </script>
+    <script>
+document.addEventListener('DOMContentLoaded', function () {
+    const hargaInput = document.getElementById('harga');
+
+    hargaInput.addEventListener('input', function () {
+        let value = this.value.replace(/\D/g, '');
+        this.value = formatRupiah(value);
+    });
+
+    function formatRupiah(angka) {
+        if (!angka) return '';
+        return angka.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    }
+
+    // sebelum submit → hapus titik
+    hargaInput.form.addEventListener('submit', function () {
+        hargaInput.value = hargaInput.value.replace(/\./g, '');
+    });
+});
+</script>
+
 </x-layout>

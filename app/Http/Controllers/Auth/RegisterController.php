@@ -20,15 +20,27 @@ class RegisterController extends Controller
 
    public function register(Request $request)
 {
-    $data = $request->validate([
-        'name' => ['required', 'string', 'max:50', 'unique:users,name'],
-        'email' => ['nullable', 'email', 'max:255', 'unique:users,email'],
-        'password' => ['required', 'string', 'min:6', 'confirmed'],
-        'nama_peternakan' => ['required', 'string', 'max:100'],
-        'alamat' => ['nullable', 'string'],
-        'nomor_handphone' => ['nullable', 'string', 'max:30'],
-        'foto_profil' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
-    ]);
+$data = $request->validate([
+    'name' => ['required', 'string', 'max:50', 'unique:users,name'],
+    'email' => ['nullable', 'email', 'max:255', 'unique:users,email'],
+    'password' => ['required', 'string', 'min:6', 'confirmed'],
+    'nama_peternakan' => ['required', 'string', 'max:100'],
+    'alamat' => ['nullable', 'string'],
+    'nomor_handphone' => ['required', 'regex:/^08[0-9]{8,12}$/'],
+    'foto_profil' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
+], [
+    'name.required' => 'Nama pengguna wajib diisi.',
+    'name.unique' => 'Nama pengguna sudah digunakan.',
+
+    'password.required' => 'Password wajib diisi.',
+    'password.min' => 'Password minimal 6 karakter.',
+    'password.confirmed' => 'Konfirmasi password tidak sesuai.',
+
+    'nomor_handphone.required' => 'Nomor handphone wajib diisi.',
+    'nomor_handphone.regex' => 'Nomor handphone harus diawali 08 dan hanya berisi angka.',
+
+    'nama_peternakan.required' => 'Nama peternakan wajib diisi.',
+]);
 
     // 1️⃣ BUAT USER DULU
     $user = User::create([

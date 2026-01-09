@@ -34,7 +34,7 @@ class StoreAnakanDariLuarRequest extends FormRequest
             'jenis_kelamin_luar' => ['required', 'in:jantan,betina,tidak_diketahui'],
 
             // Foto wajib
-            'foto_anakan_luar' => ['required', 'image', 'mimes:jpeg,jpg,png', 'max:2048'],
+            'foto_anakan_luar' => ['nullable', 'image', 'mimes:jpeg,jpg,png', 'max:2048'],
 
             // Tanggal lahir / perkiraan wajib
             'tanggal_lahir' => ['required', 'date', 'before_or_equal:today'],
@@ -52,9 +52,6 @@ class StoreAnakanDariLuarRequest extends FormRequest
             // Harga jual wajib
             'harga' => ['required', 'integer', 'min:0'],
 
-            // Harga beli wajib
-            'harga_beli' => ['required', 'integer', 'min:0'],
-
             // Karakteristik (gabungan dari karakteristik & catatan)
             'deskripsi_karakteristik' => ['nullable', 'string', 'max:5000'],
 
@@ -69,7 +66,7 @@ class StoreAnakanDariLuarRequest extends FormRequest
             'nomor_ring.unique' => 'Nomor ring sudah digunakan untuk anakan lain.',
             'jenis_kelamin_luar.required' => 'Jenis kelamin wajib dipilih.',
             'jenis_kelamin_luar.in' => 'Jenis kelamin tidak valid.',
-            'foto_anakan_luar.required' => 'Foto anakan wajib diunggah.',
+          
             'foto_anakan_luar.image' => 'File foto harus berupa gambar.',
             'foto_anakan_luar.mimes' => 'Format gambar harus JPEG, JPG, atau PNG.',
             'foto_anakan_luar.max' => 'Ukuran gambar maksimal 2MB.',
@@ -83,9 +80,7 @@ class StoreAnakanDariLuarRequest extends FormRequest
             'harga.required' => 'Harga wajib diisi.',
             'harga.integer' => 'Harga harus berupa angka.',
             'harga.min' => 'Harga tidak boleh negatif.',
-            'harga_beli.required' => 'Harga beli wajib diisi.',
-            'harga_beli.integer' => 'Harga beli harus berupa angka.',
-            'harga_beli.min' => 'Harga beli tidak boleh negatif.',
+          
             'deskripsi_karakteristik.max' => 'Karakteristik maksimal 5000 karakter.',
         ];
     }

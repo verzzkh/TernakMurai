@@ -144,38 +144,29 @@ public function getAgeAttribute(): array
 {
     if (! $this->tanggal_lahir) {
         return [
-            'days' => 0,
-            'months' => 0,
-            'years' => 0,
+            'months'    => 0,
             'formatted' => 'Tidak diketahui',
         ];
     }
 
-    $birthDate = Carbon::parse($this->tanggal_lahir);
-    $now = Carbon::now();
+    // 🔒 PAKSA BULAN INTEGER
+    $months = (int) $this->tanggal_lahir->diffInMonths(now());
 
-    $days   = $birthDate->diffInDays($now);
-    $months = $birthDate->diffInMonths($now);
-    $years  = $birthDate->diffInYears($now);
-
-    // Jika umur masih di bawah 1 tahun → pakai bulan
-    if ($years < 1) {
+    // < 12 bulan → tampil bulan
+    if ($months < 12) {
         return [
-            'days' => $days,
-            'months' => $months,
-            'years' => 0,
-            'formatted' => "{$months} bulan",
+            'months'    => $months,
+            'formatted' => $months . ' bulan',
         ];
     }
 
-    // Jika umur >= 1 tahun → pakai tahun dengan 1 angka desimal
-    $yearsDecimal = round($days / 365, 1);
+    // >= 12 bulan → tahun (1 desimal dari BULAN BULAT)
+    $years = round($months / 12, 1);
+    $years = str_replace('.', ',', (string) $years);
 
     return [
-        'days' => $days,
-        'months' => $months,
-        'years' => $yearsDecimal,
-        'formatted' => "{$yearsDecimal} tahun",
+        'months'    => $months,
+        'formatted' => $years . ' tahun',
     ];
 }
 

@@ -9,6 +9,7 @@ use App\Models\Peternak;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 
 class IndukanService
 {
@@ -26,6 +27,23 @@ class IndukanService
         }
 
         return $file->store("indukan/{$peternakId}", 'public');
+    }
+
+    public function calculateAge(Carbon $tanggalLahir): array
+    {
+        $months = $tanggalLahir->diffInMonths(now());
+
+        if ($months < 12) {
+            $formatted = "{$months} bulan";
+        } else {
+            $years = round($months / 12, 1);
+            $formatted = str_replace('.', ',', (string) $years) . ' tahun';
+        }
+
+        return [
+            'months' => $months,
+            'formatted' => $formatted,
+        ];
     }
 
     /**

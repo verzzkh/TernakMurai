@@ -38,11 +38,16 @@ if (barCtx && window.kandangChart) {
                 legend: { display: false }
             },
             scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: { callback: v => v + " ekor" },
-                    grid: { color: "#E5E7EB" }
-                },
+               y: {
+    beginAtZero: true,
+    ticks: {
+        stepSize: 1,       
+        precision: 0,      
+        callback: v => v + " ekor"
+    },
+    grid: { color: "#E5E7EB" }
+},
+
                 x: {
                     grid: { display: false }
                 }

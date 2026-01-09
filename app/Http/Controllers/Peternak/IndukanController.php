@@ -9,6 +9,7 @@ use App\Http\Requests\StoreIndukanRequest;
 use App\Http\Requests\UpdateIndukanRequest;
 use App\Models\Indukan;
 use App\Services\IndukanService;
+use App\Services\AnakanService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,7 +17,8 @@ use Illuminate\View\View;
 class IndukanController extends Controller
 {
     public function __construct(
-        private IndukanService $indukanService
+        private IndukanService $indukanService,
+        private AnakanService $anakanService
     ) {}
     public function index(Request $request): View
     {
@@ -28,7 +30,9 @@ class IndukanController extends Controller
             'sort_by' => $request->get('sort_by'),
             'sort_direction' => $request->get('sort_direction'),
         ];
-        $indukans = $this->indukanService->getPaginatedIndukan($peternak, $filters);
+    // Ambil data indukan (pagination)
+    $indukans = $this->indukanService->getPaginatedIndukan($peternak, $filters);
+
         $stats = $this->indukanService->getIndukanStats($peternak);
         return view('peternak.indukan.index', compact('indukans', 'stats', 'filters'));
     }
@@ -36,6 +40,9 @@ class IndukanController extends Controller
     {
         return view('peternak.indukan.create');
     }
+
+
+    
   public function store(StoreIndukanRequest $request): RedirectResponse
 {
     $peternak = Auth::user()->peternak;
@@ -62,6 +69,7 @@ class IndukanController extends Controller
         'kandangsJantan',
         'kandangsBetina'
     ]);
+ 
 
     return view('peternak.indukan.detail', compact('indukan'));
 }

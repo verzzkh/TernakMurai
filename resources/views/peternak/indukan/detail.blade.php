@@ -114,42 +114,43 @@
                             </div>
                         @endif
                         <!-- PERILAKU BREEDING - View Only -->
-<h2 class="text-lg font-medium text-gray-900 dark:text-white mb-3">Perilaku Breeding</h2>
+                        <h2 class="text-lg font-medium text-gray-900 dark:text-white mb-3">Perilaku Breeding</h2>
 
-<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
 
-    {{-- Jantan --}}
-    @if($indukan->jenis_kelamin=='jantan')
-    <div class="space-y-1">
-        <p>• Aktif Kicau :
-            <b class="ml-1">{{ $indukan->aktif_kicau ? '✔ Ya' : '✘ Tidak' }}</b>
-        </p>
-        <p>• Mendekati Betina :
-            <b class="ml-1">{{ $indukan->mendekati_betina ? '✔ Ya' : '✘ Tidak' }}</b>
-        </p>
-    </div>
-    @endif
+                            {{-- Jantan --}}
+                            @if ($indukan->jenis_kelamin == 'jantan')
+                                <div class="space-y-1">
+                                    <p>• Aktif Kicau :
+                                        <b class="ml-1">{{ $indukan->aktif_kicau ? '✔ Ya' : '✘ Tidak' }}</b>
+                                    </p>
+                                    <p>• Mendekati Betina :
+                                        <b class="ml-1">{{ $indukan->mendekati_betina ? '✔ Ya' : '✘ Tidak' }}</b>
+                                    </p>
+                                </div>
+                            @endif
 
-    {{-- Betina --}}
-    @if($indukan->jenis_kelamin=='betina')
-    <div class="space-y-1">
-        <p>• Nafsu Makan Meningkat :
-            <b class="ml-1">{{ $indukan->nafsu_makan_meningkat ? '✔ Ya' : '✘ Tidak' }}</b>
-        </p>
-        <p>• Aktif Membuat Sarang :
-            <b class="ml-1">{{ $indukan->aktif_buat_sarang ? '✔ Ya' : '✘ Tidak' }}</b>
-        </p>
-    </div>
-    @endif
+                            {{-- Betina --}}
+                            @if ($indukan->jenis_kelamin == 'betina')
+                                <div class="space-y-1">
+                                    <p>• Nafsu Makan Meningkat :
+                                        <b
+                                            class="ml-1">{{ $indukan->nafsu_makan_meningkat ? '✔ Ya' : '✘ Tidak' }}</b>
+                                    </p>
+                                    <p>• Aktif Membuat Sarang :
+                                        <b class="ml-1">{{ $indukan->aktif_buat_sarang ? '✔ Ya' : '✘ Tidak' }}</b>
+                                    </p>
+                                </div>
+                            @endif
 
-    {{-- Temperamen --}}
-    <div>
-        <p>• Temperamen :
-            <b class="capitalize ml-1">{{ $indukan->temperamen ?? '-' }}</b>
-        </p>
-    </div>
+                            {{-- Temperamen --}}
+                            <div>
+                                <p>• Temperamen :
+                                    <b class="capitalize ml-1">{{ $indukan->temperamen ?? '-' }}</b>
+                                </p>
+                            </div>
 
-</div>
+                        </div>
 
 
 
@@ -324,14 +325,21 @@
                                     d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" />
                             </svg>
 
-                            <div class="flex text-sm text-gray-600">
-                                <label for="file-upload-indukan"
-                                    class="relative cursor-pointer rounded-md font-medium text-primary">
-                                    <span>Pilih foto</span>
-                                    <input id="file-upload-indukan" name="file-upload-indukan" type="file"
-                                        accept="image/*" class="sr-only">
-                                </label>
-                            </div>
+                           <div class="flex text-sm">
+    <label for="file-upload-indukan"
+        class="relative cursor-pointer
+               bg-blue-600 hover:bg-blue-700
+               dark:bg-blue-500 dark:hover:bg-blue-600
+               text-white font-medium
+               px-4 py-2
+               rounded-md
+               focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-500">
+        <span>Pilih foto</span>
+        <input id="file-upload-indukan" name="file-upload-indukan" type="file"
+            accept="image/*" class="sr-only">
+    </label>
+</div>
+
 
                             <p class="text-xs text-gray-500 dark:text-gray-400">PNG, JPG, JPEG max 2MB</p>
                         </div>
@@ -345,9 +353,14 @@
                     </button>
 
                     <button id="confirmPhotoUpload"
-                        class="px-4 py-2 text-sm  bg-gray-200 dark:bg-gray-700 text-white bg-primary rounded-md hover:bg-primary-dark">
-                        Upload
-                    </button>
+    class="px-4 py-2 text-sm font-medium
+           text-white
+           bg-cyan-600 hover:bg-cyan-700
+           dark:bg-cyan-500 dark:hover:bg-cyan-600
+           rounded-md">
+    Upload
+</button>
+
                 </div>
             </div>
         </div>

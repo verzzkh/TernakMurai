@@ -17,7 +17,7 @@
         <div class="mt-2 p-4">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-                
+
                 <!-- Section Info Utama -->
                 <div class="lg:col-span-1 bg-white dark:bg-darker rounded-md shadow-md p-4">
                     <h2 class="text-xl font-semibold mb-4 text-gray-700 dark:text-light">Informasi Anakan</h2>
@@ -38,56 +38,55 @@
                                 </div>
                             @endif
                             <button
-                                class="absolute bottom-2 right-2 bg-primary hover:bg-primary-dark text-white rounded-full p-2"
-                                id="changePhotoBtn">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
-                            </button>
+    id="changePhotoBtn"
+    class="absolute top-3 right-3
+           bg-white bg-opacity-80 hover:bg-opacity-100
+           text-gray-900 text-xs
+           px-3 py-1
+           rounded-md shadow-md">
+    Ganti Foto
+</button>
+
                         </div>
                     </div>
 
                     <!-- Data Identitas -->
                     <div class="space-y-4">
                         <!-- Trip Kelahiran -->
-@if ($anakan->perkawinan)
-    <div class="flex items-center justify-between">
-        <span class="text-gray-700 dark:text-light font-medium">Trip Kelahiran:</span>
-        <span class="text-primary font-semibold">
-            {{ $anakan->perkawinan->nomor_trip ?? '-' }}
-        </span>
-    </div>
+                        @if ($anakan->perkawinan)
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-700 dark:text-light font-medium">Trip Kelahiran:</span>
+                                <span class="text-primary font-semibold">
+                                    {{ $anakan->perkawinan->nomor_trip ?? '-' }}
+                                </span>
+                            </div>
 
-    <div class="flex items-center justify-between">
-        <span class="text-gray-700 dark:text-light font-medium">Tanggal Kawin:</span>
-        <span class="text-gray-600 dark:text-gray-300">
-            {{ $anakan->perkawinan->tanggal_kawin?->format('d F Y') ?? '-' }}
-        </span>
-    </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-700 dark:text-light font-medium">Tanggal Kawin:</span>
+                                <span class="text-gray-600 dark:text-gray-300">
+                                    {{ $anakan->perkawinan->tanggal_kawin?->format('d F Y') ?? '-' }}
+                                </span>
+                            </div>
 
-    <div class="flex items-center justify-between">
-        <span class="text-gray-700 dark:text-light font-medium">Pasangan:</span>
-   <span class="text-gray-600 dark:text-gray-300 text-right">
-    {{ $anakan->perkawinan->indukanJantan
-        ? $anakan->perkawinan->indukanJantan->nomor_ring .
-            ($anakan->perkawinan->indukanJantan->nama ? ' ' . $anakan->perkawinan->indukanJantan->nama : '')
-        : 'J?' }}
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-700 dark:text-light font-medium">Pasangan:</span>
+                                <span class="text-gray-600 dark:text-gray-300 text-right">
+                                    {{ $anakan->perkawinan->indukanJantan
+                                        ? $anakan->perkawinan->indukanJantan->nomor_ring .
+                                            ($anakan->perkawinan->indukanJantan->nama ? ' ' . $anakan->perkawinan->indukanJantan->nama : '')
+                                        : 'J?' }}
 
-    ×
+                                    ×
 
-    {{ $anakan->perkawinan->indukanBetina
-        ? $anakan->perkawinan->indukanBetina->nomor_ring .
-            ($anakan->perkawinan->indukanBetina->nama ? ' ' . $anakan->perkawinan->indukanBetina->nama : '')
-        : 'B?' }}
-</span>
+                                    {{ $anakan->perkawinan->indukanBetina
+                                        ? $anakan->perkawinan->indukanBetina->nomor_ring .
+                                            ($anakan->perkawinan->indukanBetina->nama ? ' ' . $anakan->perkawinan->indukanBetina->nama : '')
+                                        : 'B?' }}
+                                </span>
 
-        
-    </div>
-@endif
+
+                            </div>
+                        @endif
 
                         <div class="flex items-center justify-between">
                             <span class="text-gray-700 dark:text-light font-medium">Ring Number:</span>
@@ -246,7 +245,7 @@
                                         </div>
 
                                     </div>
-                                    
+
                                 </div>
                             @else
                                 <!-- Anakan dari luar -->
@@ -456,8 +455,7 @@
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700 dark:text-light mb-1">Harga Baru</label>
                     <input type="text" id="newPriceInput"
-    class="w-full px-3 py-2 text-base border-gray-300 rounded-md"
-    value="{{ $anakan->harga }}">
+                        class="w-full px-3 py-2 text-base border-gray-300 rounded-md" value="{{ $anakan->harga }}">
 
                 </div>
 
@@ -510,12 +508,21 @@
                             </svg>
                             <div class="flex text-sm text-gray-600">
                                 <label for="file-upload"
-                                    class="relative cursor-pointer rounded-md font-medium text-primary hover:text-primary-dark focus-within:outline-none">
+                                    class="relative cursor-pointer rounded-md
+               bg-blue-600 hover:bg-blue-700
+               dark:bg-blue-500 dark:hover:bg-blue-600
+               text-white font-medium
+               px-3 py-1
+               focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-500">
                                     <span>Upload a file</span>
                                     <input id="file-upload" name="file-upload" type="file" class="sr-only">
                                 </label>
-                                <p class="pl-1 text-gray-500 dark:text-gray-400">or drag and drop</p>
+
+                                <p class="pl-2 text-gray-500 dark:text-gray-400">
+                                    or drag and drop
+                                </p>
                             </div>
+
                             <p class="text-xs text-gray-500 dark:text-gray-400">
                                 PNG, JPG, GIF up to 5MB
                             </p>
@@ -528,10 +535,18 @@
                         class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 dark:bg-primary-darker dark:text-light dark:hover:bg-primary-dark">
                         Batal
                     </button>
-                    <button id="confirmPhotoUpload"
-                        class="px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-offset-dark">
-                        Upload
-                    </button>
+                   <button id="confirmPhotoUpload"
+    class="px-4 py-2 text-sm font-medium
+           text-white
+           bg-cyan-600 hover:bg-cyan-700
+           dark:bg-cyan-500 dark:hover:bg-cyan-600
+           rounded-md
+           focus:outline-none focus:ring-2
+           focus:ring-cyan-500 focus:ring-offset-2
+           dark:focus:ring-offset-dark">
+    Upload
+</button>
+
                 </div>
             </div>
         </div>
@@ -652,53 +667,53 @@
             });
 
             function formatRupiah(value) {
-    return value.replace(/\D/g, "")
-                .replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-}
+                return value.replace(/\D/g, "")
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+            }
 
-// ===================================================
-// 💰 FORMAT RUPIAH — FORM PENJUALAN
-// ===================================================
-const salePriceInput = document.getElementById("salePrice");
+            // ===================================================
+            // 💰 FORMAT RUPIAH — FORM PENJUALAN
+            // ===================================================
+            const salePriceInput = document.getElementById("salePrice");
 
-if (salePriceInput) {
+            if (salePriceInput) {
 
-    // Format saat load
-    if (salePriceInput.value.trim() !== "") {
-        salePriceInput.value = formatRupiah(salePriceInput.value);
-    }
+                // Format saat load
+                if (salePriceInput.value.trim() !== "") {
+                    salePriceInput.value = formatRupiah(salePriceInput.value);
+                }
 
-    // Format saat mengetik
-    salePriceInput.addEventListener("input", function () {
-        this.value = formatRupiah(this.value);
-    });
+                // Format saat mengetik
+                salePriceInput.addEventListener("input", function() {
+                    this.value = formatRupiah(this.value);
+                });
 
-    // Hapus titik sebelum submit
-    const saleForm = document.getElementById("saleForm");
-    saleForm.addEventListener("submit", function () {
-        salePriceInput.value = salePriceInput.value.replace(/\./g, "");
-    });
-}
+                // Hapus titik sebelum submit
+                const saleForm = document.getElementById("saleForm");
+                saleForm.addEventListener("submit", function() {
+                    salePriceInput.value = salePriceInput.value.replace(/\./g, "");
+                });
+            }
 
 
-const hargaInput = document.getElementById("hargaAnakan");
+            const hargaInput = document.getElementById("hargaAnakan");
 
-if (hargaInput) {
-    // Format saat load
-    if (hargaInput.value.trim() !== "") {
-        hargaInput.value = formatRupiah(hargaInput.value);
-    }
+            if (hargaInput) {
+                // Format saat load
+                if (hargaInput.value.trim() !== "") {
+                    hargaInput.value = formatRupiah(hargaInput.value);
+                }
 
-    // Format saat mengetik
-    hargaInput.addEventListener("input", function() {
-        this.value = formatRupiah(this.value);
-    });
+                // Format saat mengetik
+                hargaInput.addEventListener("input", function() {
+                    this.value = formatRupiah(this.value);
+                });
 
-    // Bersihkan titik sebelum submit
-    hargaInput.form.addEventListener("submit", function() {
-        hargaInput.value = hargaInput.value.replace(/\./g, "");
-    });
-}
+                // Bersihkan titik sebelum submit
+                hargaInput.form.addEventListener("submit", function() {
+                    hargaInput.value = hargaInput.value.replace(/\./g, "");
+                });
+            }
 
 
             // ===================================================
@@ -736,67 +751,67 @@ if (hargaInput) {
                 });
             }
 
-           // ===================================================
-// 🧾 UPDATE STATUS PERTUMBUHAN
-// ===================================================
-const updateStatusBtn = document.getElementById('updateStatusBtn');
+            // ===================================================
+            // 🧾 UPDATE STATUS PERTUMBUHAN
+            // ===================================================
+            const updateStatusBtn = document.getElementById('updateStatusBtn');
 
-updateStatusBtn?.addEventListener('click', async function() {
-    const newStatus = document.getElementById('newStatusSelect').value;
-    let newPrice = document.getElementById('newPriceInput').value;
+            updateStatusBtn?.addEventListener('click', async function() {
+                const newStatus = document.getElementById('newStatusSelect').value;
+                let newPrice = document.getElementById('newPriceInput').value;
 
-    // Hapus titik sebelum dikirim ke backend
-    newPrice = newPrice.replace(/\./g, "");
+                // Hapus titik sebelum dikirim ke backend
+                newPrice = newPrice.replace(/\./g, "");
 
-    if (!newStatus) {
-        showToast('Silakan pilih status pertumbuhan', false);
-        return;
-    }
+                if (!newStatus) {
+                    showToast('Silakan pilih status pertumbuhan', false);
+                    return;
+                }
 
-    if (!newPrice) {
-        showToast('Masukkan harga terlebih dahulu', false);
-        return;
-    }
+                if (!newPrice) {
+                    showToast('Masukkan harga terlebih dahulu', false);
+                    return;
+                }
 
-    try {
-        const res = await fetch(`${baseUrl}/status`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrf,
-            },
-            body: JSON.stringify({
-                status_pertumbuhan: newStatus,
-                harga: parseInt(newPrice),
-                catatan_perubahan: '',
-            }),
-        });
+                try {
+                    const res = await fetch(`${baseUrl}/status`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrf,
+                        },
+                        body: JSON.stringify({
+                            status_pertumbuhan: newStatus,
+                            harga: parseInt(newPrice),
+                            catatan_perubahan: '',
+                        }),
+                    });
 
-        const data = await res.json();
-        if (data.success) {
-            showToast('Status berhasil diperbarui ✅');
-            setTimeout(() => location.reload(), 1000);
-        } else {
-            showToast('Gagal memperbarui status ❌', false);
-        }
-    } catch (err) {
-        console.error(err);
-        showToast('Kesalahan jaringan ⚠️', false);
-    }
-});
-const newPriceInput = document.getElementById("newPriceInput");
+                    const data = await res.json();
+                    if (data.success) {
+                        showToast('Status berhasil diperbarui ✅');
+                        setTimeout(() => location.reload(), 1000);
+                    } else {
+                        showToast('Gagal memperbarui status ❌', false);
+                    }
+                } catch (err) {
+                    console.error(err);
+                    showToast('Kesalahan jaringan ⚠️', false);
+                }
+            });
+            const newPriceInput = document.getElementById("newPriceInput");
 
-if (newPriceInput) {
-    // Format saat user mengetik
-    newPriceInput.addEventListener("input", function () {
-        this.value = formatRupiah(this.value);
-    });
+            if (newPriceInput) {
+                // Format saat user mengetik
+                newPriceInput.addEventListener("input", function() {
+                    this.value = formatRupiah(this.value);
+                });
 
-    // Format saat terbuka (jika ada nilai existing)
-    if (newPriceInput.value.trim() !== "") {
-        newPriceInput.value = formatRupiah(newPriceInput.value);
-    }
-}
+                // Format saat terbuka (jika ada nilai existing)
+                if (newPriceInput.value.trim() !== "") {
+                    newPriceInput.value = formatRupiah(newPriceInput.value);
+                }
+            }
 
 
             // ===================================================
