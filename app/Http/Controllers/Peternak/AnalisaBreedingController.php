@@ -244,6 +244,26 @@ $ringkasanAnakanPasangan = $anakansPasangan->map(function ($a) {
 
 $ringkasanAnakanPasangan = $ringkasanAnakanPasangan ?: "Belum ada anakan tercatat diantara kedua pasangan ini.";
 
+$jumlahAnakanJantanGlobal = $anakansJantanGlobal->count();
+$jumlahAnakanBetinaGlobal = $anakansBetinaGlobal->count();
+
+$ringkasanGlobalText = [];
+
+if ($jumlahAnakanJantanGlobal > 0) {
+    $ringkasanGlobalText[] =
+        "Jantan memiliki {$jumlahAnakanJantanGlobal} anakan dari pasangan lain (data sistem).";
+}
+
+if ($jumlahAnakanBetinaGlobal > 0) {
+    $ringkasanGlobalText[] =
+        "Betina memiliki {$jumlahAnakanBetinaGlobal} anakan dari pasangan lain (data sistem).";
+}
+
+$ringkasanGlobalText = $ringkasanGlobalText
+    ? implode("\n", $ringkasanGlobalText)
+    : "Tidak ada data anakan dari pasangan lain dalam sistem.";
+
+
 
     $jumlahPerkawinan = $perkawinanPasangan->count();
     $perkawinanTerakhir = $perkawinanPasangan->first();
@@ -297,14 +317,19 @@ B. Evaluasi Kecocokan Jantan × Betina
 
 C. Evaluasi Riwayat Breeding & Anakan  
 
-1. Data sistem menunjukkan:
+1. Data sistem pasangan ini:
 - Jumlah anakan dari pasangan ini: {$jumlahAnakanPasangan}
-- Rincian anakan pasangan:
+- Rincian anakan:
 {$ringkasanAnakanPasangan}
 
-2. Pengalaman indukan secara global:
-   - Sebutkan jumlah & karakter anakan dari pasangan lain (jika ada)
-   - Tegaskan bahwa ini hanya konteks, bukan bukti kecocokan pasangan ini
+2. Pengalaman indukan secara global (BERDASARKAN DATA SISTEM):
+{$ringkasanGlobalText}
+
+Catatan penting:
+- Gunakan HANYA data yang tertulis di atas.
+- DILARANG menyebutkan angka, karakter, atau hasil yang tidak tercantum.
+- Jika data tidak tersedia, tuliskan secara eksplisit:
+  "Tidak ada data sistem."
 
 3. Kesimpulan bagian ini → jelaskan status reproduksi pasangan ini
 
