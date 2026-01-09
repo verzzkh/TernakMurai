@@ -236,6 +236,14 @@ public function updateCatatan(Request $request, $id)
 
     array $payloadJurnal
 ): string {
+    $jumlahAnakanPasangan = $anakansPasangan->count();
+
+$ringkasanAnakanPasangan = $anakansPasangan->map(function ($a) {
+    return "- {$a->nama_anakan} ({$a->jenis_kelamin}), status: {$a->status}, menetas: {$a->tanggal_menetas}";
+})->implode("\n");
+
+$ringkasanAnakanPasangan = $ringkasanAnakanPasangan ?: "Belum ada anakan tercatat diantara kedua pasangan ini.";
+
 
     $jumlahPerkawinan = $perkawinanPasangan->count();
     $perkawinanTerakhir = $perkawinanPasangan->first();
@@ -288,9 +296,11 @@ B. Evaluasi Kecocokan Jantan × Betina
 - Tegaskan bahwa evaluasi berbasis rule, bukan prediksi  
 
 C. Evaluasi Riwayat Breeding & Anakan  
-1. Status pasangan:
-   - Jika jumlah anakan > 0 → "Pasangan telah memiliki bukti reproduksi"
-   - Jika jumlah anakan = 0 → "Belum memiliki bukti reproduksi"
+
+1. Data sistem menunjukkan:
+- Jumlah anakan dari pasangan ini: {$jumlahAnakanPasangan}
+- Rincian anakan pasangan:
+{$ringkasanAnakanPasangan}
 
 2. Pengalaman indukan secara global:
    - Sebutkan jumlah & karakter anakan dari pasangan lain (jika ada)
