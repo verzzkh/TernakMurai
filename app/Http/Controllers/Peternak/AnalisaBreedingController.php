@@ -241,162 +241,179 @@ class AnalisaBreedingController extends Controller
 
         array $payloadJurnal
     ): string {
-        
 
-    /* =========================================================
+
+        /* =========================================================
      * A. DATA DASAR ANAKAN & PERKAWINAN
      * ========================================================= */
-    $jumlahAnakanPasangan = $anakansPasangan->count();
-    $jumlahAnakanJantanGlobal = $anakansJantanGlobal->count();
-    $jumlahAnakanBetinaGlobal = $anakansBetinaGlobal->count();
+        $jumlahAnakanPasangan = $anakansPasangan->count();
+        $jumlahAnakanJantanGlobal = $anakansJantanGlobal->count();
+        $jumlahAnakanBetinaGlobal = $anakansBetinaGlobal->count();
 
-    $jumlahPerkawinan = $perkawinanPasangan->count();
-    $perkawinanTerakhir = $perkawinanPasangan->first();
+        $jumlahPerkawinan = $perkawinanPasangan->count();
+        $perkawinanTerakhir = $perkawinanPasangan->first();
 
-    $tanggalKawinTerakhir = $perkawinanTerakhir
-        ? $perkawinanTerakhir->tanggal_kawin
-        : 'Tidak ada data';
+        $tanggalKawinTerakhir = $perkawinanTerakhir
+            ? $perkawinanTerakhir->tanggal_kawin
+            : 'Tidak ada data';
 
-    /* =========================================================
+            /* =========================================================
+ * KONTEKS RIWAYAT PRODUKSI INDIVIDU INDUKAN
+ * (WAJIB SELALU ADA – DIPAKAI DI PROMPT)
+ * ========================================================= */
+
+// anakan jantan dari pasangan LAIN
+$jumlahAnakanJantanLain = $anakansJantanGlobal
+    ->where('indukan_betina_id', '!=', $betina->id)
+    ->count();
+
+// anakan betina dari pasangan LAIN
+$jumlahAnakanBetinaLain = $anakansBetinaGlobal
+    ->where('indukan_jantan_id', '!=', $jantan->id)
+    ->count();
+
+
+        /* =========================================================
      * B. RINCIAN ANAKAN PASANGAN INI (MAX 5 TERBARU)
      * ========================================================= */
-    $ringkasanAnakanPasangan = $anakansPasangan
-        ->sortByDesc('tanggal_menetas')
-        ->take(5)
-        ->values()
-        ->map(function ($a, $i) {
-            $detail = [];
+        $ringkasanAnakanPasangan = $anakansPasangan
+            ->sortByDesc('tanggal_menetas')
+            ->take(5)
+            ->values()
+            ->map(function ($a, $i) {
+                $detail = [];
 
-            if ($a->jenis_kelamin) {
-                $detail[] = "Jenis kelamin: {$a->jenis_kelamin}";
-            }
-            if ($a->status) {
-                $detail[] = "Status: {$a->status}";
-            }
-            if ($a->tanggal_menetas) {
-                $detail[] = "Menetas: {$a->tanggal_menetas}";
-            }
+                if ($a->jenis_kelamin) {
+                    $detail[] = "Jenis kelamin: {$a->jenis_kelamin}";
+                }
+                if ($a->status) {
+                    $detail[] = "Status: {$a->status}";
+                }
+                if ($a->tanggal_menetas) {
+                    $detail[] = "Menetas: {$a->tanggal_menetas}";
+                }
 
-            return $detail
-                ? "- Anakan " . ($i + 1) . ": " . implode(', ', $detail)
-                : "- Anakan " . ($i + 1) . ": Data detail belum tersedia.";
-        })
-        ->implode("\n");
+                return $detail
+                    ? "- Anakan " . ($i + 1) . ": " . implode(', ', $detail)
+                    : "- Anakan " . ($i + 1) . ": Data detail belum tersedia.";
+            })
+            ->implode("\n");
 
-    $ringkasanAnakanPasangan = $ringkasanAnakanPasangan
-        ?: "Belum ada anakan tercatat di antara kedua pasangan ini.";
+        $ringkasanAnakanPasangan = $ringkasanAnakanPasangan
+            ?: "Belum ada anakan tercatat di antara kedua pasangan ini.";
 
-    /* =========================================================
+        /* =========================================================
      * C. RINGKASAN KARAKTERISTIK – HASIL PASANGAN INI
      * ========================================================= */
-    $ringkasanKarakteristikPasanganIni = '';
+        $ringkasanKarakteristikPasanganIni = '';
 
-    if ($jumlahAnakanPasangan > 0) {
-        $ringkasanKarakteristikPasanganIni = $anakansPasangan
-            ->sortByDesc('tanggal_menetas')
-            ->take(5)
-            ->pluck('deskripsi_karakteristik')
-            ->filter()
-            ->unique()
-            ->map(fn($d) => "- {$d}")
-            ->implode("\n");
+        if ($jumlahAnakanPasangan > 0) {
+            $ringkasanKarakteristikPasanganIni = $anakansPasangan
+                ->sortByDesc('tanggal_menetas')
+                ->take(5)
+                ->pluck('deskripsi_karakteristik')
+                ->filter()
+                ->unique()
+                ->map(fn($d) => "- {$d}")
+                ->implode("\n");
 
-        $ringkasanKarakteristikPasanganIni = $ringkasanKarakteristikPasanganIni
-            ?: "- Data karakteristik anakan hasil pasangan ini belum tersedia.";
-    }
+            $ringkasanKarakteristikPasanganIni = $ringkasanKarakteristikPasanganIni
+                ?: "- Data karakteristik anakan hasil pasangan ini belum tersedia.";
+        }
 
-    /* =========================================================
+        /* =========================================================
      * D. RINGKASAN KARAKTERISTIK – HASIL PASANGAN LAIN (KONTEKS)
      * ========================================================= */
-    $ringkasanKarakteristikPasanganLain = '';
+        $ringkasanKarakteristikPasanganLain = '';
 
-    $anakansPasanganLain = collect()
-        ->merge($anakansJantanGlobal)
-        ->merge($anakansBetinaGlobal)
-        ->reject(fn($a) =>
-            $a->indukan_jantan_id === $jantan->id &&
-            $a->indukan_betina_id === $betina->id
-        );
+        $anakansPasanganLain = collect()
+            ->merge($anakansJantanGlobal)
+            ->merge($anakansBetinaGlobal)
+            ->reject(
+                fn($a) =>
+                $a->indukan_jantan_id === $jantan->id &&
+                    $a->indukan_betina_id === $betina->id
+            );
 
-    if ($anakansPasanganLain->count() > 0) {
-        $ringkasanKarakteristikPasanganLain = $anakansPasanganLain
-            ->sortByDesc('tanggal_menetas')
-            ->take(5)
-            ->pluck('deskripsi_karakteristik')
-            ->filter()
-            ->unique()
-            ->map(fn($d) => "- {$d}")
-            ->implode("\n");
+        if ($anakansPasanganLain->count() > 0) {
+            $ringkasanKarakteristikPasanganLain = $anakansPasanganLain
+                ->sortByDesc('tanggal_menetas')
+                ->take(5)
+                ->pluck('deskripsi_karakteristik')
+                ->filter()
+                ->unique()
+                ->map(fn($d) => "- {$d}")
+                ->implode("\n");
 
-        $ringkasanKarakteristikPasanganLain = $ringkasanKarakteristikPasanganLain
-            ?: "- Data karakteristik anakan dari pasangan lain belum tersedia.";
-    }
+            $ringkasanKarakteristikPasanganLain = $ringkasanKarakteristikPasanganLain
+                ?: "- Data karakteristik anakan dari pasangan lain belum tersedia.";
+        }
 
-    /* =========================================================
+        /* =========================================================
      * E. RIWAYAT PRODUKSI INDUKAN
      * ========================================================= */
-    $ringkasanGlobalText = [];
+        $ringkasanGlobalText = [];
 
-    if ($jumlahAnakanJantanGlobal > 0) {
-        $ringkasanGlobalText[] =
-            "Jantan memiliki {$jumlahAnakanJantanGlobal} anakan secara keseluruhan.";
-    }
+        if ($jumlahAnakanJantanGlobal > 0) {
+            $ringkasanGlobalText[] =
+                "Jantan memiliki {$jumlahAnakanJantanGlobal} anakan secara keseluruhan.";
+        }
 
-    if ($jumlahAnakanBetinaGlobal > 0) {
-        $ringkasanGlobalText[] =
-            "Betina memiliki {$jumlahAnakanBetinaGlobal} anakan secara keseluruhan.";
-    }
+        if ($jumlahAnakanBetinaGlobal > 0) {
+            $ringkasanGlobalText[] =
+                "Betina memiliki {$jumlahAnakanBetinaGlobal} anakan secara keseluruhan.";
+        }
 
-    $ringkasanGlobalText = $ringkasanGlobalText
-        ? implode("\n", $ringkasanGlobalText)
-        : "Tidak ada data anakan dari pasangan ini secara keseluruhan.";
+        $ringkasanGlobalText = $ringkasanGlobalText
+            ? implode("\n", $ringkasanGlobalText)
+            : "Tidak ada data anakan dari pasangan ini secara keseluruhan.";
 
-    /* =========================================================
+        /* =========================================================
      * F. DATA PERILAKU INDUKAN
      * ========================================================= */
-    $perilakuJantan =
-        "- Aktif Kicau: " . ($jantan->aktif_kicau ? "Ya" : "Tidak") . "\n" .
-        "- Mendekati Betina: " . ($jantan->mendekati_betina ? "Ya" : "Tidak") . "\n" .
-        "- Temperamen: " . ($jantan->temperamen ?: "-");
+        $perilakuJantan =
+            "- Aktif Kicau: " . ($jantan->aktif_kicau ? "Ya" : "Tidak") . "\n" .
+            "- Mendekati Betina: " . ($jantan->mendekati_betina ? "Ya" : "Tidak") . "\n" .
+            "- Temperamen: " . ($jantan->temperamen ?: "-");
 
-    $perilakuBetina =
-        "- Nafsu Makan Meningkat: " . ($betina->nafsu_makan_meningkat ? "Ya" : "Tidak") . "\n" .
-        "- Aktif Membuat Sarang: " . ($betina->aktif_buat_sarang ? "Ya" : "Tidak") . "\n" .
-        "- Temperamen: " . ($betina->temperamen ?: "-");
+        $perilakuBetina =
+            "- Nafsu Makan Meningkat: " . ($betina->nafsu_makan_meningkat ? "Ya" : "Tidak") . "\n" .
+            "- Aktif Membuat Sarang: " . ($betina->aktif_buat_sarang ? "Ya" : "Tidak") . "\n" .
+            "- Temperamen: " . ($betina->temperamen ?: "-");
 
-    /* =========================================================
+        /* =========================================================
      * G. EVALUASI RULE-BASED
      * ========================================================= */
-    $indikatorJantanLengkap = $jantan->aktif_kicau && $jantan->mendekati_betina;
-    $indikatorBetinaLengkap = $betina->nafsu_makan_meningkat && $betina->aktif_buat_sarang;
 
-    $kesimpulanJantan = $indikatorJantanLengkap
-        ? 'Indikator kesiapan jantan terpenuhi.'
-        : 'Indikator kesiapan jantan belum terpenuhi.';
+        $indikatorJantanLengkap = $jantan->aktif_kicau && $jantan->mendekati_betina;
+        $indikatorBetinaLengkap = $betina->nafsu_makan_meningkat && $betina->aktif_buat_sarang;
 
-    $kesimpulanBetina = $indikatorBetinaLengkap
-        ? 'Indikator kesiapan betina terpenuhi.'
-        : 'Indikator kesiapan betina belum terpenuhi.';
+        $kesimpulanJantan = $indikatorJantanLengkap
+            ? 'Indikator kesiapan jantan terpenuhi.'
+            : 'Indikator kesiapan jantan belum terpenuhi.';
+
+        $kesimpulanBetina = $indikatorBetinaLengkap
+            ? 'Indikator kesiapan betina terpenuhi.'
+            : 'Indikator kesiapan betina belum terpenuhi.';
 
         $blokKarakteristik = '';
 
-if ($ringkasanKarakteristikPasanganIni) {
-    $blokKarakteristik .= "
+        if ($ringkasanKarakteristikPasanganIni) {
+            $blokKarakteristik .= "
 Ringkasan karakteristik anakan (hasil pasangan ini):
 {$ringkasanKarakteristikPasanganIni}
 ";
-}
+        }
 
-if ($ringkasanKarakteristikPasanganLain) {
-    $blokKarakteristik .= "
+        if ($ringkasanKarakteristikPasanganLain) {
+            $blokKarakteristik .= "
 Ringkasan karakteristik anakan (hasil pasangan lain, sebagai konteks historis):
 {$ringkasanKarakteristikPasanganLain}
 
 Catatan:
 Data ini digunakan sebagai konteks pengalaman indukan dan tidak dijadikan
 bukti kecocokan pasangan yang dianalisis.
-";
-}
+"; }
         /*  🔥 END BLOCK  */
 
         return <<<PROMPT
@@ -404,10 +421,30 @@ bukti kecocokan pasangan yang dianalisis.
 ========================
 TUGAS ANDA
 ========================
-Susun laporan analisis breeding sesuai format berikut, lengkap, rinci,
-dan gunakan bahasa objektif berbasis data:
+Susun laporan analisis breeding Murai Batu sebagai
+sistem pendukung keputusan (Decision Support System).
 
-A. Ringkasan Singkat Indukan  
+Laporan harus disusun secara terstruktur, objektif,
+dan berbasis data faktual tanpa spekulasi biologis.
+
+========================
+PRINSIP ANALISIS SISTEM
+========================
+- Sistem diperbolehkan menarik implikasi manajerial TERBATAS
+  berdasarkan hubungan logis antar data.
+- Sistem DILARANG memprediksi hasil biologis, genetika,
+  kualitas anakan, atau tingkat keberhasilan menetas.
+- Sistem hanya menggunakan data yang tersedia di sistem.
+- Jika terdapat perbedaan antara riwayat historis dan
+  kondisi perilaku saat ini, jelaskan secara objektif.
+- Analisis bertujuan membantu pengambilan keputusan peternak,
+  bukan menentukan kebenaran biologis.
+
+========================
+FORMAT LAPORAN
+========================
+
+A. Ringkasan Singkat Indukan
 
 - Jantan: {$jantan->nomor_ring} ({$jantan->nama})
 Perilaku jantan:
@@ -416,117 +453,230 @@ Perilaku jantan:
 - Betina: {$betina->nomor_ring} ({$betina->nama})
 Perilaku betina:
 {$perilakuBetina}
+
 ATURAN PERILAKU:
 - Gunakan nilai Ya/Tidak persis seperti data sistem.
-- DILARANG mengubah atau menyimpulkan ulang perilaku indukan.
+- DILARANG mengubah, menafsirkan ulang,
+  atau menambahkan perilaku yang tidak tercatat.
 - Jika nilai = Tidak, tuliskan sebagai Tidak.
-- Jangan menambahkan perilaku yang tidak tercantum.
 
-B. Evaluasi Kecocokan Jantan × Betina  
+------------------------------------------------
 
-Evaluasi berbasis aturan sistem:
+B. Evaluasi Kecocokan Jantan × Betina
+
+Evaluasi dilakukan berdasarkan aturan perilaku sistem:
+
 - Kesiapan jantan:
   {$kesimpulanJantan}
+
 - Kesiapan betina:
   {$kesimpulanBetina}
 
 Catatan:
-Evaluasi dilakukan berdasarkan aturan perilaku yang telah ditetapkan sistem.
-Tidak dilakukan interpretasi ulang terhadap data perilaku indukan.
-Evaluasi ini bukan prediksi hasil anakan atau genetika.
+Evaluasi ini berbasis aturan perilaku yang telah
+ditetapkan sistem dan bukan prediksi hasil breeding,
+genetika, atau kualitas anakan.
 
-C. Evaluasi Riwayat Breeding & Anakan  
-1. Data sistem pasangan ini:
-- Jumlah anakan dari pasangan ini: {$jumlahAnakanPasangan}
-- Rincian anakan:
+------------------------------------------------
+
+C. Evaluasi Riwayat Breeding & Interpretasi Manajerial
+
+Tujuan bagian ini adalah mengevaluasi riwayat produksi
+secara manajerial dan membandingkannya dengan kondisi
+perilaku indukan saat ini.
+
+1. Konteks Riwayat Produksi Individu Indukan
+
+- Riwayat pasangan ini:
+  Pasangan ini telah menghasilkan {$jumlahAnakanPasangan} anakan.
+  - Rincian anakan:
 {$ringkasanAnakanPasangan}
 
-2. Riwayat produksi indukan secara keseluruhan:
-{$ringkasanGlobalText}
-{$blokKarakteristik}
+- Riwayat jantan dengan pasangan lain:
+  Jantan memiliki {$jumlahAnakanJantanLain} anakan
+  dari pasangan lain di luar pasangan ini.
 
-Riwayat perkawinan pasangan:
+- Riwayat betina dengan pasangan lain:
+  Betina memiliki {$jumlahAnakanBetinaLain} anakan
+  dari pasangan lain di luar pasangan ini.
+
+Catatan:
+Riwayat produksi individu indukan digunakan sebagai
+indikator pengalaman reproduksi.
+Data ini tidak dijadikan bukti kecocokan pasangan
+yang sedang dianalisis.
+
+
+2. Riwayat perkawinan pasangan:
 - Jumlah perkawinan tercatat: {$jumlahPerkawinan}
 - Perkawinan terakhir:
   - Tanggal kawin: {$tanggalKawinTerakhir}
 
 Catatan penting:
 - Gunakan HANYA data yang tertulis di atas.
-- DILARANG menyebutkan angka, karakter, atau hasil yang tidak tercantum.
+- DILARANG menyebutkan angka, karakter,
+  atau hasil yang tidak tersedia di sistem.
 - Jika data tidak tersedia, tuliskan secara eksplisit:
   "Tidak ada data sistem."
 
-3. Kesimpulan bagian ini → jelaskan status reproduksi pasangan ini
+3. Kesimpulan bagian ini:
+Jelaskan status reproduksi pasangan ini secara manajerial,
+misalnya apakah pasangan telah terbukti produktif secara historis
+dan apakah kondisi perilaku saat ini selaras atau tidak
+dengan riwayat tersebut.
 
-D. Evaluasi Standar Reproduksi (berdasarkan jurnal Putranto 2018)
+------------------------------------------------
 
-Misal sistem mencatat total >5 ekor anakan yang dihasilkan oleh pasangan ini.
-Namun, data jumlah telur per siklus dan daya tetas tidak tersedia dalam sistem.
+D. Evaluasi Kesiapan Produksi Berdasarkan Perilaku
+(berdasarkan indikator perilaku Saputro 2016)
 
-Oleh karena itu, evaluasi terhadap standar reproduksi (2-4 telur per periode bertelur)
-tidak dapat dilakukan secara langsung dan hanya dapat dijadikan referensi teoritis.
+Gunakan aturan berikut:
+- Jika jantan aktif kicau DAN mendekati betina
+  → indikator kesiapan jantan terpenuhi.
+- Jika betina nafsu makan meningkat DAN aktif membuat sarang
+  → indikator kesiapan betina terpenuhi.
+- Jika salah satu indikator bernilai Tidak
+  → indikator kesiapan belum lengkap.
 
-E. Evaluasi Kesiapan Produksi Berdasarkan Perilaku (Saputro 2016)  
-- Jika jantan aktif kicau + mendekati betina → catat sebagai indikator kesiapan  
-- Jika betina nafsu makan meningkat + membuat sarang → catat indikator kesiapan  
-- Jika salah satu tidak ada → tulis "indikator belum lengkap"  
+Catatan:
+Setiap indikator kesiapan yang belum lengkap
+WAJIB ditindaklanjuti dengan rekomendasi tindakan praktis
+pada bagian H.
 
-F. Risiko & Catatan Manajemen  
-- Sebutkan potensi risiko realistis (dominansi, stres, adaptasi kandang)  
-- Tanpa klaim ekstrem atau prediksi biologis pasti  
+------------------------------------------------
 
-G. Rekomendasi Akhir Sistem (WAJIB MEMILIH SALAH SATU)
+E. Risiko & Catatan Manajemen
 
-Gunakan rule:
-- Jika belum pernah menghasilkan anakan → **Rekomendasi: UJI COBA TERBATAS**
-- Jika pernah menghasilkan anakan → **Rekomendasi: LAYAK DILANJUTKAN**
-- Jika temuan risiko serius → **TIDAK DIREKOMENDASIKAN SEMENTARA**
+Sebutkan potensi risiko manajerial yang realistis
+berdasarkan data perilaku dan riwayat breeding,
+misalnya:
+- dominansi jantan,
+- stres adaptasi,
+- ketidaksiapan lingkungan.
 
-Tambahkan alasan berbasis data singkat dan jelas.
+Hindari klaim ekstrem dan hindari prediksi biologis pasti.
 
-H. Rekomendasi Tindakan Praktis  
-- Langkah yang harus dilakukan peternak  
-- Hal yang dihindari  
-- Waktu evaluasi ulang yang disarankan  
+------------------------------------------------
 
-I. Potensi Tantangan Awal
-Berikan daftar kendala awal yang mungkin terjadi berdasarkan perilaku dan riwayat breeding.
-Gunakan pendekatan rule-based, contoh:
-- betina belum membuat sarang → adaptasi awal
-- jantan terlalu dominan → potensi agresi
-- belum ada riwayat pasangan → butuh waktu observasi
+F. Rekomendasi Akhir Sistem
+(WAJIB memilih salah satu)
 
-J. Early Warning – Kondisi Stop Pairing
-Berikan batasan kapan breeder harus menghentikan pairing sementara.
-Contoh rule:
-- terjadi agresivitas jantan berulang
-- betina drop konsumsi atau terlihat stress
-- tidak ada respon interaksi 30 hari
-- luka fisik atau tanda teror/kecemasan pada salah satu indukan
+Gunakan prinsip berikut:
 
-K. Rekomendasi Perawatan & Pemulihan (Jika Diperlukan)
+1. Jika pasangan PERNAH menghasilkan anakan,
+   namun indikator perilaku SAAT INI belum lengkap:
+   → Rekomendasi: LAYAK DILANJUTKAN DENGAN PENGAWASAN
 
-Jika pada evaluasi ditemukan indikator yang belum terpenuhi atau risiko:
+2. Jika pasangan BELUM pernah menghasilkan anakan:
+   → Rekomendasi: UJI COBA TERBATAS
+
+3. Jika ditemukan risiko serius dan berulang:
+   → Rekomendasi: TIDAK DIREKOMENDASIKAN SEMENTARA
+
+Sertakan alasan singkat berbasis data historis
+dan kondisi perilaku saat ini.
+
+------------------------------------------------
+
+G. Rekomendasi Tindakan Praktis
+
+Bagian ini menyajikan opsi tindakan yang dapat dipertimbangkan oleh peternak
+berdasarkan indikator perilaku yang belum terpenuhi.
+Pelaksanaan dapat disesuaikan dengan pengalaman dan kondisi lapangan.
+
+Indikator 1
+
+Indikator: Jantan belum menunjukkan perilaku mendekati betina.
+
+→ Tindakan yang dapat dipertimbangkan:
+Pengaturan ulang interaksi visual (misalnya menggunakan sekat/tirai sementara)
+untuk mengurangi tekanan interaksi langsung pada fase awal.
+
+→ Durasi pengamatan:
+Sekitar 3–5 hari.
+
+→ Evaluasi ulang disarankan:
+Sekitar hari ke-7, dengan melihat apakah jantan mulai menunjukkan
+ketertarikan atau pendekatan saat interaksi dibuka bertahap.
+
+Indikator 2
+
+Indikator: Nafsu makan betina belum meningkat.
+
+→ Tindakan yang dapat dipertimbangkan:
+Menjaga kondisi kandang tetap stabil (minim gangguan, rutinitas pakan konsisten,
+tanpa perubahan posisi kandang) untuk membantu proses adaptasi.
+
+→ Durasi pengamatan:
+Sekitar 5–7 hari.
+
+→ Evaluasi ulang disarankan:
+Sekitar hari ke-7, dengan memperhatikan pola konsumsi pakan dan
+aktivitas harian betina.
+
+Catatan umum:
+
+Selama masa pengamatan, tidak perlu terburu-buru melakukan perubahan besar.
+
+Fokus utama adalah melihat arah perubahan indikator, bukan memaksakan hasil
+dalam waktu singkat.
+
+H. Potensi Tantangan Awal
+
+Berdasarkan data perilaku dan riwayat breeding yang tersedia,
+beberapa tantangan awal yang umumnya ditemui di kandang antara lain:
+
+Adaptasi lingkungan kandang
+Indikator nafsu makan betina yang belum meningkat sering muncul
+pada fase penyesuaian awal terhadap kondisi kandang dan pasangan.
+
+Interaksi awal yang belum stabil
+Jantan yang belum mendekati betina dapat menandakan
+proses pengenalan yang masih berjalan dan membutuhkan waktu.
+
+Ketidaksinkronan sementara antara riwayat dan kondisi saat ini
+Meskipun pasangan memiliki riwayat menghasilkan anakan,
+kondisi perilaku saat ini dapat berbeda dan perlu disikapi
+dengan pengamatan bertahap.
+
+Catatan:
+Tantangan di atas menunjukkan sinyal awal bahwa pasangan memerlukan
+waktu adaptasi dan pemantauan lanjutan sebelum diambil keputusan berikutnya.
+
+------------------------------------------------
+
+I. Early Warning – Kondisi Stop Pairing
+
+Berikan batasan kondisi kapan pairing
+perlu dihentikan sementara, seperti:
+- agresivitas jantan berulang,
+- penurunan kondisi betina,
+- tidak ada respon interaksi dalam 30 hari,
+- luka fisik atau tanda stres berat.
+
+------------------------------------------------
+
+J. Rekomendasi Perawatan & Pemulihan (Jika Diperlukan)
+
+Jika terdapat indikator yang belum terpenuhi
+atau risiko yang teridentifikasi:
 - Berikan saran perawatan atau adaptasi bersifat umum.
 - Sertakan durasi pemantauan (misalnya 7–14 hari).
 - Sertakan hal yang perlu dihindari.
-- Tekankan bahwa evaluasi ulang tetap diperlukan.
+- Tekankan perlunya evaluasi ulang.
 
 Jika semua indikator terpenuhi, tuliskan:
 "Tidak diperlukan perawatan tambahan saat ini."
 
-
-
-Gunakan bahasa operasional, tidak berspekulasi, tanpa kata mungkin/probabilitas.
-Fokus pada keputusan berbasis aturan jurnal & fakta data sistem.
-
 ========================
 BATASAN BAHASA
 ========================
-Gunakan bahasa profesional, objektif, dan instruktif.
-Hindari prediksi genetika, hindari klaim hasil anakan.
-Tujuan laporan adalah **memandu keputusan**, bukan memprediksi
-
+- Gunakan bahasa profesional, objektif, dan instruktif.
+- DILARANG menggunakan kata: "mungkin", "diperkirakan",
+  "berpotensi secara genetika", atau istilah spekulatif lain.
+- Fokus pada keputusan berbasis data sistem dan aturan perilaku.
+- Rekomendasi sistem bersifat pendukung keputusan
+  dan tetap memerlukan observasi lapangan oleh peternak.
 
 PROMPT;
     }
