@@ -390,11 +390,11 @@ $jumlahAnakanBetinaLain = $anakansBetinaGlobal
 
         $kesimpulanJantan = $indikatorJantanLengkap
             ? 'Indikator kesiapan jantan terpenuhi.'
-            : 'Indikator kesiapan jantan belum terpenuhi.';
+            : 'Indikator kesiapan jantan masih ada yang belum terpenuhi.';
 
         $kesimpulanBetina = $indikatorBetinaLengkap
             ? 'Indikator kesiapan betina terpenuhi.'
-            : 'Indikator kesiapan betina belum terpenuhi.';
+            : 'Indikator kesiapan betina masih ada yang belum terpenuhi.';
 
         $blokKarakteristik = '';
 
@@ -503,21 +503,12 @@ perilaku indukan saat ini.
 Catatan:
 Riwayat produksi individu indukan digunakan sebagai
 indikator pengalaman reproduksi.
-Data ini tidak dijadikan bukti kecocokan pasangan
-yang sedang dianalisis.
 
 
 2. Riwayat perkawinan pasangan:
 - Jumlah perkawinan tercatat: {$jumlahPerkawinan}
 - Perkawinan terakhir:
   - Tanggal kawin: {$tanggalKawinTerakhir}
-
-Catatan penting:
-- Gunakan HANYA data yang tertulis di atas.
-- DILARANG menyebutkan angka, karakter,
-  atau hasil yang tidak tersedia di sistem.
-- Jika data tidak tersedia, tuliskan secara eksplisit:
-  "Tidak ada data sistem."
 
 3. Kesimpulan bagian ini:
 Jelaskan status reproduksi pasangan ini secara manajerial,
@@ -554,7 +545,7 @@ misalnya:
 - stres adaptasi,
 - ketidaksiapan lingkungan.
 
-Hindari klaim ekstrem dan hindari prediksi biologis pasti.
+Catatan: Hindari klaim ekstrem dan hindari prediksi biologis pasti.
 
 ------------------------------------------------
 
@@ -580,68 +571,49 @@ dan kondisi perilaku saat ini.
 
 G. Rekomendasi Tindakan Praktis
 
-Bagian ini menyajikan opsi tindakan yang dapat dipertimbangkan oleh peternak
-berdasarkan indikator perilaku yang belum terpenuhi.
-Pelaksanaan dapat disesuaikan dengan pengalaman dan kondisi lapangan.
+Bagian ini menyajikan rekomendasi tindakan manajerial
+berdasarkan indikator perilaku yang belum terpenuhi
+pada pasangan indukan yang dianalisis.
 
-Indikator 1
-
-Indikator: Jantan belum menunjukkan perilaku mendekati betina.
-
-→ Tindakan yang dapat dipertimbangkan:
-Pengaturan ulang interaksi visual (misalnya menggunakan sekat/tirai sementara)
-untuk mengurangi tekanan interaksi langsung pada fase awal.
-
-→ Durasi pengamatan:
-Sekitar 3–5 hari.
-
-→ Evaluasi ulang disarankan:
-Sekitar hari ke-7, dengan melihat apakah jantan mulai menunjukkan
-ketertarikan atau pendekatan saat interaksi dibuka bertahap.
-
-Indikator 2
-
-Indikator: Nafsu makan betina belum meningkat.
-
-→ Tindakan yang dapat dipertimbangkan:
-Menjaga kondisi kandang tetap stabil (minim gangguan, rutinitas pakan konsisten,
-tanpa perubahan posisi kandang) untuk membantu proses adaptasi.
-
-→ Durasi pengamatan:
-Sekitar 5–7 hari.
-
-→ Evaluasi ulang disarankan:
-Sekitar hari ke-7, dengan memperhatikan pola konsumsi pakan dan
-aktivitas harian betina.
-
-Catatan umum:
-
-Selama masa pengamatan, tidak perlu terburu-buru melakukan perubahan besar.
-
-Fokus utama adalah melihat arah perubahan indikator, bukan memaksakan hasil
-dalam waktu singkat.
-
-H. Potensi Tantangan Awal
-
-Berdasarkan data perilaku dan riwayat breeding yang tersedia,
-beberapa tantangan awal yang umumnya ditemui di kandang antara lain:
-
-Adaptasi lingkungan kandang
-Indikator nafsu makan betina yang belum meningkat sering muncul
-pada fase penyesuaian awal terhadap kondisi kandang dan pasangan.
-
-Interaksi awal yang belum stabil
-Jantan yang belum mendekati betina dapat menandakan
-proses pengenalan yang masih berjalan dan membutuhkan waktu.
-
-Ketidaksinkronan sementara antara riwayat dan kondisi saat ini
-Meskipun pasangan memiliki riwayat menghasilkan anakan,
-kondisi perilaku saat ini dapat berbeda dan perlu disikapi
-dengan pengamatan bertahap.
+Langkah penyusunan:
+1. Identifikasi indikator perilaku yang bernilai "Tidak".
+2. Untuk setiap indikator tersebut, jelaskan:
+   - indikator yang belum terpenuhi,
+   - konteks perilaku yang teramati,
+   - tindakan manajerial yang dapat dipertimbangkan
+     berdasarkan praktik lapangan umum,
+   - durasi pengamatan yang wajar,
+   - waktu evaluasi ulang yang disarankan.
+3. Jika seluruh indikator bernilai "Ya",
+   jelaskan bahwa tidak diperlukan tindakan khusus
+   selain pemantauan rutin.
 
 Catatan:
-Tantangan di atas menunjukkan sinyal awal bahwa pasangan memerlukan
-waktu adaptasi dan pemantauan lanjutan sebelum diambil keputusan berikutnya.
+- Rekomendasi bersifat panduan manajerial,
+  bukan instruksi wajib.
+- Pelaksanaan dapat disesuaikan dengan pengalaman
+  dan kondisi lapangan oleh peternak.
+
+------------------------------------------------
+H. Potensi Tantangan Awal
+
+Bagian ini menjelaskan potensi tantangan awal yang dapat muncul
+berdasarkan indikator perilaku yang belum terpenuhi
+pada pasangan indukan yang dianalisis.
+
+Langkah penyusunan:
+1. Identifikasi indikator perilaku yang bernilai "Tidak".
+2. Untuk setiap indikator tersebut, jelaskan tantangan awal
+   yang secara umum dapat muncul di kandang.
+3. Jika seluruh indikator bernilai "Ya",
+   jelaskan bahwa tidak terdapat tantangan awal yang signifikan,
+   namun pemantauan rutin tetap disarankan.
+
+Catatan:
+Tantangan yang disampaikan bersifat sinyal awal,
+bukan penentu kegagalan breeding,
+dan perlu disikapi dengan pengamatan bertahap
+sebelum diambil keputusan lanjutan.
 
 ------------------------------------------------
 
