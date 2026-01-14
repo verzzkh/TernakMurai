@@ -174,4 +174,14 @@ class Anakan extends Model
 
         return asset('storage/' . $this->foto_path);
     }
+    
+public function indukanJantan(): BelongsTo
+{
+    return $this->belongsTo(Indukan::class, 'indukan_jantan_id');
+}
+
+public function indukanBetina(): BelongsTo
+{
+    return $this->belongsTo(Indukan::class, 'indukan_betina_id');
+}
 }

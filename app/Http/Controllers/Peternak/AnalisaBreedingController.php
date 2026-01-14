@@ -152,43 +152,61 @@ private function buildTripKonteksIndukanLain(
     Indukan $betina
 ): string {
 
-    // Trip jantan dengan betina lain
+    $teks = [];
+
+    // ==============================
+    // JANTAN DENGAN BETINA LAIN
+    // ==============================
     $tripJantanLain = Perkawinan::where('peternak_id', $peternakId)
         ->where('indukan_jantan_id', $jantan->id)
         ->where('indukan_betina_id', '!=', $betina->id)
         ->withCount('anakans')
-        ->get();
+        ->get()
+        ->groupBy('indukan_betina_id');
 
-    // Trip betina dengan jantan lain
+    if ($tripJantanLain->isNotEmpty()) {
+        $teks[] = "Riwayat jantan dengan pasangan lain:";
+
+        foreach ($tripJantanLain as $betinaId => $trips) {
+            $jumlahTrip   = $trips->count();
+            $jumlahAnakan = $trips->sum('anakans_count');
+
+            $namaBetina = Indukan::find($betinaId)?->nama ?? 'Indukan tidak diketahui';
+
+            $teks[] = "- {$jantan->nama} × {$namaBetina}: {$jumlahTrip} trip, {$jumlahAnakan} anakan";
+        }
+    }
+
+    // ==============================
+    // BETINA DENGAN JANTAN LAIN
+    // ==============================
     $tripBetinaLain = Perkawinan::where('peternak_id', $peternakId)
         ->where('indukan_betina_id', $betina->id)
         ->where('indukan_jantan_id', '!=', $jantan->id)
         ->withCount('anakans')
-        ->get();
+        ->get()
+        ->groupBy('indukan_jantan_id');
 
-    // Jika benar-benar tidak ada data
-    if ($tripJantanLain->isEmpty() && $tripBetinaLain->isEmpty()) {
+    if ($tripBetinaLain->isNotEmpty()) {
+        $teks[] = "\nRiwayat betina dengan pasangan lain:";
+
+        foreach ($tripBetinaLain as $jantanId => $trips) {
+            $jumlahTrip   = $trips->count();
+            $jumlahAnakan = $trips->sum('anakans_count');
+
+            $namaJantan = Indukan::find($jantanId)?->nama ?? 'Indukan tidak diketahui';
+
+            $teks[] = "- {$betina->nama} × {$namaJantan}: {$jumlahTrip} trip, {$jumlahAnakan} anakan";
+        }
+    }
+
+    if (empty($teks)) {
         return "Tidak terdapat riwayat trip breeding indukan dengan pasangan lain.";
     }
 
-    $teks = [];
-
-    if ($tripJantanLain->isNotEmpty()) {
-        $teks[] =
-            "- Riwayat jantan dengan pasangan lain:\n" .
-            "  Total trip: {$tripJantanLain->count()}\n" .
-            "  Total anakan: {$tripJantanLain->sum('anakans_count')}";
-    }
-
-    if ($tripBetinaLain->isNotEmpty()) {
-        $teks[] =
-            "- Riwayat betina dengan pasangan lain:\n" .
-            "  Total trip: {$tripBetinaLain->count()}\n" .
-            "  Total anakan: {$tripBetinaLain->sum('anakans_count')}";
-    }
-
-    return implode("\n\n", $teks);
+    return implode("\n", $teks);
 }
+
 
 
     /**
@@ -210,9 +228,14 @@ private function buildTripKonteksIndukanLain(
             ->where('indukan_jantan_id', $jantan->id)
             ->where('indukan_betina_id', $betina->id)
             ->get();
+            
+$anakansJantanGlobal = $jantan->anakansSebagaiJantan()
+    ->with(['indukanJantan', 'indukanBetina'])
+    ->get();
 
-        $anakansJantanGlobal = $jantan->anakansSebagaiJantan;
-        $anakansBetinaGlobal = $betina->anakansSebagaiBetina;
+$anakansBetinaGlobal = $betina->anakansSebagaiBetina()
+    ->with(['indukanJantan', 'indukanBetina'])
+    ->get();
 
         $perkawinanPasangan = Perkawinan::where('peternak_id', $peternakId)
             ->where('indukan_jantan_id', $jantan->id)
@@ -455,34 +478,55 @@ $jumlahAnakanBetinaLain = $anakansBetinaGlobal
             $ringkasanKarakteristikPasanganIni = $ringkasanKarakteristikPasanganIni
                 ?: "- Data karakteristik anakan hasil pasangan ini belum tersedia.";
         }
+/* =========================================================
+ * D. RINGKASAN KARAKTERISTIK – HASIL PASANGAN LAIN (KONTEKS)
+ * ========================================================= */
 
-        /* =========================================================
-     * D. RINGKASAN KARAKTERISTIK – HASIL PASANGAN LAIN (KONTEKS)
-     * ========================================================= */
-        $ringkasanKarakteristikPasanganLain = '';
+$ringkasanKarakteristikPasanganLain = '';
 
-        $anakansPasanganLain = collect()
-            ->merge($anakansJantanGlobal)
-            ->merge($anakansBetinaGlobal)
-            ->reject(
-                fn($a) =>
-                $a->indukan_jantan_id === $jantan->id &&
-                    $a->indukan_betina_id === $betina->id
-            );
+$anakansPasanganLain = collect()
+    ->merge($anakansJantanGlobal)
+    ->merge($anakansBetinaGlobal)
+    ->reject(fn ($a) =>
+        $a->indukan_jantan_id === $jantan->id &&
+        $a->indukan_betina_id === $betina->id
+    )
+    ->filter(fn ($a) => !empty($a->deskripsi_karakteristik));
 
-        if ($anakansPasanganLain->count() > 0) {
-            $ringkasanKarakteristikPasanganLain = $anakansPasanganLain
-                ->sortByDesc('tanggal_menetas')
-                ->take(5)
-                ->pluck('deskripsi_karakteristik')
-                ->filter()
-                ->unique()
-                ->map(fn($d) => "- {$d}")
-                ->implode("\n");
+if ($anakansPasanganLain->isNotEmpty()) {
 
-            $ringkasanKarakteristikPasanganLain = $ringkasanKarakteristikPasanganLain
-                ?: "- Data karakteristik anakan dari pasangan lain belum tersedia.";
+    // Kelompokkan berdasarkan pasangan indukan
+    $grouped = $anakansPasanganLain->groupBy(
+        fn ($a) => $a->indukan_jantan_id . '-' . $a->indukan_betina_id
+    );
+
+    $blok = [];
+
+    foreach ($grouped as $pairKey => $anakans) {
+
+        $contoh = $anakans->first();
+
+        $namaJantan = $contoh->indukanJantan->nama ?? 'Jantan Tidak Diketahui';
+        $namaBetina = $contoh->indukanBetina->nama ?? 'Betina Tidak Diketahui';
+
+        $karakteristik = $anakans
+            ->pluck('deskripsi_karakteristik')
+            ->filter()
+            ->unique()
+            ->map(fn ($d) => "  • {$d}")
+            ->implode("\n");
+
+        if ($karakteristik) {
+            $blok[] =
+                "- {$namaJantan} × {$namaBetina}:\n{$karakteristik}";
         }
+    }
+
+    $ringkasanKarakteristikPasanganLain = $blok
+        ? implode("\n\n", $blok)
+        : "- Data karakteristik anakan dari pasangan lain belum tersedia.";
+}
+
         
 // =========================================================
 // TRIP BREEDING (5 TERAKHIR) – KHUSUS PASANGAN INI
@@ -603,10 +647,6 @@ PRINSIP ANALISIS SISTEM
   kondisi perilaku saat ini, jelaskan secara objektif.
 - Analisis bertujuan membantu pengambilan keputusan peternak,
   bukan menentukan kebenaran biologis.
-- Sistem diperbolehkan mengklasifikasikan status pasangan
-(misalnya pasangan baru dicoba, pasangan sudah terbukti menghasilkan,
-pasangan pernah menghasilkan namun belum konsisten,
-atau pasangan yang memerlukan pengawasan lebih ketat)
   berdasarkan data riwayat breeding yang tersedia.
 - Klasifikasi ini bersifat manajerial dan kontekstual,
   bukan penilaian biologis atau prediksi hasil breeding.
@@ -668,14 +708,6 @@ perilaku indukan saat ini.
   - Rincian anakan:
 {$ringkasanAnakanPasangan}
 
-- Riwayat jantan dengan pasangan lain:
-  Jantan memiliki {$jumlahAnakanJantanLain} anakan
-  dari pasangan lain di luar pasangan ini.
-
-- Riwayat betina dengan pasangan lain:
-  Betina memiliki {$jumlahAnakanBetinaLain} anakan
-  dari pasangan lain di luar pasangan ini.
-
 Catatan:
 Riwayat produksi individu indukan digunakan sebagai
 indikator pengalaman reproduksi.
@@ -711,10 +743,17 @@ Catatan:
 - Data ini tidak digunakan untuk prediksi biologis atau genetika.
 
 ------------------------------------------------
+3 Konteks Historis Trip Indukan (Pasangan Lain)
 
 3.1 Catatan Karakteristik Anakan
 Gunakan data karakteristik anakan hasil pasangan ini
+{$konteksTripIndukanLain}
 {$blokKarakteristik}
+
+Catatan:
+Data ini digunakan sebagai konteks pengalaman reproduksi
+dan kestabilan hasil breeding indukan secara individual,
+bukan sebagai dasar utama evaluasi kecocokan pasangan aktif.
 
 ------------------------------------------------
 
@@ -725,17 +764,7 @@ objektif dan deskriptif.
 
 ------------------------------------------------
 
-3.3 Konteks Historis Trip Indukan (Pasangan Lain)
-
-{$konteksTripIndukanLain}
-
-Catatan:
-Data ini digunakan sebagai konteks pengalaman reproduksi
-dan kestabilan hasil breeding indukan secara individual,
-bukan sebagai dasar utama evaluasi kecocokan pasangan aktif.
-
-
-4. Kesimpulan bagian ini:
+3.3 Kesimpulan bagian ini:
 
 Jelaskan status reproduksi pasangan ini secara manajerial
 berdasarkan riwayat jumlah trip, jumlah anakan,
@@ -744,10 +773,9 @@ dan konsistensi hasil breeding yang tercatat di sistem.
 Dalam kesimpulan ini, sistem wajib menetapkan status pasangan breeding
 (secara kontekstual), misalnya sebagai:
 
-pasangan baru,
-pasangan mapan,
-pasangan dengan hasil fluktuatif, atau
-pasangan dengan risiko manajerial tertentu.
+misalnya pasangan baru dicoba, pasangan sudah terbukti menghasilkan,
+pasangan pernah menghasilkan namun belum konsisten,
+atau pasangan yang memerlukan pengawasan lebih ketat
 
 Penetapan status ini digunakan untuk menjelaskan apakah pasangan
 telah terbukti produktif secara historis dan apakah kondisi perilaku
@@ -836,7 +864,7 @@ Langkah penyusunan:
 2. Untuk setiap indikator tersebut, jelaskan:
    - indikator yang belum terpenuhi,
    - konteks perilaku yang teramati,
-   - tindakan manajerial yang dapat dipertimbangkan
+   - rekomendasi tindakan manajerial yang dapat dipertimbangkan
      berdasarkan praktik lapangan umum,
    - durasi pengamatan yang wajar,
    - waktu evaluasi ulang yang disarankan.
@@ -873,28 +901,14 @@ sebelum diambil keputusan lanjutan.
 
 ------------------------------------------------
 
-I. Early Warning – Kondisi Stop Pairing
+I. Early Warning - Kondisi Stop Pairing
 
 Berikan batasan kondisi kapan pairing
 perlu dihentikan sementara, seperti:
-- agresivitas jantan berulang,
+- terdapat agresivitas jantan yang berulang,
 - penurunan kondisi betina,
 - tidak ada respon interaksi dalam 30 hari,
 - luka fisik atau tanda stres berat.
-
-------------------------------------------------
-
-J. Rekomendasi Perawatan & Pemulihan (Jika Diperlukan)
-
-Jika terdapat indikator yang belum terpenuhi
-atau risiko yang teridentifikasi:
-- Berikan saran perawatan atau adaptasi bersifat umum.
-- Sertakan durasi pemantauan (misalnya 7–14 hari).
-- Sertakan hal yang perlu dihindari.
-- Tekankan perlunya evaluasi ulang.
-
-Jika semua indikator terpenuhi, tuliskan:
-"Tidak diperlukan perawatan tambahan saat ini."
 
 ========================
 BATASAN BAHASA
