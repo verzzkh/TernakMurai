@@ -163,6 +163,10 @@ Route::get('/hasil',
     Route::get('/riwayat', 
         [\App\Http\Controllers\Peternak\AnalisaBreedingController::class, 'riwayat']
     )->name('riwayat');
+// ➤ Simpan tindak lanjut peternak (lanjut / pantau / stop)
+Route::post('/{id}/tindak-lanjut',
+    [\App\Http\Controllers\Peternak\AnalisaBreedingController::class, 'updateTindakLanjut']
+)->name('updateTindakLanjut');
 
     // ➤ Detail 1 analisa + halaman untuk memberikan catatan lapangan
     Route::get('/detail/{id}', 

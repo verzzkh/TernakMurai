@@ -78,6 +78,30 @@ class AnalisaBreedingController extends Controller
             ->with('success', 'Hasil analisa berhasil disimpan ke riwayat.');
     }
 
+    public function updateTindakLanjut(Request $request, $id)
+{
+    // Validasi input
+    $request->validate([
+        'tindak_lanjut_peternak' => 'required|in:lanjut,pantau,stop',
+    ]);
+
+    $peternakId = Auth::user()->peternak->id;
+
+    // Pastikan data milik peternak yang login (multi-tenant aman)
+    $analisa = HasilAnalisaBreeding::where('peternak_id', $peternakId)
+        ->findOrFail($id);
+
+    // Simpan tindak lanjut peternak
+    $analisa->update([
+        'tindak_lanjut_peternak' => $request->tindak_lanjut_peternak,
+    ]);
+
+    return redirect()
+        ->back()
+        ->with('success', 'Tindak lanjut peternak berhasil disimpan.');
+}
+
+
     public function hapus($id)
     {
         $peternakId = Auth::user()->peternak->id;
@@ -201,7 +225,18 @@ $konteksTripIndukanLain = $this->buildTripKonteksIndukanLain(
     $jantan,
     $betina
 );
+$tindakLanjutPeternakGlobal = HasilAnalisaBreeding::where('peternak_id', $peternakId)
+    ->whereNotNull('tindak_lanjut_peternak')
+    ->orderByDesc('tanggal_analisa')
+    ->take(5) // cukup 5 terakhir
+    ->pluck('tindak_lanjut_peternak');
 
+// ======================================================
+// HITUNG REKOMENDASI SISTEM (LEVEL 1)
+// ======================================================
+$rekomendasiSistem = $this->tentukanRekomendasiSistem(
+    $anakansPasangan->count()
+);
 
         $payloadJurnal = [
             'putranto_2018_reproduksi' => [
@@ -231,6 +266,7 @@ $konteksTripIndukanLain = $this->buildTripKonteksIndukanLain(
             $konteksTripIndukanLain,
             $perkawinanPasangan,
             $payloadJurnal,
+            $tindakLanjutPeternakGlobal,
         );
 
         try {
@@ -256,6 +292,7 @@ $konteksTripIndukanLain = $this->buildTripKonteksIndukanLain(
             'hasilAnalisa' => $hasilAnalisa,
             'jantan_id'    => $jantan->id,
             'betina_id'    => $betina->id,
+             'rekomendasi'  => $rekomendasiSistem,
         ]);
     }
 
@@ -270,13 +307,33 @@ $konteksTripIndukanLain = $this->buildTripKonteksIndukanLain(
         $jantan = Indukan::find(session('jantan_id'));
         $betina = Indukan::find(session('betina_id'));
         $hasilAnalisa = session('hasilAnalisa');
+           $rekomendasi  = session('rekomendasi');
 
         return view('peternak.kandang.hasilAnalisa', compact(
             'hasilAnalisa',
             'jantan',
-            'betina'
+            'betina',
+             'rekomendasi'
         ));
     }
+// ======================================================
+// PENENTU REKOMENDASI SISTEM (LEVEL 1 – SEDERHANA)
+// ======================================================
+private function tentukanRekomendasiSistem(
+    int $jumlahAnakanPasangan
+): string {
+
+    // Jika pasangan belum pernah menghasilkan anakan
+    if ($jumlahAnakanPasangan === 0) {
+        return 'uji_coba';
+    }
+
+    // Jika pasangan pernah menghasilkan anakan
+    return 'lanjut';
+
+    // STOP tidak pernah otomatis (hak peternak)
+}
+
 
 
     /**
@@ -290,9 +347,35 @@ $konteksTripIndukanLain = $this->buildTripKonteksIndukanLain(
         $anakansBetinaGlobal,
          string $konteksTripIndukanLain,
         $perkawinanPasangan,
-
-        array $payloadJurnal
+        array $payloadJurnal,
+        $riwayatTindakLanjutPeternakGlobal
     ): string {
+$konteksKeputusanPeternak = '';
+
+if (
+    isset($riwayatTindakLanjutPeternakGlobal)
+    && $riwayatTindakLanjutPeternakGlobal->count() > 0
+) {
+    $ringkasanKeputusan = $riwayatTindakLanjutPeternakGlobal
+        ->countBy()
+        ->map(fn ($jumlah, $aksi) => strtoupper($aksi) . ": {$jumlah}x")
+        ->implode(', ');
+
+    $konteksKeputusanPeternak = <<<TEXT
+
+========================
+KONTEKS RIWAYAT KEPUTUSAN PETERNAK
+========================
+Berdasarkan riwayat analisa breeding sebelumnya,
+peternak tercatat mengambil tindak lanjut sebagai berikut:
+{$ringkasanKeputusan}
+
+Catatan:
+Data ini digunakan sebagai konteks gaya pengelolaan peternak
+secara umum dan tidak digunakan sebagai dasar utama evaluasi
+atau penilaian benar atau salah keputusan peternak.
+TEXT;
+}
 
 
         /* =========================================================
@@ -400,6 +483,7 @@ $jumlahAnakanBetinaLain = $anakansBetinaGlobal
             $ringkasanKarakteristikPasanganLain = $ringkasanKarakteristikPasanganLain
                 ?: "- Data karakteristik anakan dari pasangan lain belum tersedia.";
         }
+        
 // =========================================================
 // TRIP BREEDING (5 TERAKHIR) – KHUSUS PASANGAN INI
 // =========================================================
@@ -491,7 +575,7 @@ Catatan:
 Data ini digunakan sebagai konteks pengalaman indukan dan tidak dijadikan
 bukti kecocokan pasangan yang dianalisis.
 "; }
-        /*  🔥 END BLOCK  */
+        /*  END BLOCK  */
 
         return <<<PROMPT
 
@@ -503,6 +587,9 @@ sistem pendukung keputusan (Decision Support System).
 
 Laporan harus disusun secara terstruktur, objektif,
 dan berbasis data faktual tanpa spekulasi biologis.
+
+{$konteksKeputusanPeternak}
+
 
 ========================
 PRINSIP ANALISIS SISTEM
@@ -516,6 +603,13 @@ PRINSIP ANALISIS SISTEM
   kondisi perilaku saat ini, jelaskan secara objektif.
 - Analisis bertujuan membantu pengambilan keputusan peternak,
   bukan menentukan kebenaran biologis.
+- Sistem diperbolehkan mengklasifikasikan status pasangan
+(misalnya pasangan baru dicoba, pasangan sudah terbukti menghasilkan,
+pasangan pernah menghasilkan namun belum konsisten,
+atau pasangan yang memerlukan pengawasan lebih ketat)
+  berdasarkan data riwayat breeding yang tersedia.
+- Klasifikasi ini bersifat manajerial dan kontekstual,
+  bukan penilaian biologis atau prediksi hasil breeding.
 
 ========================
 FORMAT LAPORAN
@@ -552,7 +646,12 @@ Evaluasi dilakukan berdasarkan aturan perilaku sistem:
 Catatan:
 Evaluasi ini berbasis aturan perilaku yang telah
 ditetapkan sistem dan bukan prediksi hasil breeding,
-genetika, atau kualitas anakan.
+genetika, atau kualitas anakan.Interpretasi kecocokan perilaku ini
+perlu dibaca bersama dengan status pasangan breeding
+berdasarkan riwayat historis,
+karena indikator perilaku yang sama
+dapat memiliki makna manajerial yang berbeda
+pada pasangan baru dan pasangan mapan.
 
 ------------------------------------------------
 
@@ -637,10 +736,27 @@ bukan sebagai dasar utama evaluasi kecocokan pasangan aktif.
 
 
 4. Kesimpulan bagian ini:
-Jelaskan status reproduksi pasangan ini secara manajerial,
-misalnya apakah pasangan telah terbukti produktif secara historis
-dan apakah kondisi perilaku saat ini selaras atau tidak
-dengan riwayat tersebut.
+
+Jelaskan status reproduksi pasangan ini secara manajerial
+berdasarkan riwayat jumlah trip, jumlah anakan,
+dan konsistensi hasil breeding yang tercatat di sistem.
+
+Dalam kesimpulan ini, sistem wajib menetapkan status pasangan breeding
+(secara kontekstual), misalnya sebagai:
+
+pasangan baru,
+pasangan mapan,
+pasangan dengan hasil fluktuatif, atau
+pasangan dengan risiko manajerial tertentu.
+
+Penetapan status ini digunakan untuk menjelaskan apakah pasangan
+telah terbukti produktif secara historis dan apakah kondisi perilaku
+saat ini selaras atau tidak dengan riwayat tersebut.
+
+Catatan:
+Penetapan status pasangan bersifat manajerial dan deskriptif,
+bukan penilaian biologis, bukan prediksi keberhasilan breeding,
+dan digunakan sebagai konteks untuk rekomendasi lanjutan sistem.
 
 ------------------------------------------------
 
@@ -693,6 +809,13 @@ Gunakan prinsip berikut:
 Sertakan alasan singkat berbasis data historis
 dan kondisi perilaku saat ini.
 
+Catatan Kontekstual:
+Dengan mempertimbangkan riwayat tindak lanjut peternak pada analisa breeding sebelumnya,
+rekomendasi ini disampaikan dengan tingkat kehati-hatian yang disesuaikan.
+Riwayat tersebut digunakan sebagai konteks gaya pengambilan keputusan peternak,
+dan tidak mempengaruhi penetapan rekomendasi utama yang tetap berbasis
+pada data breeding dan indikator perilaku saat ini.
+
 ------------------------------------------------
 
 G. Rekomendasi Tindakan Praktis
@@ -700,6 +823,13 @@ G. Rekomendasi Tindakan Praktis
 Bagian ini menyajikan rekomendasi tindakan manajerial
 berdasarkan indikator perilaku yang belum terpenuhi
 pada pasangan indukan yang dianalisis.
+
+Definisi indikator perilaku:
+- Indikator "Aktif Kicau" merujuk pada perilaku kicau
+  yang berfungsi sebagai respons interaksi atau
+  rayuan terhadap betina dalam konteks breeding,
+  dan bukan kicau agresif, kicau tarung,
+  atau kicau untuk tujuan kompetisi.
 
 Langkah penyusunan:
 1. Identifikasi indikator perilaku yang bernilai "Tidak".

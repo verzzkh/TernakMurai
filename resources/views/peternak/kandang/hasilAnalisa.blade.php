@@ -50,7 +50,7 @@
             <input type="hidden" name="jantan_id" value="{{ $jantan->id }}">
             <input type="hidden" name="betina_id" value="{{ $betina->id }}">
             <input type="hidden" name="hasil_ai" value="{{ $hasilAnalisa }}">
-             <input type="hidden" name="rekomendasi" value="uji_coba"> {{-- WAJIB AGAR LULUS VALIDASI --}}
+             <input type="hidden" name="rekomendasi" value="{{ $rekomendasi }}">
 
             <button type="submit"
                 class="w-full md:w-auto px-5 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded">

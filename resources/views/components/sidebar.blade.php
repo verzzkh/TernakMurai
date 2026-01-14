@@ -172,25 +172,28 @@
         <!-- Additional links -->
         <h5 class="px-2 text-xs font-semibold text-text-secondary uppercase dark:text-primary-light">Lainnya</h5>
 
-        <!-- Deteksi Penyakit link -->
-        <a href="{{ route('peternak.deteksi-penyakit.index') }}"
-            class="flex items-center p-2 rounded-md transition-colors
-          @if (request()->routeIs('peternak.deteksi-penyakit.*')) bg-primary-100 text-primary-dark dark:bg-primary dark:text-primary-100
-          @else
-               text-text-tertiary dark:text-light hover:bg-primary-100 dark:hover:bg-primary @endif">
+       <!-- Riwayat Analisa Breeding link -->
+<a href="{{ route('peternak.analisaBreeding.riwayat') }}"
+   class="flex items-center p-2 rounded-md transition-colors
+   @if (request()->routeIs('peternak.analisaBreeding.*'))
+       bg-primary-100 text-primary-dark dark:bg-primary dark:text-primary-100
+   @else
+       text-text-tertiary dark:text-light hover:bg-primary-100 dark:hover:bg-primary
+   @endif">
 
-            <!-- Icon -->
-            <span aria-hidden="true">
-                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-            </span>
+    <!-- Icon -->
+    <span aria-hidden="true">
+        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none"
+             viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+    </span>
 
-            <!-- Label -->
-            <span class="ml-2 text-sm">Deteksi Penyakit</span>
-        </a>
+    <!-- Label -->
+    <span class="ml-2 text-sm">Riwayat Analisa Breeding</span>
+</a>
+
 
         </nav>
 

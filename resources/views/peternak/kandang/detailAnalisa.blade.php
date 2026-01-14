@@ -23,6 +23,45 @@
             {!! Illuminate\Support\Str::markdown($data->hasil_ai) !!}
         </div>
     </div>
+{{-- ===================== TINDAK LANJUT PETERNAK ===================== --}}
+<div class="bg-white p-4 rounded shadow mb-4">
+    <h2 class="font-semibold mb-2">Tindak Lanjut Peternak</h2>
+
+    <form method="POST" action="{{ route('peternak.analisaBreeding.updateTindakLanjut', $data->id) }}">
+        @csrf
+
+        <div class="flex flex-col gap-2 mt-2">
+            <label class="flex items-center gap-2">
+                <input type="radio" name="tindak_lanjut_peternak" value="lanjut"
+                    {{ $data->tindak_lanjut_peternak === 'lanjut' ? 'checked' : '' }}>
+                <span>Lanjut pairing</span>
+            </label>
+
+            <label class="flex items-center gap-2">
+                <input type="radio" name="tindak_lanjut_peternak" value="pantau"
+                    {{ $data->tindak_lanjut_peternak === 'pantau' ? 'checked' : '' }}>
+                <span>Pantau kondisi</span>
+            </label>
+
+            <label class="flex items-center gap-2">
+                <input type="radio" name="tindak_lanjut_peternak" value="stop"
+                    {{ $data->tindak_lanjut_peternak === 'stop' ? 'checked' : '' }}>
+                <span>Hentikan sementara</span>
+            </label>
+        </div>
+
+        <button class="mt-3 px-4 py-2 bg-indigo-600 text-white rounded shadow hover:bg-indigo-700">
+            Simpan Tindak Lanjut
+        </button>
+    </form>
+
+    @if(!$data->tindak_lanjut_peternak)
+        <p class="text-xs text-gray-500 mt-2 italic">
+            Tindak lanjut belum ditentukan.
+        </p>
+    @endif
+</div>
+{{-- =============================================================== --}}
 
  <form method="POST" action="{{ route('peternak.analisaBreeding.updateCatatan', $data->id) }}">
     @csrf

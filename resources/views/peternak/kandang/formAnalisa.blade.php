@@ -9,11 +9,6 @@
             class="px-4 py-2 text-sm text-white bg-green-600 hover:bg-green-700 rounded-lg">
             Riwayat Analisa
         </a>
-
-        <a href="{{ route('peternak.kandang.index') }}"
-            class="px-4 py-2 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded-lg">
-            Kembali
-        </a>
     </div>
 </div>
 

@@ -14,6 +14,7 @@ class HasilAnalisaBreeding extends Model
         'betina_id',
         'hasil_ai',
         'rekomendasi',
+        'tindak_lanjut_peternak',
         'catatan_user',
         'tanggal_analisa',
     ];

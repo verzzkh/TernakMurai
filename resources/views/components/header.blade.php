@@ -14,81 +14,75 @@
         </button>
 
         <!-- BRAND -->
-        <a
-            class="inline-block text-2xl font-bold tracking-wider uppercase text-primary-dark dark:text-light">
+        <a class="inline-block text-2xl font-bold tracking-wider uppercase text-primary-dark dark:text-light">
             Ternak Jawara
         </a>
 
         <!-- Desktop Right Buttons -->
-<div class="flex items-center space-x-2">
+        <div class="flex items-center space-x-2">
 
-    <!-- Avatar Mobile -->
-    <div class="relative md:hidden" x-data="{ open: false }">
-        <button @click="open = !open"
-            class="rounded-full focus:outline-none focus:ring">
-            <img
-    class="w-10 h-10 rounded-full object-cover"
-    src="{{ auth()->user()->peternak && auth()->user()->peternak->foto_profil
-        ? asset('storage/' . auth()->user()->peternak->foto_profil)
-        : asset('build/images/avatar.jpg') }}"
-    alt="Avatar"
-/>
+            <!-- Avatar Mobile -->
+            <div class="relative md:hidden" x-data="{ open: false }">
+                <button @click="open = !open" class="rounded-full focus:outline-none focus:ring">
+                    <img class="w-10 h-10 rounded-full object-cover"
+                        src="{{ auth()->user()->peternak && auth()->user()->peternak->foto_profil
+                            ? asset('storage/' . auth()->user()->peternak->foto_profil)
+                            : asset('build/images/avatar.jpg') }}"
+                        alt="Avatar" />
 
-        </button>
+                </button>
 
-        <div x-show="open" @click.away="open=false"
-            class="absolute right-0 z-50 w-48 py-1 mt-2 bg-white dark:bg-dark rounded-md shadow-lg">
+                <div x-show="open" @click.away="open=false"
+                    class="absolute right-0 z-50 w-48 py-1 mt-2 bg-white dark:bg-dark rounded-md shadow-lg">
 
-            <a href="{{ route('peternak.profile.show') }}"
-                class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700">
-                Profil Kamu
-            </a>
+                    <a href="{{ route('peternak.profile.show') }}"
+                        class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700">
+                        Profil Kamu
+                    </a>
 
-            <form id="logout-form-mobile" action="{{ route('logout') }}" method="POST">
-                @csrf
-            </form>
+                    <form id="logout-form-mobile" action="{{ route('logout') }}" method="POST">
+                        @csrf
+                    </form>
 
-            <a onclick="event.preventDefault(); document.getElementById('logout-form-mobile').submit()"
-                class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
-                Logout
-            </a>
-        </div>
-    </div>
-
-    <!-- Avatar Desktop -->
-    <nav class="hidden space-x-2 md:flex md:items-center">
-        <div class="relative" x-data="{ open: false }">
-            <button @click="open = !open"
-                class="transition-opacity rounded-full dark:opacity-75 dark:hover:opacity-100 focus:outline-none focus:ring">
-                <img
-    class="w-10 h-10 rounded-full object-cover"
-    src="{{ auth()->user()->peternak && auth()->user()->peternak->foto_profil
-        ? asset('storage/' . auth()->user()->peternak->foto_profil)
-        : asset('build/images/avatar.jpg') }}"
-    alt="Avatar"
-/>
-
-            </button>
-
-            <div x-show="open" @click.away="open=false"
-                class="absolute right-0 w-48 py-1 mt-2 bg-white dark:bg-dark rounded-md shadow-lg">
-
-                <a href="{{ route('peternak.profile.show') }}"
-                    class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700">
-                    Profil Kamu
-                </a>
-
-                <form id="logout-form" action="{{ route('logout') }}" method="POST">@csrf</form>
-
-                <a onclick="event.preventDefault(); document.getElementById('logout-form').submit()"
-                    class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700">
-                    Logout
-                </a>
+                    <a onclick="event.preventDefault(); document.getElementById('logout-form-mobile').submit()"
+                        class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
+                        Logout
+                    </a>
+                </div>
             </div>
-        </div>
-    </nav>
 
-</div>
+            <!-- Avatar Desktop -->
+            <nav class="hidden space-x-2 md:flex md:items-center">
+                <div class="relative" x-data="{ open: false }">
+                    <button @click="open = !open"
+                        class="transition-opacity rounded-full dark:opacity-75 dark:hover:opacity-100 focus:outline-none focus:ring">
+                        <img class="w-10 h-10 rounded-full object-cover"
+                            src="{{ auth()->user()->peternak && auth()->user()->peternak->foto_profil
+                                ? asset('storage/' . auth()->user()->peternak->foto_profil)
+                                : asset('build/images/avatar.jpg') }}"
+                            alt="Avatar" />
+
+                    </button>
+
+                    <div x-show="open" @click.away="open=false"
+                        class="absolute right-0 w-48 py-1 mt-2 bg-white dark:bg-dark rounded-md shadow-lg">
+
+                        <a href="{{ route('peternak.profile.show') }}"
+                            class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700">
+                            Profil Kamu
+                        </a>
+
+                        <form id="logout-form" action="{{ route('logout') }}" method="POST">@csrf</form>
+
+                        <a onclick="event.preventDefault(); document.getElementById('logout-form').submit()"
+                            class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700">
+                            Logout
+                        </a>
+                    </div>
+                </div>
+            </nav>
+
+        </div>
 
     </div>
 
@@ -238,30 +232,33 @@
                 Lainnya
             </h5>
 
-            <!-- Deteksi Penyakit link -->
-            <div x-data="{ isActive: false, open: false }">
-                <a href="{{ route('peternak.deteksi-penyakit.index') }}"
-                    class="flex items-center p-2 rounded-md transition-colors
-        @if (request()->routeIs('peternak.deteksi-penyakit.*')) bg-primary-100 text-primary-dark dark:bg-primary dark:text-primary-100
-        @else
-            text-text-tertiary dark:text-light hover:bg-primary-100 dark:hover:bg-primary @endif">
+           <!-- Riwayat Analisa Breeding link -->
+<div x-data="{ isActive: false, open: false }">
+    <a href="{{ route('peternak.analisaBreeding.riwayat') }}"
+        class="flex items-center p-2 rounded-md transition-colors
+@if (request()->routeIs('peternak.analisaBreeding.*'))
+    bg-primary-100 text-primary-dark dark:bg-primary dark:text-primary-100
+@else
+    text-text-tertiary dark:text-light hover:bg-primary-100 dark:hover:bg-primary
+@endif">
 
-                    <span aria-hidden="true">
-                        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                    </span>
+        <span aria-hidden="true">
+            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none"
+                viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+        </span>
 
-                    <span class="ml-2 text-sm">Deteksi Penyakit</span>
-                </a>
-            </div>
+        <span class="ml-2 text-sm">Riwayat Analisa Breeding</span>
+    </a>
+</div>
+
 
         </nav>
     </div>
 
     <!-- ========== MOBILE SUB MENU (tetap absolute) ========== -->
-   
+
 
 </header>
