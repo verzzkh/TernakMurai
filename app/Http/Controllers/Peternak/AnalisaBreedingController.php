@@ -348,6 +348,31 @@ $jumlahAnakanBetinaLain = $anakansBetinaGlobal
             $ringkasanKarakteristikPasanganLain = $ringkasanKarakteristikPasanganLain
                 ?: "- Data karakteristik anakan dari pasangan lain belum tersedia.";
         }
+// =========================================================
+// TRIP BREEDING (5 TERAKHIR) – KHUSUS PASANGAN INI
+// =========================================================
+
+$tripPasangan = $perkawinanPasangan
+    ->sortByDesc('created_at')
+    ->take(5)
+    ->values();
+
+$ringkasanTripText = [];
+
+foreach ($tripPasangan as $i => $trip) {
+
+    $jumlahAnakanTrip = $trip->anakans->count();
+
+    $ringkasanTripText[] =
+        "- Trip " . ($i + 1) .
+        " | Tanggal kawin: {$trip->tanggal_kawin}" .
+        " | Jumlah anakan: {$jumlahAnakanTrip}";
+}
+
+
+$ringkasanTripText = $ringkasanTripText
+    ? implode("\n", $ringkasanTripText)
+    : "Belum terdapat data trip breeding yang dapat dievaluasi.";
 
         /* =========================================================
      * E. RIWAYAT PRODUKSI INDUKAN
@@ -509,8 +534,47 @@ indikator pengalaman reproduksi.
 - Jumlah perkawinan tercatat: {$jumlahPerkawinan}
 - Perkawinan terakhir:
   - Tanggal kawin: {$tanggalKawinTerakhir}
+  Gunakan ringkasan ini untuk:
+- menilai apakah hasil breeding cenderung konsisten,
+- mengidentifikasi pengulangan hasil tanpa perbaikan,
+- mendukung keputusan lanjutan secara bertahap.
 
-3. Kesimpulan bagian ini:
+  ------------------------------------------------
+3.  Evaluasi Periode Breeding (Trip)
+
+Bagian ini menyajikan ringkasan beberapa trip breeding terakhir
+khusus untuk pasangan jantan dan betina yang dianalisis.
+
+Ringkasan 5 trip terakhir pasangan ini:
+{$ringkasanTripText}
+
+Catatan:
+- Trip breeding didefinisikan sebagai satu periode perkawinan
+  yang diakhiri dengan ada atau tidaknya hasil anakan.
+- Evaluasi ini bersifat deskriptif untuk membantu mengidentifikasi
+  pola hasil breeding secara kuantitatif, seperti kecenderungan
+  peningkatan, penurunan, atau kestabilan hasil antar trip.
+- Apabila jumlah trip masih terbatas, hasil evaluasi tidak
+  disimpulkan sebagai pola jangka panjang dan tetap memerlukan
+  pemantauan lanjutan.
+- Data ini tidak digunakan untuk prediksi biologis atau genetika.
+
+------------------------------------------------
+
+3.1 Catatan Karakteristik Anakan
+Gunakan data karakteristik anakan hasil pasangan ini
+{$blokKarakteristik}
+
+------------------------------------------------
+
+3.2 Evaluasi Karakteristik Anakan
+Gunakan data karakteristik anakan di atas untuk
+menyusun evaluasi kualitatif hasil breeding secara
+objektif dan deskriptif.
+
+------------------------------------------------
+
+4. Kesimpulan bagian ini:
 Jelaskan status reproduksi pasangan ini secara manajerial,
 misalnya apakah pasangan telah terbukti produktif secara historis
 dan apakah kondisi perilaku saat ini selaras atau tidak
