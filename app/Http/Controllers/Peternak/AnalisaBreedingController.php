@@ -122,6 +122,49 @@ class AnalisaBreedingController extends Controller
             ->with('success', 'Catatan berhasil disimpan.');
     }
 
+private function buildTripKonteksIndukanLain(
+    int $peternakId,
+    Indukan $jantan,
+    Indukan $betina
+): string {
+
+    // Trip jantan dengan betina lain
+    $tripJantanLain = Perkawinan::where('peternak_id', $peternakId)
+        ->where('indukan_jantan_id', $jantan->id)
+        ->where('indukan_betina_id', '!=', $betina->id)
+        ->withCount('anakans')
+        ->get();
+
+    // Trip betina dengan jantan lain
+    $tripBetinaLain = Perkawinan::where('peternak_id', $peternakId)
+        ->where('indukan_betina_id', $betina->id)
+        ->where('indukan_jantan_id', '!=', $jantan->id)
+        ->withCount('anakans')
+        ->get();
+
+    // Jika benar-benar tidak ada data
+    if ($tripJantanLain->isEmpty() && $tripBetinaLain->isEmpty()) {
+        return "Tidak terdapat riwayat trip breeding indukan dengan pasangan lain.";
+    }
+
+    $teks = [];
+
+    if ($tripJantanLain->isNotEmpty()) {
+        $teks[] =
+            "- Riwayat jantan dengan pasangan lain:\n" .
+            "  Total trip: {$tripJantanLain->count()}\n" .
+            "  Total anakan: {$tripJantanLain->sum('anakans_count')}";
+    }
+
+    if ($tripBetinaLain->isNotEmpty()) {
+        $teks[] =
+            "- Riwayat betina dengan pasangan lain:\n" .
+            "  Total trip: {$tripBetinaLain->count()}\n" .
+            "  Total anakan: {$tripBetinaLain->sum('anakans_count')}";
+    }
+
+    return implode("\n\n", $teks);
+}
 
 
     /**
@@ -151,7 +194,14 @@ class AnalisaBreedingController extends Controller
             ->where('indukan_jantan_id', $jantan->id)
             ->where('indukan_betina_id', $betina->id)
             ->orderByDesc('tanggal_kawin')
-            ->get();
+            ->get();       
+            
+$konteksTripIndukanLain = $this->buildTripKonteksIndukanLain(
+    $peternakId,
+    $jantan,
+    $betina
+);
+
 
         $payloadJurnal = [
             'putranto_2018_reproduksi' => [
@@ -178,8 +228,9 @@ class AnalisaBreedingController extends Controller
             $anakansPasangan,
             $anakansJantanGlobal,
             $anakansBetinaGlobal,
+            $konteksTripIndukanLain,
             $perkawinanPasangan,
-            $payloadJurnal
+            $payloadJurnal,
         );
 
         try {
@@ -237,6 +288,7 @@ class AnalisaBreedingController extends Controller
         $anakansPasangan,
         $anakansJantanGlobal,
         $anakansBetinaGlobal,
+         string $konteksTripIndukanLain,
         $perkawinanPasangan,
 
         array $payloadJurnal
@@ -573,6 +625,16 @@ menyusun evaluasi kualitatif hasil breeding secara
 objektif dan deskriptif.
 
 ------------------------------------------------
+
+3.3 Konteks Historis Trip Indukan (Pasangan Lain)
+
+{$konteksTripIndukanLain}
+
+Catatan:
+Data ini digunakan sebagai konteks pengalaman reproduksi
+dan kestabilan hasil breeding indukan secara individual,
+bukan sebagai dasar utama evaluasi kecocokan pasangan aktif.
+
 
 4. Kesimpulan bagian ini:
 Jelaskan status reproduksi pasangan ini secara manajerial,
