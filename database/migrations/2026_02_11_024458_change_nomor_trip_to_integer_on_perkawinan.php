@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('perkawinan', function (Blueprint $table) {
-            $table->unsignedInteger('nomor_trip')->change();
+        Schema::table('integer_on_perkawinan', function (Blueprint $table) {
+            //
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('perkawinan', function (Blueprint $table) {
-            $table->string('nomor_trip', 50)->change();
+        Schema::table('integer_on_perkawinan', function (Blueprint $table) {
+            //
         });
     }
 };

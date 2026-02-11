@@ -45,6 +45,36 @@ class IndukanService
     ]);
 }
 
+public function calculatePerformaGlobal(Indukan $indukan): array
+{
+    $allPerkawinans = collect()
+        ->merge($indukan->perkawinansJantan ?? collect())
+        ->merge($indukan->perkawinansBetina ?? collect());
+
+    $totalTrip = $allPerkawinans->count();
+    $berhasil = $allPerkawinans->where('status', 'berhasil')->count();
+    $gagal = $allPerkawinans->where('status', 'gagal')->count();
+    $totalAnakan = $allPerkawinans->sum(fn($p) => $p->anakans->count());
+
+    $successRate = $totalTrip > 0
+        ? round(($berhasil / $totalTrip) * 100)
+        : 0;
+
+    $avgAnakan = $totalTrip > 0
+        ? round($totalAnakan / $totalTrip, 2)
+        : 0;
+
+    return [
+        'total_trip' => $totalTrip,
+        'berhasil' => $berhasil,
+        'gagal' => $gagal,
+        'total_anakan' => $totalAnakan,
+        'success_rate' => $successRate,
+
+    ];
+}
+
+
 
     public function calculateAge(Carbon $tanggalLahir): array
     {

@@ -71,8 +71,9 @@ class KandangController extends Controller
             }
 
             $kandang = $this->kandangService->getKandangById($peternak, $kandang->id);
+            $performa = $this->kandangService->getPerformaPasanganAktif($kandang);
 
-            return view('peternak.kandang.detail', compact('kandang'));
+            return view('peternak.kandang.detail', compact('kandang', 'performa'));
         }
 
 
@@ -196,10 +197,11 @@ public function storeGagal(Request $request, Kandang $kandang)
         'kandang_id'         => $kandang->id,
         'indukan_jantan_id'  => $kandang->indukan_jantan_id,
         'indukan_betina_id'  => $kandang->indukan_betina_id,
-        'nomor_trip'         => \App\Models\Perkawinan::generateNomorTripKandang(
-            $peternak->id,
-            $kandang->id
-        ),
+        'nomor_trip' => \App\Models\Perkawinan::generateNomorTripPasangan(
+    $peternak->id,
+    $kandang->indukan_jantan_id,
+    $kandang->indukan_betina_id
+),
         'tanggal_kawin'      => $request->tanggal_gagal,
         'catatan'            => $request->catatan,
         'status'             => 'gagal',

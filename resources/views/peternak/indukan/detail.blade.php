@@ -157,152 +157,157 @@
                     </div>
 
                     <!-- Anakan dari Indukan ini -->
-                    
-@php
-    $allPerkawinans = collect()
-        ->merge($indukan->perkawinansJantan ?? collect())
-        ->merge($indukan->perkawinansBetina ?? collect());
-
-    $allPerkawinans = $allPerkawinans->sortBy(function ($p) {
-        return $p->tanggal_kawin ? $p->tanggal_kawin->timestamp : 0;
-    });
-
-    $groupedPerkawinan = $allPerkawinans->groupBy(function ($p) {
-        return $p->indukan_jantan_id . '-' . $p->indukan_betina_id;
-    });
-@endphp
-
-
-@if ($groupedPerkawinan->isNotEmpty())
-<div class="mt-6 bg-white dark:bg-darker rounded-lg shadow p-6">
-    <h2 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
-        Riwayat Breeding Indukan Ini
-    </h2>
-
-    @foreach ($groupedPerkawinan as $pairKey => $perkawinanGroup)
-
-        @php
-            $first = $perkawinanGroup->first();
-
-            $pairName =
-                ($first->indukanJantan?->nomor_ring ?? 'J?')
-                . ' × ' .
-                ($first->indukanBetina?->nomor_ring ?? 'B?');
-
-            $totalTrip = $perkawinanGroup->count();
-            $totalAnakan = $perkawinanGroup->sum(fn($p) => $p->anakans->count());
-        @endphp
-
-        <div class="mb-6 border border-primary/40 dark:border-primary-darker rounded-lg shadow-md bg-white dark:bg-gray-900 p-5">
-
-            {{-- HEADER PASANGAN --}}
-            <div class="flex items-center justify-between mb-3">
-                <div>
-                    <h3 class="text-lg font-bold text-primary">
-                        🐦 {{ $pairName }}
-                    </h3>
-                    <p class="text-sm">
-                        Total Trip: <span class="text-primary">{{ $totalTrip }}</span> |
-                        Total Anakan: <span class="text-primary">{{ $totalAnakan }}</span>
-                    </p>
-                </div>
-
-                <button type="button"
-                    onclick="togglePair('indukan-pair-{{ $loop->index }}', this)"
-                    class="px-3 py-1 text-xs font-semibold 
-                           bg-gray-100 dark:bg-gray-800 
-                           rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition">
-                    👁️ Lihat Riwayat
-                </button>
-            </div>
-
-            {{-- DAFTAR TRIP (DEFAULT HIDDEN) --}}
-            <div id="indukan-pair-{{ $loop->index }}" class="hidden mt-3 space-y-4">
-
-                @foreach ($perkawinanGroup->values() as $index => $perkawinan)
 
                     @php
-                        $anakans = $perkawinan->anakans;
-                        $countTotal = $anakans->count();
-                        $countJantan = $anakans->where('jenis_kelamin','jantan')->count();
-                        $countBetina = $anakans->where('jenis_kelamin','betina')->count();
+                        $allPerkawinans = collect()
+                            ->merge($indukan->perkawinansJantan ?? collect())
+                            ->merge($indukan->perkawinansBetina ?? collect());
+
+                        $allPerkawinans = $allPerkawinans->sortBy(function ($p) {
+                            return $p->tanggal_kawin ? $p->tanggal_kawin->timestamp : 0;
+                        });
+
+                        $groupedPerkawinan = $allPerkawinans->groupBy(function ($p) {
+                            return $p->indukan_jantan_id . '-' . $p->indukan_betina_id;
+                        });
                     @endphp
 
-                    <div class="relative pl-4 border-l-4 border-primary/70">
 
-                        <div class="text-sm font-semibold flex flex-wrap items-center gap-1">
-                            <span class="inline-block w-2 h-2 bg-primary rounded-full mr-2"></span>
+                    @if ($groupedPerkawinan->isNotEmpty())
+                        <div class="mt-6 bg-white dark:bg-darker rounded-lg shadow p-6">
+                            <h2 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
+                                Riwayat Breeding Indukan Ini
+                            </h2>
 
-                            Trip {{ $index + 1 }}
-                         @if($perkawinan->status === 'gagal')
-    <span class="ml-2 px-2 py-0.5 text-xs font-semibold 
+                            @foreach ($groupedPerkawinan as $pairKey => $perkawinanGroup)
+                                @php
+                                    $first = $perkawinanGroup->first();
+
+                                    $pairName =
+                                        ($first->indukanJantan?->nomor_ring ?? 'J?') .
+                                        ' × ' .
+                                        ($first->indukanBetina?->nomor_ring ?? 'B?');
+
+                                    $totalTrip = $perkawinanGroup->count();
+                                    $totalAnakan = $perkawinanGroup->sum(fn($p) => $p->anakans->count());
+                                @endphp
+
+                                <div
+                                    class="mb-6 border border-primary/40 dark:border-primary-darker rounded-lg shadow-md bg-white dark:bg-gray-900 p-5">
+
+                                    {{-- HEADER PASANGAN --}}
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div>
+                                            <h3 class="text-lg font-bold text-primary">
+                                                🐦 {{ $pairName }}
+                                            </h3>
+                                            <p class="text-sm">
+                                                Total Trip: <span class="text-primary">{{ $totalTrip }}</span> |
+                                                Total Anakan: <span class="text-primary">{{ $totalAnakan }}</span>
+                                            </p>
+                                        </div>
+
+                                        <button type="button"
+                                            onclick="togglePair('indukan-pair-{{ $loop->index }}', this)"
+                                            class="px-3 py-1 text-xs font-semibold 
+                           bg-gray-100 dark:bg-gray-800 
+                           rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition">
+                                            👁️ Lihat Riwayat
+                                        </button>
+                                    </div>
+
+                                    {{-- DAFTAR TRIP (DEFAULT HIDDEN) --}}
+                                    <div id="indukan-pair-{{ $loop->index }}" class="hidden mt-3 space-y-4">
+
+                                        @foreach ($perkawinanGroup->values() as $index => $perkawinan)
+                                            @php
+                                                $anakans = $perkawinan->anakans;
+                                                $countTotal = $anakans->count();
+                                                $countJantan = $anakans->where('jenis_kelamin', 'jantan')->count();
+                                                $countBetina = $anakans->where('jenis_kelamin', 'betina')->count();
+                                            @endphp
+
+                                            <div class="relative pl-4 border-l-4 border-primary/70">
+
+                                                <div class="text-sm font-semibold flex flex-wrap items-center gap-1">
+                                                    <span
+                                                        class="inline-block w-2 h-2 bg-primary rounded-full mr-2"></span>
+
+                                                    Trip {{ $index + 1 }}
+                                                    @if ($perkawinan->status === 'gagal')
+                                                        <span
+                                                            class="ml-2 px-2 py-0.5 text-xs font-semibold 
         bg-red-100 text-red-700 
         dark:bg-red-900 dark:text-red-200 
         rounded-full">
-        GAGAL
-    </span>
-@endif
+                                                            GAGAL
+                                                        </span>
+                                                    @endif
 
-<span class="font-normal text-gray-600 dark:text-gray-300">
-    — {{ $perkawinan->tanggal_kawin?->format('d M Y') ?? '-' }}
-</span>
-                                , total <span class="text-primary font-semibold">{{ $countTotal }}</span> anakan
-                                ({{ $countJantan }} jantan,
-                                {{ $countBetina }} betina)
-                            </span>
+                                                    <span class="font-normal text-gray-600 dark:text-gray-300">
+                                                        — {{ $perkawinan->tanggal_kawin?->format('d M Y') ?? '-' }}
+                                                    </span>
+                                                    , total <span
+                                                        class="text-primary font-semibold">{{ $countTotal }}</span>
+                                                    anakan
+                                                    ({{ $countJantan }} jantan,
+                                                    {{ $countBetina }} betina)
+                                                    </span>
 
-                            @if ($countTotal > 0)
-                                <button type="button"
-                                    onclick="toggleTrip('indukan-trip-{{ $perkawinan->id }}')"
-                                    class="text-xs text-primary hover:text-primary-dark ml-2">
-                                    👁️ Lihat Anak
-                                </button>
-                            @endif
-                        </div>
+                                                    @if ($countTotal > 0)
+                                                        <button type="button"
+                                                            onclick="toggleTrip('indukan-trip-{{ $perkawinan->id }}')"
+                                                            class="text-xs text-primary hover:text-primary-dark ml-2">
+                                                            👁️ Lihat Anak
+                                                        </button>
+                                                    @endif
+                                                </div>
 
-                        {{-- LIST ANAK PER TRIP --}}
-                        <div id="indukan-trip-{{ $perkawinan->id }}"
-                            class="hidden mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                                                {{-- LIST ANAK PER TRIP --}}
+                                                <div id="indukan-trip-{{ $perkawinan->id }}"
+                                                    class="hidden mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
 
-                            @foreach ($anakans as $child)
-                                <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-3 bg-gray-50 dark:bg-gray-800 hover:shadow transition">
-                                    <div class="flex justify-between items-center mb-1">
-                                        <h4 class="text-xs font-semibold">
-                                            {{ $child->nomor_ring ?? '(tanpa ring)' }}
-                                        </h4>
-                                        <span class="px-2 py-0.5 text-xs rounded-full
+                                                    @foreach ($anakans as $child)
+                                                        <div
+                                                            class="border border-gray-200 dark:border-gray-700 rounded-lg p-3 bg-gray-50 dark:bg-gray-800 hover:shadow transition">
+                                                            <div class="flex justify-between items-center mb-1">
+                                                                <h4 class="text-xs font-semibold">
+                                                                    {{ $child->nomor_ring ?? '(tanpa ring)' }}
+                                                                </h4>
+                                                                <span
+                                                                    class="px-2 py-0.5 text-xs rounded-full
                                             {{ $child->jenis_kelamin === 'jantan'
                                                 ? 'bg-blue-100 text-blue-800'
                                                 : ($child->jenis_kelamin === 'betina'
                                                     ? 'bg-pink-100 text-pink-800'
                                                     : 'bg-gray-100 text-gray-800') }}">
-                                            {{ ucfirst(str_replace('_',' ',$child->jenis_kelamin)) }}
-                                        </span>
+                                                                    {{ ucfirst(str_replace('_', ' ', $child->jenis_kelamin)) }}
+                                                                </span>
+                                                            </div>
+
+                                                            @if ($child->tanggal_lahir)
+                                                                <p class="text-xs text-gray-500">
+                                                                    {{ $child->tanggal_lahir->format('d M Y') }}
+                                                                    ({{ $child->age['formatted'] }})
+                                                                </p>
+                                                            @endif
+
+                                                            <a href="{{ route('peternak.anakan.show', $child) }}"
+                                                                class="text-xs text-primary hover:text-primary-dark">
+                                                                🔍 Detail
+                                                            </a>
+                                                        </div>
+                                                    @endforeach
+
+                                                </div>
+                                            </div>
+                                        @endforeach
+
                                     </div>
-
-                                    @if ($child->tanggal_lahir)
-                                        <p class="text-xs text-gray-500">
-                                            {{ $child->tanggal_lahir->format('d M Y') }}
-                                            ({{ $child->age['formatted'] }})
-                                        </p>
-                                    @endif
-
-                                    <a href="{{ route('peternak.anakan.show', $child) }}"
-                                        class="text-xs text-primary hover:text-primary-dark">
-                                        🔍 Detail
-                                    </a>
                                 </div>
                             @endforeach
-
                         </div>
-                    </div>
-                @endforeach
-
-            </div>
-        </div>
-    @endforeach
-</div>
-@endif
+                    @endif
 
 
                 </div>
@@ -352,39 +357,76 @@
                         </div>
                     @endif
 
-                    <!-- Statistik -->
-                    <div class="bg-white dark:bg-darker rounded-lg shadow p-6">
-                        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Statistik</h3>
+                    <!-- 🐦 Performa Indukan (Global) -->
+<div class="bg-white dark:bg-darker rounded-xl shadow-lg p-6">
 
-                        <div class="space-y-4">
-                            <div class="flex justify-between">
-                                <span class="text-sm text-gray-500 dark:text-gray-400">Total Anakan</span>
-                                <span
-                                    class="text-sm font-medium text-gray-900 dark:text-white">{{ $indukan->getAnakanCount() }}</span>
-                            </div>
+    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-5 flex items-center gap-2">
+        🐦 Performa Indukan Secara Keseluruhan
+    </h3>
 
-                            <div class="flex justify-between">
-                                <span class="text-sm text-gray-500 dark:text-gray-400">Anakan Jantan</span>
-                                <span class="text-sm font-medium text-gray-900 dark:text-white">
-                                    {{ $indukan->anakans->where('jenis_kelamin', 'jantan')->count() }}
-                                </span>
-                            </div>
+    <div class="space-y-4 text-sm">
 
-                            <div class="flex justify-between">
-                                <span class="text-sm text-gray-500 dark:text-gray-400">Anakan Betina</span>
-                                <span class="text-sm font-medium text-gray-900 dark:text-white">
-                                    {{ $indukan->anakans->where('jenis_kelamin', 'betina')->count() }}
-                                </span>
-                            </div>
+        <div class="flex justify-between items-center">
+            <span class="text-gray-500 dark:text-gray-400">Total Trip</span>
+            <span class="font-semibold text-gray-900 dark:text-white text-base">
+                {{ $performa['total_trip'] }}
+            </span>
+        </div>
 
-                            <div class="flex justify-between">
-                                <span class="text-sm text-gray-500 dark:text-gray-400">Anakan Aktif</span>
-                                <span class="text-sm font-medium text-gray-900 dark:text-white">
-                                    {{ $indukan->anakans->where('status_penjualan', 'belum_dijual')->count() }}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
+        <div class="flex justify-between items-center">
+            <span class="text-gray-500 dark:text-gray-400">Berhasil</span>
+            <span class="px-2 py-1 text-xs font-semibold rounded-full 
+                         bg-green-100 text-green-700 
+                         dark:bg-green-900 dark:text-green-300">
+                {{ $performa['berhasil'] }}
+            </span>
+        </div>
+
+        <div class="flex justify-between items-center">
+            <span class="text-gray-500 dark:text-gray-400">Gagal</span>
+            <span class="px-2 py-1 text-xs font-semibold rounded-full 
+                         bg-red-100 text-red-700 
+                         dark:bg-red-900 dark:text-red-300">
+                {{ $performa['gagal'] }}
+            </span>
+        </div>
+
+        <div class="flex justify-between items-center">
+            <span class="text-gray-500 dark:text-gray-400">Total Anakan</span>
+            <span class="font-semibold text-gray-900 dark:text-white text-base">
+                {{ $performa['total_anakan'] }}
+            </span>
+        </div>
+
+        <!-- Success Rate Highlight -->
+        <div class="mt-6 p-4 rounded-lg 
+            {{ $performa['success_rate'] >= 60 
+                ? 'bg-green-50 dark:bg-green-900/30' 
+                : ($performa['success_rate'] >= 40 
+                    ? 'bg-yellow-50 dark:bg-yellow-900/30' 
+                    : 'bg-red-50 dark:bg-red-900/30') }}">
+
+            <div class="flex justify-between items-center">
+                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Success Rate
+                </span>
+
+                <span class="text-xl font-bold 
+                    {{ $performa['success_rate'] >= 60 
+                        ? 'text-green-600' 
+                        : ($performa['success_rate'] >= 40 
+                            ? 'text-yellow-600' 
+                            : 'text-red-600') }}">
+                    {{ $performa['success_rate'] }}%
+                </span>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
                 </div>
             </div>
         </div>
@@ -416,20 +458,20 @@
                                     d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" />
                             </svg>
 
-                           <div class="flex text-sm">
-    <label for="file-upload-indukan"
-        class="relative cursor-pointer
+                            <div class="flex text-sm">
+                                <label for="file-upload-indukan"
+                                    class="relative cursor-pointer
                bg-blue-600 hover:bg-blue-700
                dark:bg-blue-500 dark:hover:bg-blue-600
                text-white font-medium
                px-4 py-2
                rounded-md
                focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-500">
-        <span>Pilih foto</span>
-        <input id="file-upload-indukan" name="file-upload-indukan" type="file"
-            accept="image/*" class="sr-only">
-    </label>
-</div>
+                                    <span>Pilih foto</span>
+                                    <input id="file-upload-indukan" name="file-upload-indukan" type="file"
+                                        accept="image/*" class="sr-only">
+                                </label>
+                            </div>
 
 
                             <p class="text-xs text-gray-500 dark:text-gray-400">PNG, JPG, JPEG max 2MB</p>
@@ -444,13 +486,13 @@
                     </button>
 
                     <button id="confirmPhotoUpload"
-    class="px-4 py-2 text-sm font-medium
+                        class="px-4 py-2 text-sm font-medium
            text-white
            bg-cyan-600 hover:bg-cyan-700
            dark:bg-cyan-500 dark:hover:bg-cyan-600
            rounded-md">
-    Upload
-</button>
+                        Upload
+                    </button>
 
                 </div>
             </div>
@@ -500,21 +542,21 @@
         });
     </script>
 
-  <script>
-function togglePair(id, btn) {
-    const el = document.getElementById(id);
-    el.classList.toggle('hidden');
+    <script>
+        function togglePair(id, btn) {
+            const el = document.getElementById(id);
+            el.classList.toggle('hidden');
 
-    btn.innerText = el.classList.contains('hidden')
-        ? '👁️ Lihat Riwayat'
-        : '🚫 Sembunyikan';
-}
+            btn.innerText = el.classList.contains('hidden') ?
+                '👁️ Lihat Riwayat' :
+                '🚫 Sembunyikan';
+        }
 
-function toggleTrip(id) {
-    const el = document.getElementById(id);
-    el.classList.toggle('hidden');
-}
-</script>
+        function toggleTrip(id) {
+            const el = document.getElementById(id);
+            el.classList.toggle('hidden');
+        }
+    </script>
 
 
 

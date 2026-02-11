@@ -251,6 +251,47 @@ public function updateKandangWithRolling(Kandang $kandang, array $data): bool
             ->get();
     }
 
+    public function getPerformaPasanganAktif(Kandang $kandang): array
+{
+    if (!$kandang->indukan_jantan_id || !$kandang->indukan_betina_id) {
+        return [
+            'total_trip' => 0,
+            'berhasil' => 0,
+            'gagal' => 0,
+            'success_rate' => 0,
+            'rata_anakan' => 0,
+        ];
+    }
+
+    $perkawinans = \App\Models\Perkawinan::where('peternak_id', $kandang->peternak_id)
+        ->where('indukan_jantan_id', $kandang->indukan_jantan_id)
+        ->where('indukan_betina_id', $kandang->indukan_betina_id)
+        ->withCount('anakans')
+        ->get();
+
+    $totalTrip = $perkawinans->count();
+    $berhasil = $perkawinans->where('status', 'berhasil')->count();
+    $gagal = $perkawinans->where('status', 'gagal')->count();
+    $totalAnakan = $perkawinans->sum('anakans_count');
+
+    $successRate = $totalTrip > 0
+        ? round(($berhasil / $totalTrip) * 100)
+        : 0;
+
+    $rataAnakan = $totalTrip > 0
+        ? round($totalAnakan / $totalTrip, 1)
+        : 0;
+
+    return [
+        'total_trip' => $totalTrip,
+        'berhasil' => $berhasil,
+        'gagal' => $gagal,
+        'success_rate' => $successRate,
+        'rata_anakan' => $rataAnakan,
+    ];
+}
+
+
    public function storeAnakanFromKandang(array $data, Kandang $kandang, int $peternakId)
 {
     // 1) Buat Perkawinan (trip) BARU di luar transaksi anakan
@@ -259,9 +300,13 @@ public function updateKandangWithRolling(Kandang $kandang, array $data): bool
         'kandang_id'         => $kandang->id,
         'indukan_jantan_id'  => $kandang->indukan_jantan_id,
         'indukan_betina_id'  => $kandang->indukan_betina_id,
-        'nomor_trip'         => \App\Models\Perkawinan::generateNomorTripKandang($peternakId, $kandang->id),
-        'tanggal_kawin'      => now(),
-        'catatan'            => 'Perkawinan otomatis dibuat saat menetas (' . now()->format('Y-m-d H:i:s') . ')',
+           'nomor_trip'         => \App\Models\Perkawinan::generateNomorTripPasangan(
+        $peternakId,
+        $kandang->indukan_jantan_id,
+        $kandang->indukan_betina_id
+    ),
+    'tanggal_kawin'      => $data['tanggal_lahir'], // ✅ PENTING
+       'catatan'            => 'Perkawinan otomatis dibuat saat menetas (' . $data['tanggal_lahir'] . ')',
     ]);
 
     // 2) Lengkapi data untuk anakan

@@ -71,9 +71,10 @@ class IndukanController extends Controller
         'kandangsBetina'
     ]);
      $indukan = $this->indukanService->getIndukanWithBreeding($indukan);
+     $performa = $this->indukanService->calculatePerformaGlobal($indukan);
 
 
-    return view('peternak.indukan.detail', compact('indukan'));
+    return view('peternak.indukan.detail', compact('indukan', 'performa'));
 }
 
 public function updateFoto(Request $request, Indukan $indukan)

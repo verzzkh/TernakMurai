@@ -73,6 +73,21 @@ class Perkawinan extends Model
         return sprintf('TRIP-%03d', $nextNumber);
     }
 
+    public static function generateNomorTripPasangan(
+    int $peternakId,
+    int $jantanId,
+    int $betinaId
+): int {
+
+    $lastTrip = static::where('peternak_id', $peternakId)
+        ->where('indukan_jantan_id', $jantanId)
+        ->where('indukan_betina_id', $betinaId)
+        ->max('nomor_trip');
+
+    return $lastTrip ? $lastTrip + 1 : 1;
+}
+
+
 public static function generateNomorTripKandang(int $peternakId, int $kandangId): string
 {
     $nextNumber = 1;
