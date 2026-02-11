@@ -29,6 +29,23 @@ class IndukanService
         return $file->store("indukan/{$peternakId}", 'public');
     }
 
+    public function getIndukanWithBreeding(Indukan $indukan): Indukan
+{
+    return $indukan->load([
+        'anakansSebagaiJantan.perkawinan',
+        'anakansSebagaiBetina.perkawinan',
+        'kandangsJantan',
+        'kandangsBetina',
+
+        // 🔥 INI YANG KURANG
+        'perkawinansJantan.anakans',
+        'perkawinansBetina.anakans',
+        'perkawinansJantan.indukanBetina',
+        'perkawinansBetina.indukanJantan',
+    ]);
+}
+
+
     public function calculateAge(Carbon $tanggalLahir): array
     {
         $months = $tanggalLahir->diffInMonths(now());

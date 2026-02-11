@@ -1,4 +1,10 @@
-<aside class="flex-shrink-0 hidden w-64 bg-white border-r dark:border-primary-darker dark:bg-darker md:block"
+<aside class="flex-shrink-0 hidden w-64
+       bg-slate-700 border-r border-slate-800
+       dark:bg-slate-950 dark:border-slate-800
+       md:block"
+
+
+
     id="sidebar" x-data="{ isDark: false }" @theme-changed.window="isDark = $event.detail.isDark">
     <div class="flex flex-col h-full">
         <!-- Sidebar header -->
@@ -13,9 +19,9 @@
 >
 
 
-        <span class="text-lg font-bold whitespace-nowrap">
-            Ternak Jawara
-        </span>
+      <span class="text-lg font-bold whitespace-nowrap text-slate-100">
+    Ternak Jawara
+</span>
     </div>
 
     <!-- Close button (mobile) -->
@@ -32,21 +38,25 @@
 </div>
 
 
-        <!-- User profile -->
-        <div class="flex items-center px-4 py-3 border-b dark:border-primary-darker">
-            <div class="ml-3">
-                <h4 class="text-sm font-semibold text-text-primary dark:text-light">
-                    {{ auth()->user()->name ?? 'Peternak' }}</h4>
-                
-            </div>
-        </div>
+     <!-- User profile -->
+<div class="flex items-center px-4 py-3 
+            border-b border-slate-800">
+    <div class="ml-3">
+        <h4 class="text-sm font-semibold text-slate-100">
+            {{ auth()->user()->name ?? 'Peternak' }}
+        </h4>
+    </div>
+</div>
+
 
         <!-- Sidebar links -->
         <a href="{{ route('dashboard') }}"
-            class="flex items-center p-2 rounded-md transition-colors
-          @if (request()->routeIs('dashboard') || request()->routeIs('peternak.dashboard')) bg-primary-100 text-primary-dark dark:bg-primary dark:text-primary-100
-          @else
-               text-text-tertiary dark:text-light hover:bg-primary-100 dark:hover:bg-primary @endif">
+           class="flex items-center p-2 rounded-md transition-colors
+   @if (request()->routeIs('dashboard') || request()->routeIs('peternak.dashboard'))
+       bg-primary-600 text-white
+   @else
+       text-slate-200 hover:bg-slate-600 hover:text-white
+   @endif">
             <span aria-hidden="true">
                 <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
@@ -60,10 +70,12 @@
 
         <!-- Indukan link -->
         <a href="{{ route('peternak.indukan.index') }}"
-            class="flex items-center p-2 rounded-md transition-colors
-          @if (request()->routeIs('peternak.indukan.*')) bg-primary-100 text-primary-dark dark:bg-primary dark:text-primary-100
-          @else
-               text-text-tertiary dark:text-light hover:bg-primary-100 dark:hover:bg-primary @endif">
+          class="flex items-center p-2 rounded-md transition-colors
+@if (request()->routeIs('peternak.indukan.*'))
+    bg-primary-600 text-white
+@else
+    text-slate-200 hover:bg-slate-600 hover:text-white
+@endif">
 
             <!-- ICON -->
             <span aria-hidden="true">
@@ -87,12 +99,13 @@
 
         <!-- Kandang link -->
         <a href="{{ route('peternak.kandang.index') }}"
-            class="flex items-center p-2 rounded-md transition-colors
-          @if (request()->routeIs('peternak.kandang.*')) bg-primary-100 text-primary-dark dark:bg-primary dark:text-primary-100
-          @else
-               text-text-tertiary dark:text-light hover:bg-primary-100 dark:hover:bg-primary @endif">
-
-            <!-- Icon -->
+           class="flex items-center p-2 rounded-md transition-colors
+@if (request()->routeIs('peternak.kandang.*'))
+    bg-primary-600 text-white
+@else
+    text-slate-200 hover:bg-slate-600 hover:text-white
+@endif"
+>            <!-- Icon -->
             <span aria-hidden="true">
                 <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
@@ -115,10 +128,13 @@
 
         <!-- Anakan link -->
         <a href="{{ route('peternak.anakan.index') }}"
-            class="flex items-center p-2 rounded-md transition-colors
-          @if (request()->routeIs('peternak.anakan.*')) bg-primary-100 text-primary-dark dark:bg-primary dark:text-primary-100
-          @else
-               text-text-tertiary dark:text-light hover:bg-primary-100 dark:hover:bg-primary @endif">
+           class="flex items-center p-2 rounded-md transition-colors
+@if (request()->routeIs('peternak.anakan.*'))
+    bg-primary-600 text-white
+@else
+    text-slate-200 hover:bg-slate-600 hover:text-white
+@endif"
+>
 
             <!-- Icon -->
             <span aria-hidden="true">
@@ -147,10 +163,12 @@
         <!-- keuangan link -->
         <a href="{{ route('peternak.keuangan.index') }}"
             class="flex items-center p-2 rounded-md transition-colors
-          @if (request()->routeIs('peternak.keuangan.*')) bg-primary-100 text-primary-dark dark:bg-primary dark:text-primary-100
-          @else
-               text-text-tertiary dark:text-light hover:bg-primary-100 dark:hover:bg-primary @endif">
-
+@if (request()->routeIs('peternak.keuangan.*'))
+    bg-primary-600 text-white
+@else
+    text-slate-200 hover:bg-slate-600 hover:text-white
+@endif"
+>
             <!-- Icon -->
             <span aria-hidden="true">
                 <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -175,12 +193,12 @@
        <!-- Riwayat Analisa Breeding link -->
 <a href="{{ route('peternak.analisaBreeding.riwayat') }}"
    class="flex items-center p-2 rounded-md transition-colors
-   @if (request()->routeIs('peternak.analisaBreeding.*'))
-       bg-primary-100 text-primary-dark dark:bg-primary dark:text-primary-100
-   @else
-       text-text-tertiary dark:text-light hover:bg-primary-100 dark:hover:bg-primary
-   @endif">
-
+@if (request()->routeIs('peternak.analisaBreeding.*'))
+    bg-primary-600 text-white
+@else
+    text-slate-200 hover:bg-slate-600 hover:text-white
+@endif"
+>
     <!-- Icon -->
     <span aria-hidden="true">
         <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none"

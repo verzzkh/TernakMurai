@@ -2,7 +2,7 @@
 <main>
     <!-- HEADER -->
     <div class="flex items-center justify-between px-4 py-4 border-b dark:border-primary-darker">
-        <h1 class="text-2xl font-semibold">Hasil Analisis Kecocokan Indukan</h1>
+        <h1 class="text-2xl font-semibold">Hasil Evaluasi Indukan</h1>
 
         <a href="{{ route('peternak.analisaBreeding.form') }}"
             class="px-4 py-2 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded-lg">

@@ -2,9 +2,18 @@
     <main>
         <!-- HEADER -->
        <div class="flex items-center justify-between px-4 py-4 border-b lg:py-6 dark:border-primary-darker">
-    <h1 class="text-2xl font-semibold">Analisis Kecocokan Indukan</h1>
+    <h1 class="text-2xl font-semibold">Evaluasi Breeding</h1>
 
-    <div class="flex gap-3">
+    <div class="flex gap-3">  
+         <!-- Tombol ke Index Kandang -->
+    <a href="{{ route('peternak.kandang.index') }}"
+   class="px-4 py-2 text-sm 
+          text-white 
+          bg-slate-600 hover:bg-slate-700 
+          rounded-lg">
+    Kandang
+</a>
+
         <a href="{{ route('peternak.analisaBreeding.riwayat') }}"
             class="px-4 py-2 text-sm text-white bg-green-600 hover:bg-green-700 rounded-lg">
             Riwayat Analisa

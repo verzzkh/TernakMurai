@@ -118,6 +118,15 @@ Route::middleware(['auth', 'peternak'])->prefix('peternak')->name('peternak.')->
     Route::get('/{kandang}/create-anak', [KandangController::class, 'createAnak'])->name('createAnak');
     Route::post('/{kandang}/anakan', [KandangController::class, 'storeAnakan'])->name('anakan.store');
     Route::get('/{kandang}', [KandangController::class, 'show'])->name('show');
+       // ✅ BARU – FORM GAGAL
+    Route::get('/{kandang}/form-gagal',
+        [KandangController::class, 'formGagal']
+    )->name('formGagal');
+
+    // ✅ BARU – STORE GAGAL
+    Route::post('/{kandang}/store-gagal',
+        [KandangController::class, 'storeGagal']
+    )->name('storeGagal');
     Route::get('/{kandang}/edit', [KandangController::class, 'edit'])->name('edit');
     Route::put('/{kandang}', [KandangController::class, 'update'])->name('update');
     Route::delete('/{kandang}', [KandangController::class, 'destroy'])->name('destroy');

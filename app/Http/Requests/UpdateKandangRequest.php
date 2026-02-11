@@ -28,7 +28,7 @@ class UpdateKandangRequest extends FormRequest
                 'unique:kandang,nomor_kandang,' . $kandangId . ',id,peternak_id,' . $peternakId,
             ],
             'deskripsi_kandang' => ['nullable', 'string'],
-            'status' => ['required', 'in:kosong,bertelur,mengeram,menetas'],
+            'status' => ['required', 'in:kosong,bertelur,mengeram,menetas,gagal'],
             'indukan_jantan_id' => ['nullable', 'exists:indukan,id'],
             'indukan_betina_id' => ['nullable', 'exists:indukan,id'],
         ];

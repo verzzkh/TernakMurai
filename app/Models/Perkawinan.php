@@ -24,6 +24,7 @@ class Perkawinan extends Model
         'nomor_trip',
         'tanggal_kawin',
         'catatan',
+        'status',
     ];
 
     protected function casts(): array
@@ -144,6 +145,16 @@ public static function generateNomorTripKandang(int $peternakId, int $kandangId)
     {
         return $this->anakans()->count();
     }
+
+    public function isBerhasil(): bool
+{
+    return $this->status === 'berhasil';
+}
+
+public function isGagal(): bool
+{
+    return $this->status === 'gagal';
+}
 
     /**
      * Get active anakan count (not sold)

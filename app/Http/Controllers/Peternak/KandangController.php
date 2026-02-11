@@ -119,35 +119,97 @@ public function createAnak(Kandang $kandang): \Illuminate\View\View
     return view('peternak.kandang.edit', compact('kandang', 'indukan', 'canEditIndukan'));
 }
 
-
-    public function update(UpdateKandangRequest $request, Kandang $kandang): RedirectResponse
+public function update(UpdateKandangRequest $request, Kandang $kandang): RedirectResponse
 {
     $peternak = Auth::user()->peternak;
 
-    // Pastikan kandang milik peternak yang sedang login
     if ($kandang->peternak_id !== $peternak->id) {
         abort(404);
     }
 
     $data = $request->validated();
 
-    // Jika status menetas, arahkan ke form createAnak dan ubah status jadi kosong
+    /*
+    |--------------------------------------------------------------------------
+    | STATUS GAGAL → Redirect ke Form Input Tanggal
+    |--------------------------------------------------------------------------
+    */
+    if ($data['status'] === 'gagal') {
+
+        return redirect()
+            ->route('peternak.kandang.formGagal', $kandang->id)
+            ->with('warning', 'Silakan isi tanggal kegagalan trip.');
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | STATUS MENETAS → Redirect ke Form Tambah Anakan
+    |--------------------------------------------------------------------------
+    */
     if ($data['status'] === 'menetas') {
-        // Ubah status menjadi kosong
+
         $kandang->update(['status' => 'kosong']);
 
-        // Redirect langsung ke halaman form createAnak milik kandang ini
         return redirect()
             ->route('peternak.kandang.createAnak', $kandang->id)
             ->with('info', 'Status "Menetas" terdeteksi. Silakan isi form penambahan anakan.');
     }
 
-   // Gunakan rolling-aware update
+    /*
+    |--------------------------------------------------------------------------
+    | STATUS NORMAL
+    |--------------------------------------------------------------------------
+    */
     $this->kandangService->updateKandangWithRolling($kandang, $data);
 
     return redirect()
         ->route('peternak.kandang.show', $kandang)
         ->with('success', 'Kandang berhasil diperbarui.');
+}
+
+public function formGagal(Kandang $kandang)
+{
+    $peternak = Auth::user()->peternak;
+
+    if ($kandang->peternak_id !== $peternak->id) {
+        abort(404);
+    }
+
+    return view('peternak.kandang.formGagal', compact('kandang'));
+}
+
+public function storeGagal(Request $request, Kandang $kandang)
+{
+    $peternak = Auth::user()->peternak;
+
+    if ($kandang->peternak_id !== $peternak->id) {
+        abort(404);
+    }
+
+    $request->validate([
+        'tanggal_gagal' => 'required|date',
+        'catatan' => 'nullable|string|max:1000'
+    ]);
+
+    \App\Models\Perkawinan::create([
+        'peternak_id'        => $peternak->id,
+        'kandang_id'         => $kandang->id,
+        'indukan_jantan_id'  => $kandang->indukan_jantan_id,
+        'indukan_betina_id'  => $kandang->indukan_betina_id,
+        'nomor_trip'         => \App\Models\Perkawinan::generateNomorTripKandang(
+            $peternak->id,
+            $kandang->id
+        ),
+        'tanggal_kawin'      => $request->tanggal_gagal,
+        'catatan'            => $request->catatan,
+        'status'             => 'gagal',
+    ]);
+
+    $kandang->update(['status' => 'kosong']);
+
+    return redirect()
+        ->route('peternak.kandang.show', $kandang)
+        ->with('error', 'Trip berhasil dicatat sebagai GAGAL.');
 }
 
 

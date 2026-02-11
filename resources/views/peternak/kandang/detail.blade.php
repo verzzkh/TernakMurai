@@ -484,7 +484,7 @@
         </div>
     @endif
 
-    <form action="{{ route('peternak.kandang.update', $kandang) }}" method="POST" class="space-y-3">
+    <form  id="statusForm" action="{{ route('peternak.kandang.update', $kandang) }}" method="POST" class="space-y-3">
         @csrf
         @method('PUT')
 
@@ -498,6 +498,7 @@
                 <option value="bertelur" {{ $kandang->status === 'bertelur' ? 'selected' : '' }}>Bertelur</option>
                 <option value="mengeram" {{ $kandang->status === 'mengeram' ? 'selected' : '' }}>Mengeram</option>
                 <option value="menetas">Menetas</option>
+                <option value="gagal">Gagal</option>
             </select>
         </div>
 
@@ -514,6 +515,59 @@
                 </div>
             </div>
         </div>
+
+        <!-- Modal Konfirmasi Gagal -->
+<!-- Modal Konfirmasi Gagal -->
+<div id="gagalModal"
+     class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+
+    <div class="bg-white dark:bg-darker rounded-lg w-full max-w-md mx-4 p-6 shadow-lg">
+
+        <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-3">
+            Breeding Dinyatakan Gagal
+        </h3>
+
+        <form id="gagalForm"
+      method="POST"
+      action="{{ route('peternak.kandang.storeGagal', $kandang->id) }}">
+            @csrf
+
+            <!-- Tanggal Gagal -->
+            <div class="mb-4">
+                <label class="text-sm text-gray-700 dark:text-gray-300">
+                    Tanggal Gagal <span class="text-red-500">*</span>
+                </label>
+                <input type="date" name="tanggal_gagal" required
+                       class="mt-1 w-full px-3 py-2 border rounded-md dark:bg-darker dark:border-gray-600">
+            </div>
+
+            <!-- Catatan -->
+            <div class="mb-4">
+                <label class="text-sm text-gray-700 dark:text-gray-300">
+                    Catatan (Opsional)
+                </label>
+                <textarea name="catatan"
+                          class="mt-1 w-full px-3 py-2 border rounded-md dark:bg-darker dark:border-gray-600"
+                          rows="2"></textarea>
+            </div>
+
+            <div class="flex justify-end space-x-3">
+                <button type="button" id="cancelGagal"
+                        class="px-4 py-2 text-sm bg-gray-200 rounded-md">
+                    Batal
+                </button>
+
+                <button type="submit"
+                        class="px-4 py-2 text-sm text-white bg-red-600 rounded-md">
+                    Simpan Gagal
+                </button>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+
     </main>
 
 
@@ -651,6 +705,30 @@ function togglePair(id, btn) {
         btn.innerText = '🚫 Sembunyikan';
     }
 }
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const statusForm = document.getElementById('statusForm');
+    const statusSelect = statusForm.querySelector('select[name="status"]');
+    const modal = document.getElementById('gagalModal');
+    const cancelBtn = document.getElementById('cancelGagal');
+
+    statusForm.addEventListener('submit', function (e) {
+
+        if (statusSelect.value === 'gagal') {
+            e.preventDefault(); // hentikan submit update
+            modal.classList.remove('hidden'); // tampilkan modal
+        }
+
+    });
+
+    cancelBtn.addEventListener('click', function () {
+        modal.classList.add('hidden');
+    });
+
+});
 </script>
 
 

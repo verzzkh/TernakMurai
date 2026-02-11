@@ -17,18 +17,19 @@
 <body>
     <div x-data="setup()" x-init="$refs.loading.classList.add('hidden');
     setColors(color);" :class="{ 'dark': isDark }">
-        <div class="flex h-screen antialiased text-text-primary bg-gray-300 dark:bg-darker dark:text-light">
+        <div class="flex min-h-screen antialiased text-text-primary bg-gray-300 dark:bg-darker dark:text-light">
            
 
             <!-- Sidebar -->
             <x-sidebar></x-sidebar>
 
-            <div class="flex-1 h-full overflow-x-hidden overflow-y-auto">
+            <div class="flex-1 flex flex-col min-h-screen overflow-x-hidden">
+
                 <!-- Navbar -->
                 <x-header></x-header>
                 
                  <!-- Main Content -->
-            <main>
+            <main class="flex-1">
               {{ $slot }}
           </main>
           

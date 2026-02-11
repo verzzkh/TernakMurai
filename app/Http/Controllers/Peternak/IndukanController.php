@@ -55,6 +55,7 @@ class IndukanController extends Controller
     return redirect()->route('peternak.indukan.index')
         ->with('success', 'Indukan berhasil ditambahkan.');
 }
+
    public function show(Indukan $indukan): View
 {
     $peternak = Auth::user()->peternak;
@@ -69,7 +70,8 @@ class IndukanController extends Controller
         'kandangsJantan',
         'kandangsBetina'
     ]);
- 
+     $indukan = $this->indukanService->getIndukanWithBreeding($indukan);
+
 
     return view('peternak.indukan.detail', compact('indukan'));
 }

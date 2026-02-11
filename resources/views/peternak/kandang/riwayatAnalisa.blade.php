@@ -3,10 +3,12 @@
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border-b gap-3">
         <h1 class="text-xl sm:text-2xl font-semibold">Riwayat Analisa Breeding</h1>
 
-        <a href="{{ route('peternak.analisaBreeding.form') }}"
-            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm sm:text-base">
-            Analisis Indukan
-        </a>
+          <a href="{{ route('peternak.analisaBreeding.form') }}"
+                    class="px-4 py-2 text-white bg-purple-600 hover:bg-purple-700 
+           rounded-lg focus:outline-none focus:ring focus:ring-purple-600 
+           focus:ring-offset-1 focus:ring-offset-white dark:focus:ring-offset-dark">
+                    Analisis Indukan
+                </a>
     </div>
 
     <div class="p-3 sm:p-4 max-w-5xl mx-auto">

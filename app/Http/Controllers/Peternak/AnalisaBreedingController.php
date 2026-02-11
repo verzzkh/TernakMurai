@@ -258,7 +258,7 @@ $tindakLanjutPeternakGlobal = HasilAnalisaBreeding::where('peternak_id', $petern
 // HITUNG REKOMENDASI SISTEM (LEVEL 1)
 // ======================================================
 $rekomendasiSistem = $this->tentukanRekomendasiSistem(
-    $anakansPasangan->count()
+    $perkawinanPasangan
 );
 
         $payloadJurnal = [
@@ -290,6 +290,7 @@ $rekomendasiSistem = $this->tentukanRekomendasiSistem(
             $perkawinanPasangan,
             $payloadJurnal,
             $tindakLanjutPeternakGlobal,
+             $rekomendasiSistem,
         );
 
         try {
@@ -298,7 +299,7 @@ $rekomendasiSistem = $this->tentukanRekomendasiSistem(
             $response = $client->chat()->create([
                 'model' => env('OPENAI_MODEL', 'gpt-4o-mini'),
                 'messages' => [
-                    ['role' => 'system', 'content' => 'Anda adalah sistem SPK breeding Murai Batu.'],
+                    ['role' => 'system', 'content' => 'Anda adalah sistem SPK breeding Murai Batu berbasis analisis manajerial dan aturan perilaku.'],
                     ['role' => 'user', 'content' => $prompt]
                 ],
                 'temperature' => 0.2,
@@ -306,7 +307,7 @@ $rekomendasiSistem = $this->tentukanRekomendasiSistem(
 
             $hasilAnalisa = $response->choices[0]->message->content;
         } catch (\OpenAI\Exceptions\RateLimitException $e) {
-            $hasilAnalisa = $this->fallbackAnalisa($jantan, $betina); // 🔥 anti putus
+            $hasilAnalisa = $this->fallbackAnalisa($jantan, $betina); 
         } catch (\Exception $e) {
             $hasilAnalisa = $this->fallbackAnalisa($jantan, $betina);
         }
@@ -342,20 +343,85 @@ $rekomendasiSistem = $this->tentukanRekomendasiSistem(
 // ======================================================
 // PENENTU REKOMENDASI SISTEM (LEVEL 1 – SEDERHANA)
 // ======================================================
-private function tentukanRekomendasiSistem(
-    int $jumlahAnakanPasangan
-): string {
+private function tentukanRekomendasiSistem($perkawinanPasangan): string
+{
+    $totalTrip = $perkawinanPasangan->count();
 
-    // Jika pasangan belum pernah menghasilkan anakan
-    if ($jumlahAnakanPasangan === 0) {
+    // Jika belum ada trip sama sekali
+    if ($totalTrip === 0) {
         return 'uji_coba';
     }
 
-    // Jika pasangan pernah menghasilkan anakan
-    return 'lanjut';
+    // Urutkan terbaru → terlama
+    $sorted = $perkawinanPasangan
+        ->sortByDesc('tanggal_kawin')
+        ->values();
 
-    // STOP tidak pernah otomatis (hak peternak)
+    /*
+    |--------------------------------------------------------------------------
+    | 1️⃣ Window Historis (maks 20 trip terakhir)
+    |--------------------------------------------------------------------------
+    */
+    $window20 = $sorted->take(min(20, $totalTrip));
+    $total20 = $window20->count();
+    $berhasil20 = $window20->where('status', '!=', 'gagal')->count();
+
+    $successRate20 = $total20 > 0
+        ? $berhasil20 / $total20
+        : 0;
+
+    /*
+    |--------------------------------------------------------------------------
+    | 2️⃣ Window Short-Term (5 trip terakhir)
+    |--------------------------------------------------------------------------
+    */
+    $window5 = $sorted->take(min(5, $totalTrip));
+    $total5 = $window5->count();
+    $berhasil5 = $window5->where('status', '!=', 'gagal')->count();
+
+    $successRate5 = $total5 > 0
+        ? $berhasil5 / $total5
+        : 0;
+
+    /*
+    |--------------------------------------------------------------------------
+    | 3️⃣ Analisis Tren
+    |--------------------------------------------------------------------------
+    */
+    $delta = $successRate5 - $successRate20;
+
+    /*
+    |--------------------------------------------------------------------------
+    | 4️⃣ Klasifikasi Tren
+    |--------------------------------------------------------------------------
+    |
+    | STABIL     : baseline ≥ 70% dan tidak turun signifikan
+    | FLUKTUATIF : baseline 40–70% atau penurunan sedang
+    | MENURUN    : baseline < 40% atau penurunan tajam (≥30%)
+    |
+    */
+
+    // 🔴 MENURUN (krisis performa)
+    if (
+        $successRate20 < 0.40 ||
+        $delta <= -0.30
+    ) {
+        return 'stop';
+    }
+
+    // 🟡 FLUKTUATIF (belum stabil)
+    if (
+        $successRate20 < 0.70 ||
+        $delta <= -0.15
+    ) {
+        return 'uji_coba';
+    }
+
+    // 🟢 STABIL
+    return 'lanjut';
 }
+
+
 
 
 
@@ -371,7 +437,8 @@ private function tentukanRekomendasiSistem(
          string $konteksTripIndukanLain,
         $perkawinanPasangan,
         array $payloadJurnal,
-        $riwayatTindakLanjutPeternakGlobal
+        $riwayatTindakLanjutPeternakGlobal,
+        string $rekomendasiSistem
     ): string {
 $konteksKeputusanPeternak = '';
 
@@ -542,12 +609,24 @@ $ringkasanTripText = [];
 foreach ($tripPasangan as $i => $trip) {
 
     $jumlahAnakanTrip = $trip->anakans->count();
+    $statusTrip = $trip->status === 'gagal'
+        ? 'GAGAL'
+        : 'BERHASIL';
 
     $ringkasanTripText[] =
         "- Trip " . ($i + 1) .
         " | Tanggal kawin: {$trip->tanggal_kawin}" .
+        " | Status: {$statusTrip}" .
         " | Jumlah anakan: {$jumlahAnakanTrip}";
 }
+
+$totalTrip = $perkawinanPasangan->count();
+$totalGagal = $perkawinanPasangan->where('status','gagal')->count();
+$totalBerhasil = $totalTrip - $totalGagal;
+
+$successRate = $totalTrip > 0
+    ? round(($totalBerhasil / $totalTrip) * 100)
+    : 0;
 
 
 $ringkasanTripText = $ringkasanTripText
@@ -714,13 +793,20 @@ indikator pengalaman reproduksi.
 
 
 2. Riwayat perkawinan pasangan:
-- Jumlah perkawinan tercatat: {$jumlahPerkawinan}
+
+- Total trip: {$totalTrip}
+- Trip berhasil: {$totalBerhasil}
+- Trip gagal: {$totalGagal}
+- Tingkat keberhasilan (success rate): {$successRate}%
+
 - Perkawinan terakhir:
   - Tanggal kawin: {$tanggalKawinTerakhir}
   Gunakan ringkasan ini untuk:
 - menilai apakah hasil breeding cenderung konsisten,
 - mengidentifikasi pengulangan hasil tanpa perbaikan,
 - mendukung keputusan lanjutan secara bertahap.
+Jika trip terakhir berstatus GAGAL,
+jelaskan sebagai kondisi risiko yang memerlukan evaluasi segera.
 
   ------------------------------------------------
 3.  Evaluasi Periode Breeding (Trip)
@@ -820,29 +906,35 @@ Catatan: Hindari klaim ekstrem dan hindari prediksi biologis pasti.
 ------------------------------------------------
 
 F. Rekomendasi Akhir Sistem
-(WAJIB memilih salah satu)
+(Berbasis Evaluasi Engine + Analisis Manajerial)
 
-Gunakan prinsip berikut:
+Sistem telah melakukan evaluasi kuantitatif
+berbasis tren historis (20 trip terakhir dibanding 5 terbaru).
 
-1. Jika pasangan PERNAH menghasilkan anakan,
-   namun indikator perilaku SAAT INI belum lengkap:
-   → Rekomendasi: LAYAK DILANJUTKAN DENGAN PENGAWASAN
+Rekomendasi awal sistem:
+REKOMENDASI_ENGINE: {$rekomendasiSistem}
 
-2. Jika pasangan BELUM pernah menghasilkan anakan:
-   → Rekomendasi: UJI COBA TERBATAS
+Instruksi:
 
-3. Jika ditemukan risiko serius dan berulang:
-   → Rekomendasi: TIDAK DIREKOMENDASIKAN SEMENTARA
+1. Gunakan rekomendasi engine ini sebagai dasar utama.
+2. Jelaskan alasan keputusan tersebut dengan mengacu pada:
+   - Riwayat jumlah trip,
+   - Tingkat keberhasilan,
+   - Konsistensi hasil,
+   - Kondisi perilaku saat ini.
+3. AI DILARANG mengubah klasifikasi rekomendasi engine.
+4. AI hanya berfungsi memperjelas alasan manajerial
+   di balik keputusan sistem.
 
-Sertakan alasan singkat berbasis data historis
-dan kondisi perilaku saat ini.
+Jika rekomendasi adalah:
+- "lanjut" → jelaskan faktor kestabilan produksi.
+- "uji_coba" → jelaskan faktor fluktuasi atau ketidakstabilan.
+- "stop" → jelaskan indikasi penurunan performa atau risiko berulang.
 
-Catatan Kontekstual:
-Dengan mempertimbangkan riwayat tindak lanjut peternak pada analisa breeding sebelumnya,
-rekomendasi ini disampaikan dengan tingkat kehati-hatian yang disesuaikan.
-Riwayat tersebut digunakan sebagai konteks gaya pengambilan keputusan peternak,
-dan tidak mempengaruhi penetapan rekomendasi utama yang tetap berbasis
-pada data breeding dan indikator perilaku saat ini.
+Catatan:
+Rekomendasi ini bersifat manajerial dan kontekstual,
+bukan prediksi biologis.
+
 
 ------------------------------------------------
 
