@@ -8,7 +8,7 @@
                     <div class="mb-4 p-3 bg-green-100 text-green-800 rounded">{{ session('success') }}</div>
                 @endif
 
-                <form action="{{ route('peternak.profile.update') }}" method="POST" enctype="multipart/form-data"
+                <form action="{{ route('peternak.profile.update') }}" method="POST"  autocomplete="off" enctype="multipart/form-data"
                     class="space-y-4">
                     @csrf
                     @method('PUT')
@@ -25,7 +25,7 @@
 
                         <div>
                             <label class="text-sm">Email</label>
-                            <input type="email" name="email" value="{{ old('email', $user->email) }}"
+                            <input type="email" name="email" value="{{ old('email', $user->email) }}" autocomplete="new-email"
                                 class="block w-full px-3 py-2 border rounded-md">
                             @error('email')
                                 <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
@@ -36,7 +36,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="text-sm">Password (kosongkan untuk tidak berubah)</label>
-                            <input type="password" name="password" class="block w-full px-3 py-2 border rounded-md">
+                            <input type="password" name="password"  autocomplete="new-password" class="block w-full px-3 py-2 border rounded-md">
                             @error('password')
                                 <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                             @enderror
@@ -44,7 +44,7 @@
 
                         <div>
                             <label class="text-sm">Confirm Password</label>
-                            <input type="password" name="password_confirmation"
+                            <input type="password" name="password_confirmation"  autocomplete="new-password"
                                 class="block w-full px-3 py-2 border rounded-md">
                         </div>
                     </div>

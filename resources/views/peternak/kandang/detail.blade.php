@@ -470,7 +470,7 @@
                                         </label>
                                         <p class="pl-1 dark:text-gray-400">atau seret dan lepas</p>
                                     </div>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">PNG, JPG, JPEG hingga 2MB</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">PNG, JPG, JPEG hingga 5MB</p>
                                 </div>
                             </div>
                         </div>

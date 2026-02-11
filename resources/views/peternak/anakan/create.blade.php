@@ -189,7 +189,7 @@
                                         <p class="pl-1 dark:text-gray-400">atau seret dan lepas</p>
                                     </div>
                                     <p class="text-xs text-gray-500 dark:text-gray-400">
-                                        PNG, JPG, JPEG hingga 2MB
+                                        PNG, JPG, JPEG hingga 5MB
                                     </p>
                                     <div id="foto-preview" class="mt-2 hidden">
                                         <img id="preview-image" src="#" alt="Preview"
@@ -279,7 +279,7 @@
                                         <p class="pl-1 dark:text-gray-400">atau seret dan lepas</p>
                                     </div>
                                     <p class="text-xs text-gray-500 dark:text-gray-400">
-                                        PNG, JPG, JPEG hingga 2MB
+                                        PNG, JPG, JPEG hingga 5MB
                                     </p>
                                     <div id="foto-preview-luar" class="mt-2 hidden">
                                         <img id="preview-image-luar" src="#" alt="Preview"
@@ -560,7 +560,7 @@
                                 </label>
                                 <p class="pl-1 dark:text-gray-400">atau seret dan lepas</p>
                             </div>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">PNG, JPG, JPEG hingga 2MB</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">PNG, JPG, JPEG hingga 5MB</p>
                             <div id="foto-preview-${i}" class="mt-2 hidden">
                                 <img id="preview-image-${i}" src="#" alt="Preview" class="h-40 mx-auto rounded-md object-cover">
                             </div>

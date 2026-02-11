@@ -80,7 +80,7 @@ class IndukanController extends Controller
 public function updateFoto(Request $request, Indukan $indukan)
 {
     $request->validate([
-        'foto_indukan' => ['required', 'image', 'mimes:jpeg,jpg,png', 'max:2048']
+        'foto_indukan' => ['required', 'image', 'mimes:jpeg,jpg,png', 'max:5120']
     ]);
 
     $peternak = Auth::user()->peternak;

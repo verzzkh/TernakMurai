@@ -29,11 +29,17 @@ class ProfileController extends Controller
         $data = $request->validated();
 
         // Update user fields
-        if (isset($data['name'])) $user->name = $data['name'];
-        if (isset($data['email'])) $user->email = $data['email'];
-        if (!empty($data['password'])) $user->password = Hash::make($data['password']);
-        $user->save();
+        $user->name = $data['name']; // name memang required
 
+if ($request->filled('email')) {
+    $user->email = $data['email'];
+}
+
+if ($request->filled('password')) {
+    $user->password = Hash::make($data['password']);
+}
+
+$user->save();
         // Update peternak fields (create if missing)
         if (! $peternak) {
             $peternak = $user->peternak()->create([

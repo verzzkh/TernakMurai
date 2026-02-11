@@ -40,7 +40,7 @@ class StoreAnakanDariDalamKandangRequest extends FormRequest
 
             // foto opsional tapi valid
             'foto_anakan' => ['nullable'],
-            'foto_anakan.*' => ['nullable', 'image', 'mimes:jpeg,jpg,png', 'max:2048'],
+            'foto_anakan.*' => ['nullable', 'image', 'mimes:jpeg,jpg,png', 'max:5020'],
 
             // deskripsi karakteristik opsional
             'deskripsi_karakteristik' => ['nullable', 'string', 'max:5000'],

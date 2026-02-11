@@ -20,14 +20,26 @@ class UpdateProfileRequest extends FormRequest
         $userId = Auth::id();
 
         return [
-            'name' => ['required', 'string', 'max:50', Rule::unique('users', 'name')->ignore($userId)],
-            'email' => ['nullable', 'email', 'max:255', Rule::unique('users', 'email')->ignore($userId)],
+                  'name' => [
+            'required',
+            'string',
+            'max:50',
+            Rule::unique('users', 'name')->ignore($userId),
+        ],
+
+        'email' => [
+            'nullable',
+            'sometimes', // ← tambahkan ini
+            'email',
+            'max:255',
+            Rule::unique('users', 'email')->ignore($userId),
+        ],
             'password' => ['nullable', 'string', 'min:6', 'confirmed'],
 
             'nama_peternakan' => ['required', 'string', 'max:100'],
             'alamat' => ['nullable', 'string'],
             'nomor_handphone' => ['nullable', 'string', 'max:30'],
-            'foto_profil' => ['nullable', 'image', 'mimes:jpeg,jpg,png', 'max:2048'],
+            'foto_profil' => ['nullable', 'image', 'mimes:jpeg,jpg,png', 'max:5020'],
         ];
     }
 

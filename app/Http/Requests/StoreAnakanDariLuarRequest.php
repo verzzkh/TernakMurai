@@ -34,7 +34,7 @@ class StoreAnakanDariLuarRequest extends FormRequest
             'jenis_kelamin_luar' => ['required', 'in:jantan,betina,tidak_diketahui'],
 
             // Foto wajib
-            'foto_anakan_luar' => ['nullable', 'image', 'mimes:jpeg,jpg,png', 'max:2048'],
+            'foto_anakan_luar' => ['nullable', 'image', 'mimes:jpeg,jpg,png', 'max:5020'],
 
             // Tanggal lahir / perkiraan wajib
             'tanggal_lahir' => ['required', 'date', 'before_or_equal:today'],

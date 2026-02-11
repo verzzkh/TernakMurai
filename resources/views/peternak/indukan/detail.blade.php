@@ -474,7 +474,7 @@
                             </div>
 
 
-                            <p class="text-xs text-gray-500 dark:text-gray-400">PNG, JPG, JPEG max 2MB</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">PNG, JPG, JPEG max 5MB</p>
                         </div>
                     </div>
                 </div>

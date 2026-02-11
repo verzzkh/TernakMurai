@@ -137,7 +137,7 @@
                                     </label>
                                     <p class="pl-1 dark:text-gray-400">atau seret ke sini</p>
                                 </div>
-                                <p class="text-xs text-gray-500 dark:text-gray-400">PNG, JPG, JPEG hingga 2MB</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">PNG, JPG, JPEG hingga 5MB</p>
                                 <div id="foto-preview" class="hidden">
                                     <img id="preview-image" src="#" alt="Preview"
                                         class="h-40 mx-auto rounded-md object-cover">
@@ -245,7 +245,7 @@
                                     </label>
                                     <p class="pl-1">atau seret ke sini</p>
                                 </div>
-                                <p class="text-xs text-gray-500 dark:text-gray-400">PNG, JPG, JPEG hingga 2MB</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">PNG, JPG, JPEG hingga 5MB</p>
 
                                 <div id="preview-wrapper-${i}" class="hidden mt-3">
                                     <img id="preview_${i}" class="h-32 w-auto mx-auto rounded-md shadow object-cover border border-gray-300 dark:border-gray-600">

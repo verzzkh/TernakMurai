@@ -40,7 +40,7 @@ class StoreAnakanDariKandangRequest extends FormRequest
 'jenis_kelamin.*' => ['in:jantan,betina,tidak_diketahui'],
 
 'foto_anakan' => ['nullable'],
-'foto_anakan.*' => ['nullable', 'image', 'mimes:jpeg,jpg,png', 'max:2048'],
+'foto_anakan.*' => ['nullable', 'image', 'mimes:jpeg,jpg,png', 'max:5020'],
 
 
             // Status pertumbuhan opsional (default trotöl)

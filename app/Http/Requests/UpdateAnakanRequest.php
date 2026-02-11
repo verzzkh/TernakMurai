@@ -26,7 +26,7 @@ class UpdateAnakanRequest extends FormRequest
         'nomor_ring' => 'sometimes|nullable|string|max:50',
         'harga' => 'sometimes|nullable|integer|min:0',
         'deskripsi_karakteristik' => 'sometimes|nullable|string|max:2000',
-        'foto_anakan' => 'sometimes|nullable|image|mimes:jpeg,jpg,png|max:2048',
+        'foto_anakan' => 'sometimes|nullable|image|mimes:jpeg,jpg,png|max:5020',
         ];
     }
 
@@ -41,7 +41,7 @@ class UpdateAnakanRequest extends FormRequest
             'deskripsi_karakteristik.max' => 'Deskripsi karakteristik maksimal 2000 karakter.',
             'foto_anakan.image' => 'File harus berupa gambar.',
             'foto_anakan.mimes' => 'Format gambar harus jpeg, jpg, atau png.',
-            'foto_anakan.max' => 'Ukuran gambar maksimal 2MB.',
+            'foto_anakan.max' => 'Ukuran gambar maksimal 5MB.',
         ];
     }
 }

@@ -35,7 +35,7 @@ class UpdateIndukanRequest extends FormRequest
             'catatan' => ['nullable', 'string'],
             'prestasi' => ['nullable', 'string'],
             'karakteristik' => ['nullable', 'string'],
-            'foto_indukan' => ['nullable', 'image', 'mimes:jpeg,jpg,png', 'max:2048'],
+            'foto_indukan' => ['nullable', 'image', 'mimes:jpeg,jpg,png', 'max:5020'],
             'aktif_kicau' => ['nullable', 'boolean'],
 'mendekati_betina' => ['nullable', 'boolean'],
 'nafsu_makan_meningkat' => ['nullable', 'boolean'],
