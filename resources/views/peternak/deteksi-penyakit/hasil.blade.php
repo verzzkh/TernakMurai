@@ -66,25 +66,7 @@
 
                     <div class="p-5 md:p-6 space-y-6">
 
-                        <!-- Foto Burung -->
-                        @if($deteksi->fotos->count())
-                            <section>
-                                <h3 class="text-base md:text-lg font-semibold mb-3 text-gray-800 dark:text-gray-100">
-                                    Foto Burung
-                                </h3>
-                                <div class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
-                                    @foreach($deteksi->fotos as $foto)
-                                        <div class="rounded-md overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm bg-gray-50 dark:bg-gray-800">
-                                            <img
-                                                src="{{ asset('storage/'.$foto->foto_path) }}"
-                                                alt="Foto burung"
-                                                class="w-full h-32 md:h-40 object-cover"
-                                            >
-                                        </div>
-                                    @endforeach
-                                </div>
-                            </section>
-                        @endif
+                        {{-- Foto Burung removed --}}
 
                         <!-- Informasi Dasar + Perilaku -->
                         <section>

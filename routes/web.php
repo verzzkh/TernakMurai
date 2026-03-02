@@ -53,8 +53,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/deteksi', [\App\Http\Controllers\Admin\DeteksiController::class, 'index'])->name('deteksi.index');
     Route::get('/deteksi/{id}', [\App\Http\Controllers\Admin\DeteksiController::class, 'show'])->name('deteksi.show');
 
-    // Paket & Kuota
-    Route::get('/paket', [\App\Http\Controllers\Admin\PaketController::class, 'index'])->name('paket.index');
+    // Paket & Kuota (removed) — route deleted because paket/kuota pages were removed
 
     // Pengaturan
     Route::get('/settings', [\App\Http\Controllers\Admin\SettingsController::class, 'index'])->name('settings.index');

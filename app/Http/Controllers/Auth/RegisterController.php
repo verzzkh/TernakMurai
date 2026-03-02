@@ -47,6 +47,7 @@ $data = $request->validate([
         'name' => $data['name'],
         'email' => $data['email'] ?? null,
         'password' => Hash::make($data['password']),
+        'role' => 'peternak',
     ]);
 
     // 2️⃣ BARU BUAT PETERNAK

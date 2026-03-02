@@ -21,6 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
     ];
 
     /**
@@ -56,24 +57,26 @@ class User extends Authenticatable
         return $this->hasOne(Peternak::class);
     }
 
-    public function isAdmin(): bool
-    {
-        return $this->admin()->exists();
-    }
+public function isAdmin(): bool
+{
+    return ($this->attributes['role'] ?? null) === 'admin';
+}
 
-    public function isPeternak(): bool
-    {
-        return $this->peternak()->exists();
-    }
+public function isPeternak(): bool
+{
+    return ($this->attributes['role'] ?? null) === 'peternak';
+}
 
-    public function getRoleAttribute(): string
+    public function getRoleAttribute(?string $value): string
     {
-        if ($this->isAdmin()) {
+        if ($value === 'admin') {
             return 'admin';
-        } elseif ($this->isPeternak()) {
+        }
+
+        if ($value === 'peternak') {
             return 'peternak';
         }
-    
+
         return 'guest';
     }
 }

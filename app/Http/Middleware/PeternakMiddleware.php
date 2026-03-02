@@ -11,17 +11,19 @@ use Symfony\Component\HttpFoundation\Response;
 
 class PeternakMiddleware
 {
-    /**
-     * Handle an incoming request.
-     */
     public function handle(Request $request, Closure $next): Response
     {
+
         if (! Auth::check()) {
+
             return redirect()->route('login');
+
         }
 
         if (! Auth::user()->isPeternak()) {
-            abort(403, 'Akses ditolak. Hanya peternak yang dapat mengakses halaman ini.');
+
+            abort(403, 'Akses ditolak. Hanya peternak.');
+
         }
 
         return $next($request);

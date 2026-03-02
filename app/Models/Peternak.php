@@ -21,18 +21,7 @@ class Peternak extends Model
         'alamat',
         'nomor_handphone',
         'foto_profil',
-        'jenis_akun',
-        'pro_berlaku_hingga',
-        'periode_deteksi',
-        'deteksi_terpakai',
     ];
-
-    protected function casts(): array
-    {
-        return [
-            'pro_berlaku_hingga' => 'date',
-        ];
-    }
 
     public function user(): BelongsTo
     {
@@ -62,51 +51,5 @@ class Peternak extends Model
     public function invoices(): HasMany
     {
         return $this->hasMany(Invoice::class);
-    }
-
-    public function deteksiPenyakits(): HasMany
-    {
-        return $this->hasMany(DeteksiPenyakit::class);
-    }
-
-    /**
-     * Check if peternak has pro account and it's still valid
-     */
-    public function isPro(): bool
-    {
-        return $this->jenis_akun === 'pro' &&
-               ($this->pro_berlaku_hingga === null || $this->pro_berlaku_hingga >= now());
-    }
-
-    /**
-     * Check if peternak can add more anakan (free account limit: 20)
-     */
-    public function canAddAnakan(): bool
-    {
-        if ($this->isPro()) {
-            return true;
-        }
-
-        return $this->anakans()->where('status_penjualan', 'belum_dijual')->count() < 30;
-    }
-
-    /**
-     * Get count of active anakan (not sold)
-     */
-    public function getActiveAnakanCount(): int
-    {
-        return $this->anakans()->where('status_penjualan', 'belum_dijual')->count();
-    }
-
-    /**
-     * Get remaining anakan slots for free accounts
-     */
-    public function getRemainingAnakanSlots(): int
-    {
-        if ($this->isPro()) {
-            return -1; // Unlimited
-        }
-
-        return max(0, 30 - $this->getActiveAnakanCount());
     }
 }

@@ -6,7 +6,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\DeteksiPenyakit;
+use App\Models\HasilAnalisaBreeding;
 
 class DeteksiController extends Controller
 {
@@ -14,11 +14,13 @@ class DeteksiController extends Controller
     {
         $q = $request->input('q');
 
-        $query = DeteksiPenyakit::with('peternak')
+        // Use HasilAnalisaBreeding (evaluasi breeding) as the data source.
+        // Limit text/column-based searches to related `peternak` to avoid
+        // querying unknown columns on the evaluation table.
+        $query = HasilAnalisaBreeding::with('peternak')
             ->when($q, function ($b) use ($q) {
-                $b->where('nama_burung', 'like', "%{$q}%")
-                    ->orWhere('diagnosis_utama', 'like', "%{$q}%")
-                    ->orWhereHas('peternak', fn($p) => $p->where('nama_peternakan', 'like', "%{$q}%"));
+                $b->whereHas('peternak', fn($p) => $p->where('nama_peternakan', 'like', "%{$q}%")
+                    ->orWhere('nomor_handphone', 'like', "%{$q}%"));
             })
             ->latest();
 
@@ -29,7 +31,16 @@ class DeteksiController extends Controller
 
     public function show($id)
     {
-        $deteksi = DeteksiPenyakit::with('peternak', 'fotos')->findOrFail($id);
+        // Only eager-load relations that actually exist on the model to avoid
+        // RelationNotFoundException if e.g. `fotos` relation is not defined.
+        $model = new HasilAnalisaBreeding();
+        $relations = ['peternak'];
+
+        if (method_exists($model, 'fotos')) {
+            $relations[] = 'fotos';
+        }
+
+        $deteksi = HasilAnalisaBreeding::with($relations)->findOrFail($id);
 
         return view('admin.deteksi.show', compact('deteksi'));
     }

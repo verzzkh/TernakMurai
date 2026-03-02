@@ -107,7 +107,7 @@
 
         <!-- Footer -->
         <div class="mt-8 text-center">
-            <p class="text-xs text-text-secondary dark:text-light">© 2025 Ternak Murai.</p>
+            <p class="text-xs text-text-secondary dark:text-light">© 2026 Ternak Murai.</p>
             <div class="mt-2">
                 <a href="{{ route('register') }}" class="inline-block px-4 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700">Daftar Peternak</a>
             </div>

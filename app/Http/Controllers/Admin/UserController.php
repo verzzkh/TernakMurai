@@ -24,7 +24,6 @@ class UserController extends Controller
                           ->orWhere('email', 'like', "%{$q}%");
                     });
             })
-            ->when($jenis, fn($b) => $b->where('jenis_akun', $jenis))
             ->latest('id');
 
         $peternaks = $query->paginate(15)->withQueryString();

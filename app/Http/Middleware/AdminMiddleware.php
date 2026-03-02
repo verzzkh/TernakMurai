@@ -11,17 +11,19 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AdminMiddleware
 {
-    /**
-     * Handle an incoming request.
-     */
     public function handle(Request $request, Closure $next): Response
     {
+
         if (! Auth::check()) {
+
             return redirect()->route('login');
+
         }
 
         if (! Auth::user()->isAdmin()) {
-            abort(403, 'Akses ditolak. Hanya admin yang dapat mengakses halaman ini.');
+
+            abort(403, 'Akses ditolak. Hanya admin.');
+
         }
 
         return $next($request);

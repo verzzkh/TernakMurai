@@ -41,12 +41,7 @@
     <p><strong>ID Laporan:</strong> #{{ $deteksi->id }}</p>
     <p><strong>Tanggal:</strong> {{ $deteksi->created_at->format('d M Y') }}</p>
 
-    <h2>Foto Burung</h2>
-    <div class="photos">
-        @foreach($deteksi->fotos as $foto)
-            <img src="{{ public_path('storage/' . $foto->foto_path) }}">
-        @endforeach
-    </div>
+    {{-- Foto Burung removed --}}
 
     <h2>Informasi Dasar</h2>
     <p><span class="label">Nama Burung:</span> {{ $deteksi->nama_burung ?? '-' }}</p>

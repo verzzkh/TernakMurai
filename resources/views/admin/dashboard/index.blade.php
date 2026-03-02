@@ -80,7 +80,7 @@
             </div>
 
             <div class="bg-white rounded-md shadow dark:bg-darker p-4">
-                <h4 class="text-lg font-semibold mb-2">Jumlah deteksi penyakit per bulan</h4>
+                    <h4 class="text-lg font-semibold mb-2">Jumlah evaluasi breeding per bulan</h4>
                 <div class="h-72"><canvas id="deteksiChart"></canvas></div>
             </div>
 
@@ -112,7 +112,7 @@
         <div class="p-4">
             <div class="bg-white rounded-md shadow dark:bg-darker p-4">
                 <div class="flex items-center justify-between p-2 border-b dark:border-primary">
-                    <h4 class="text-lg font-semibold">5 Deteksi Terbaru</h4>
+                        <h4 class="text-lg font-semibold">5 Evaluasi Terbaru</h4>
                 </div>
 
                 <ul class="divide-y dark:divide-primary">
@@ -120,12 +120,12 @@
                         <li class="p-4 flex justify-between items-center">
                             <div>
                                 <div class="font-medium">{{ $d->peternak?->nama_peternakan ?? 'Anonymous' }}</div>
-                                <div class="text-xs text-gray-500">{{ \Illuminate\Support\Str::limit(is_array($d->hasil_analisis) ? implode(', ', $d->hasil_analisis) : ($d->diagnosis_utama ?? '-'), 80) }}</div>
+                                <div class="text-xs text-gray-500">{{ \Illuminate\Support\Str::limit(strip_tags($d->hasil_ai ?? ''), 80) }}</div>
                             </div>
-                            <div class="text-xs text-gray-400">{{ $d->created_at->format('d M Y') }}</div>
+                            <div class="text-xs text-gray-400">{{ optional($d->tanggal_analisa)->format('d M Y') }}</div>
                         </li>
                     @empty
-                        <li class="p-4 text-center text-gray-500">Tidak ada deteksi terbaru</li>
+                        <li class="p-4 text-center text-gray-500">Tidak ada evaluasi terbaru</li>
                     @endforelse
                 </ul>
             </div>
@@ -152,7 +152,7 @@
     const deteksiCtx = document.getElementById('deteksiChart').getContext('2d');
     new Chart(deteksiCtx, {
         type: 'bar',
-        data: { labels, datasets: [{ label: 'Deteksi per bulan', data: deteksiData, backgroundColor: '#F59E0B' }] },
+        data: { labels, datasets: [{ label: 'Evaluasi per bulan', data: deteksiData, backgroundColor: '#F59E0B' }] },
         options: { responsive: true, maintainAspectRatio: false }
     });
 </script>

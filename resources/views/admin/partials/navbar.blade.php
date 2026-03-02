@@ -25,13 +25,10 @@
 
         <a href="{{ route('admin.deteksi.index') }}" class="flex items-center px-3 py-2 rounded-md text-sm hover:bg-gray-100 dark:hover:bg-gray-700 {{ request()->routeIs('admin.deteksi.*') ? 'bg-gray-100 dark:bg-gray-700' : '' }}">
             <svg class="w-5 h-5 mr-2 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6M12 9v6M5 12a7 7 0 1114 0 7 7 0 01-14 0z"/></svg>
-            Riwayat Deteksi
+            Riwayat Evaluasi
         </a>
 
-        <a href="{{ route('admin.paket.index') }}" class="flex items-center px-3 py-2 rounded-md text-sm hover:bg-gray-100 dark:hover:bg-gray-700 {{ request()->routeIs('admin.paket.*') ? 'bg-gray-100 dark:bg-gray-700' : '' }}">
-            <svg class="w-5 h-5 mr-2 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h18M3 12h18M3 17h18"/></svg>
-            Paket & Kuota
-        </a>
+        <!-- Paket & Kuota removed -->
 
         <a href="{{ route('admin.settings.index') }}" class="flex items-center px-3 py-2 rounded-md text-sm hover:bg-gray-100 dark:hover:bg-gray-700 {{ request()->routeIs('admin.settings.*') ? 'bg-gray-100 dark:bg-gray-700' : '' }}">
             <svg class="w-5 h-5 mr-2 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3"/></svg>
