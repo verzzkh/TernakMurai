@@ -79,27 +79,27 @@ class AnalisaBreedingController extends Controller
     }
 
     public function updateTindakLanjut(Request $request, $id)
-{
-    // Validasi input
-    $request->validate([
-        'tindak_lanjut_peternak' => 'required|in:lanjut,pantau,stop',
-    ]);
+    {
+        // Validasi input
+        $request->validate([
+            'tindak_lanjut_peternak' => 'required|in:lanjut,pantau,stop',
+        ]);
 
-    $peternakId = Auth::user()->peternak->id;
+        $peternakId = Auth::user()->peternak->id;
 
-    // Pastikan data milik peternak yang login (multi-tenant aman)
-    $analisa = HasilAnalisaBreeding::where('peternak_id', $peternakId)
-        ->findOrFail($id);
+        // Pastikan data milik peternak yang login (multi-tenant aman)
+        $analisa = HasilAnalisaBreeding::where('peternak_id', $peternakId)
+            ->findOrFail($id);
 
-    // Simpan tindak lanjut peternak
-    $analisa->update([
-        'tindak_lanjut_peternak' => $request->tindak_lanjut_peternak,
-    ]);
+        // Simpan tindak lanjut peternak
+        $analisa->update([
+            'tindak_lanjut_peternak' => $request->tindak_lanjut_peternak,
+        ]);
 
-    return redirect()
-        ->back()
-        ->with('success', 'Tindak lanjut peternak berhasil disimpan.');
-}
+        return redirect()
+            ->back()
+            ->with('success', 'Tindak lanjut peternak berhasil disimpan.');
+    }
 
 
     public function hapus($id)
@@ -146,66 +146,168 @@ class AnalisaBreedingController extends Controller
             ->with('success', 'Catatan berhasil disimpan.');
     }
 
-private function buildTripKonteksIndukanLain(
-    int $peternakId,
-    Indukan $jantan,
-    Indukan $betina
-): string {
+    private function buildTripKonteksIndukanLain(
+        int $peternakId,
+        Indukan $jantan,
+        Indukan $betina
+    ): string {
 
-    $teks = [];
+        $teks = [];
 
-    // ==============================
-    // JANTAN DENGAN BETINA LAIN
-    // ==============================
-    $tripJantanLain = Perkawinan::where('peternak_id', $peternakId)
-        ->where('indukan_jantan_id', $jantan->id)
-        ->where('indukan_betina_id', '!=', $betina->id)
-        ->withCount('anakans')
-        ->get()
-        ->groupBy('indukan_betina_id');
+        // ==============================
+        // JANTAN DENGAN BETINA LAIN
+        // ==============================
+        $tripJantanLain = Perkawinan::where('peternak_id', $peternakId)
+            ->where('indukan_jantan_id', $jantan->id)
+            ->where('indukan_betina_id', '!=', $betina->id)
+            ->get()
+            ->groupBy('indukan_betina_id');
 
-    if ($tripJantanLain->isNotEmpty()) {
-        $teks[] = "Riwayat jantan dengan pasangan lain:";
+        if ($tripJantanLain->isNotEmpty()) {
 
-        foreach ($tripJantanLain as $betinaId => $trips) {
-            $jumlahTrip   = $trips->count();
-            $jumlahAnakan = $trips->sum('anakans_count');
+            $teks[] = "Riwayat jantan dengan pasangan lain:";
 
-            $namaBetina = Indukan::find($betinaId)?->nama ?? 'Indukan tidak diketahui';
+            foreach ($tripJantanLain as $betinaId => $trips) {
 
-            $teks[] = "- {$jantan->nama} × {$namaBetina}: {$jumlahTrip} trip, {$jumlahAnakan} anakan";
+                $jumlahTrip = $trips->count();
+                $jumlahGagal = $trips->where('status', 'gagal')->count();
+                $jumlahBerhasil = $jumlahTrip - $jumlahGagal;
+
+                $successRate = $jumlahTrip > 0
+                    ? round(($jumlahBerhasil / $jumlahTrip) * 100)
+                    : 0;
+
+                $namaBetina = Indukan::find($betinaId)?->nama ?? 'Indukan tidak diketahui';
+
+                $teks[] =
+                    "- {$jantan->nama} × {$namaBetina}: "
+                    . "{$jumlahTrip} trip "
+                    . "({$jumlahBerhasil} berhasil, {$jumlahGagal} gagal), "
+                    . "success rate {$successRate}%";
+            }
         }
-    }
 
-    // ==============================
-    // BETINA DENGAN JANTAN LAIN
-    // ==============================
-    $tripBetinaLain = Perkawinan::where('peternak_id', $peternakId)
-        ->where('indukan_betina_id', $betina->id)
-        ->where('indukan_jantan_id', '!=', $jantan->id)
-        ->withCount('anakans')
-        ->get()
-        ->groupBy('indukan_jantan_id');
+        // ==============================
+        // BETINA DENGAN JANTAN LAIN
+        // ==============================
+        $tripBetinaLain = Perkawinan::where('peternak_id', $peternakId)
+            ->where('indukan_betina_id', $betina->id)
+            ->where('indukan_jantan_id', '!=', $jantan->id)
+            ->get()
+            ->groupBy('indukan_jantan_id');
 
-    if ($tripBetinaLain->isNotEmpty()) {
-        $teks[] = "\nRiwayat betina dengan pasangan lain:";
+        if ($tripBetinaLain->isNotEmpty()) {
 
-        foreach ($tripBetinaLain as $jantanId => $trips) {
-            $jumlahTrip   = $trips->count();
-            $jumlahAnakan = $trips->sum('anakans_count');
+            $teks[] = "\nRiwayat betina dengan pasangan lain:";
 
-            $namaJantan = Indukan::find($jantanId)?->nama ?? 'Indukan tidak diketahui';
+            foreach ($tripBetinaLain as $jantanId => $trips) {
 
-            $teks[] = "- {$betina->nama} × {$namaJantan}: {$jumlahTrip} trip, {$jumlahAnakan} anakan";
+                $jumlahTrip = $trips->count();
+                $jumlahGagal = $trips->where('status', 'gagal')->count();
+                $jumlahBerhasil = $jumlahTrip - $jumlahGagal;
+
+                $successRate = $jumlahTrip > 0
+                    ? round(($jumlahBerhasil / $jumlahTrip) * 100)
+                    : 0;
+
+                $namaJantan = Indukan::find($jantanId)?->nama ?? 'Indukan tidak diketahui';
+
+                $teks[] =
+                    "- {$betina->nama} × {$namaJantan}: "
+                    . "{$jumlahTrip} trip "
+                    . "({$jumlahBerhasil} berhasil, {$jumlahGagal} gagal), "
+                    . "success rate {$successRate}%";
+            }
         }
+
+        if (empty($teks)) {
+            return "Tidak terdapat riwayat trip breeding indukan dengan pasangan lain.";
+        }
+
+        return implode("\n", $teks);
     }
 
-    if (empty($teks)) {
-        return "Tidak terdapat riwayat trip breeding indukan dengan pasangan lain.";
+    private function buildFaseProduksiIndukan(
+        int $peternakId,
+        Indukan $indukan,
+        string $peran // 'jantan' atau 'betina'
+    ): array {
+
+        $query = Perkawinan::where('peternak_id', $peternakId);
+
+        if ($peran === 'jantan') {
+            $query->where('indukan_jantan_id', $indukan->id);
+        } else {
+            $query->where('indukan_betina_id', $indukan->id);
+        }
+
+        // Ambil semua lalu urutkan terbaru dulu
+        $perkawinans = $query
+            ->orderByDesc('tanggal_kawin')
+            ->get()
+            ->groupBy(function ($p) use ($peran) {
+                return $peran === 'jantan'
+                    ? $p->indukan_betina_id
+                    : $p->indukan_jantan_id;
+            });
+
+        $fase = [];
+
+        foreach ($perkawinans as $pasanganId => $trips) {
+
+            $totalTrip = $trips->count();
+            $berhasil  = $trips->where('status', '!=', 'gagal')->count();
+            $gagal     = $totalTrip - $berhasil;
+
+            $successRate = $totalTrip > 0
+                ? round(($berhasil / $totalTrip) * 100)
+                : 0;
+
+            $statusFase = match (true) {
+                $successRate >= 70 => 'stabil',
+                $successRate >= 40 => 'fluktuatif',
+                default => 'rendah'
+            };
+
+            $pasanganNama = Indukan::find($pasanganId)?->nama ?? 'Tidak diketahui';
+
+            $fase[] = [
+                'pasangan' => $indukan->nama . ' × ' . $pasanganNama,
+                'periode_mulai' => $trips->last()->tanggal_kawin,
+                'periode_selesai' => $trips->first()->tanggal_kawin,
+                'total_trip' => $totalTrip,
+                'berhasil' => $berhasil,
+                'gagal' => $gagal,
+                'success_rate' => $successRate,
+                'status_fase' => $statusFase
+            ];
+        }
+
+        // BATASI HANYA 3 FASE TERBARU
+        $fase = array_slice($fase, 0, 3);
+
+        return $fase;
     }
 
-    return implode("\n", $teks);
-}
+    private function formatFaseProduksiText(array $faseData, string $label): string
+    {
+        if (empty($faseData)) {
+            return "{$label} belum memiliki riwayat fase produksi dengan pasangan lain.";
+        }
+
+        $text = ["Riwayat fase produksi {$label} (maksimal 3 fase terbaru):"];
+
+        foreach ($faseData as $index => $fase) {
+
+            $text[] =
+                "Fase " . ($index + 1) . ": {$fase['pasangan']} | "
+                . "{$fase['total_trip']} trip "
+                . "({$fase['berhasil']} berhasil, {$fase['gagal']} gagal) | "
+                . "status fase: {$fase['status_fase']}";
+        }
+
+        return implode("\n", $text);
+    }
 
 
 
@@ -228,38 +330,59 @@ private function buildTripKonteksIndukanLain(
             ->where('indukan_jantan_id', $jantan->id)
             ->where('indukan_betina_id', $betina->id)
             ->get();
-            
-$anakansJantanGlobal = $jantan->anakansSebagaiJantan()
-    ->with(['indukanJantan', 'indukanBetina'])
-    ->get();
 
-$anakansBetinaGlobal = $betina->anakansSebagaiBetina()
-    ->with(['indukanJantan', 'indukanBetina'])
-    ->get();
+        $anakansJantanGlobal = $jantan->anakansSebagaiJantan()
+            ->with(['indukanJantan', 'indukanBetina'])
+            ->get();
+
+        $anakansBetinaGlobal = $betina->anakansSebagaiBetina()
+            ->with(['indukanJantan', 'indukanBetina'])
+            ->get();
 
         $perkawinanPasangan = Perkawinan::where('peternak_id', $peternakId)
             ->where('indukan_jantan_id', $jantan->id)
             ->where('indukan_betina_id', $betina->id)
             ->orderByDesc('tanggal_kawin')
-            ->get();       
-            
-$konteksTripIndukanLain = $this->buildTripKonteksIndukanLain(
-    $peternakId,
-    $jantan,
-    $betina
-);
-$tindakLanjutPeternakGlobal = HasilAnalisaBreeding::where('peternak_id', $peternakId)
-    ->whereNotNull('tindak_lanjut_peternak')
-    ->orderByDesc('tanggal_analisa')
-    ->take(5) // cukup 5 terakhir
-    ->pluck('tindak_lanjut_peternak');
+            ->get();
 
-// ======================================================
-// HITUNG REKOMENDASI SISTEM (LEVEL 1)
-// ======================================================
-$rekomendasiSistem = $this->tentukanRekomendasiSistem(
-    $perkawinanPasangan
-);
+        $konteksTripIndukanLain = $this->buildTripKonteksIndukanLain(
+            $peternakId,
+            $jantan,
+            $betina
+        );
+
+        // ======================================================
+        // FASE PRODUKSI INDUKAN (MAKS 3 TERBARU)
+        // ======================================================
+
+        $faseJantan = $this->buildFaseProduksiIndukan(
+            $peternakId,
+            $jantan,
+            'jantan'
+        );
+
+        $faseBetina = $this->buildFaseProduksiIndukan(
+            $peternakId,
+            $betina,
+            'betina'
+        );
+
+        $konteksFaseProduksi =
+            $this->formatFaseProduksiText($faseJantan, 'jantan') . "\n\n" .
+            $this->formatFaseProduksiText($faseBetina, 'betina');
+
+        $tindakLanjutPeternakGlobal = HasilAnalisaBreeding::where('peternak_id', $peternakId)
+            ->whereNotNull('tindak_lanjut_peternak')
+            ->orderByDesc('tanggal_analisa')
+            ->take(5) // cukup 5 terakhir
+            ->pluck('tindak_lanjut_peternak');
+
+        // ======================================================
+        // HITUNG REKOMENDASI SISTEM (LEVEL 1)
+        // ======================================================
+        $rekomendasiSistem = $this->tentukanRekomendasiSistem(
+            $perkawinanPasangan
+        );
 
         $payloadJurnal = [
             'putranto_2018_reproduksi' => [
@@ -287,10 +410,11 @@ $rekomendasiSistem = $this->tentukanRekomendasiSistem(
             $anakansJantanGlobal,
             $anakansBetinaGlobal,
             $konteksTripIndukanLain,
+            $konteksFaseProduksi,
             $perkawinanPasangan,
             $payloadJurnal,
             $tindakLanjutPeternakGlobal,
-             $rekomendasiSistem,
+            $rekomendasiSistem,
         );
 
         try {
@@ -299,7 +423,7 @@ $rekomendasiSistem = $this->tentukanRekomendasiSistem(
             $response = $client->chat()->create([
                 'model' => env('OPENAI_MODEL', 'gpt-4o-mini'),
                 'messages' => [
-                    ['role' => 'system', 'content' => 'Anda adalah sistem SPK breeding Murai Batu berbasis analisis manajerial dan aturan perilaku.'],
+                    ['role' => 'system', 'content' => 'Anda adalah sistem SPK breeding Murai Batu berbasis analisis manajerial'],
                     ['role' => 'user', 'content' => $prompt]
                 ],
                 'temperature' => 0.2,
@@ -307,16 +431,16 @@ $rekomendasiSistem = $this->tentukanRekomendasiSistem(
 
             $hasilAnalisa = $response->choices[0]->message->content;
         } catch (\OpenAI\Exceptions\RateLimitException $e) {
-            $hasilAnalisa = $this->fallbackAnalisa($jantan, $betina); 
+            $hasilAnalisa = $this->fallbackAnalisa($jantan, $betina, $rekomendasiSistem);
         } catch (\Exception $e) {
-            $hasilAnalisa = $this->fallbackAnalisa($jantan, $betina);
+            $hasilAnalisa = $this->fallbackAnalisa($jantan, $betina, $rekomendasiSistem);
         }
 
         return redirect()->route('peternak.analisaBreeding.hasil')->with([
             'hasilAnalisa' => $hasilAnalisa,
             'jantan_id'    => $jantan->id,
             'betina_id'    => $betina->id,
-             'rekomendasi'  => $rekomendasiSistem,
+            'rekomendasi'  => $rekomendasiSistem,
         ]);
     }
 
@@ -331,95 +455,115 @@ $rekomendasiSistem = $this->tentukanRekomendasiSistem(
         $jantan = Indukan::find(session('jantan_id'));
         $betina = Indukan::find(session('betina_id'));
         $hasilAnalisa = session('hasilAnalisa');
-           $rekomendasi  = session('rekomendasi');
+        $rekomendasi  = session('rekomendasi');
 
         return view('peternak.kandang.hasilAnalisa', compact(
             'hasilAnalisa',
             'jantan',
             'betina',
-             'rekomendasi'
+            'rekomendasi'
         ));
     }
-// ======================================================
-// PENENTU REKOMENDASI SISTEM (LEVEL 1 – SEDERHANA)
-// ======================================================
-private function tentukanRekomendasiSistem($perkawinanPasangan): string
-{
-    $totalTrip = $perkawinanPasangan->count();
+    // ======================================================
+    // PENENTU REKOMENDASI SISTEM RULE BASED
+    // ======================================================
+    private function tentukanRekomendasiSistem($perkawinanPasangan): string
+    {
+        $totalTrip = $perkawinanPasangan->count();
 
-    // Jika belum ada trip sama sekali
-    if ($totalTrip === 0) {
-        return 'uji_coba';
+        // ==================================================
+        // 0️⃣ Belum Ada Data
+        // ==================================================
+        if ($totalTrip === 0) {
+            return 'uji_coba';
+        }
+
+        // ==================================================
+        // 1️⃣ Minimum Sample Rule (Minimal 3 Trip)
+        // ==================================================
+        if ($totalTrip < 3) {
+            return 'uji_coba';
+        }
+
+        // Urutkan terbaru → terlama
+        $sorted = $perkawinanPasangan
+            ->sortByDesc('tanggal_kawin')
+            ->values();
+
+        // ==================================================
+        // 2️⃣ Deteksi 3 Gagal Beruntun (Hard Stop Rule)
+        // ==================================================
+        $streakGagal = 0;
+
+        foreach ($sorted as $trip) {
+            if ($trip->status === 'gagal') {
+                $streakGagal++;
+                if ($streakGagal >= 3) {
+                    return 'stop';
+                }
+            } else {
+                break; // berhenti jika streak terputus
+            }
+        }
+
+        /*
+    |------------------------------------------------------------------
+    | 3️⃣ Window Historis (maks 20 trip terakhir)
+    |------------------------------------------------------------------
+    */
+        $window20 = $sorted->take(min(20, $totalTrip));
+        $total20 = $window20->count();
+        $berhasil20 = $window20->where('status', '!=', 'gagal')->count();
+
+        $successRate20 = $total20 > 0
+            ? $berhasil20 / $total20
+            : 0;
+
+        /*
+    |------------------------------------------------------------------
+    | 4️⃣ Window Short-Term (5 trip terakhir)
+    |------------------------------------------------------------------
+    */
+        $window5 = $sorted->take(min(5, $totalTrip));
+        $total5 = $window5->count();
+        $berhasil5 = $window5->where('status', '!=', 'gagal')->count();
+
+        $successRate5 = $total5 > 0
+            ? $berhasil5 / $total5
+            : 0;
+
+        /*
+    |------------------------------------------------------------------
+    | 5️⃣ Analisis Tren
+    |------------------------------------------------------------------
+    */
+        $delta = $successRate5 - $successRate20;
+
+        /*
+    |------------------------------------------------------------------
+    | 6️⃣ Klasifikasi Tren
+    |------------------------------------------------------------------
+    */
+
+        // 🔴 MENURUN (krisis performa)
+        if (
+            $successRate20 < 0.40 ||
+            $delta <= -0.30
+        ) {
+            return 'stop';
+        }
+
+        // 🟡 FLUKTUATIF (belum stabil)
+        if (
+            $successRate20 < 0.70 ||
+            $delta <= -0.15
+        ) {
+            return 'uji_coba';
+        }
+
+        // 🟢 STABIL
+        return 'lanjut';
     }
-
-    // Urutkan terbaru → terlama
-    $sorted = $perkawinanPasangan
-        ->sortByDesc('tanggal_kawin')
-        ->values();
-
-    /*
-    |--------------------------------------------------------------------------
-    | 1️⃣ Window Historis (maks 20 trip terakhir)
-    |--------------------------------------------------------------------------
-    */
-    $window20 = $sorted->take(min(20, $totalTrip));
-    $total20 = $window20->count();
-    $berhasil20 = $window20->where('status', '!=', 'gagal')->count();
-
-    $successRate20 = $total20 > 0
-        ? $berhasil20 / $total20
-        : 0;
-
-    /*
-    |--------------------------------------------------------------------------
-    | 2️⃣ Window Short-Term (5 trip terakhir)
-    |--------------------------------------------------------------------------
-    */
-    $window5 = $sorted->take(min(5, $totalTrip));
-    $total5 = $window5->count();
-    $berhasil5 = $window5->where('status', '!=', 'gagal')->count();
-
-    $successRate5 = $total5 > 0
-        ? $berhasil5 / $total5
-        : 0;
-
-    /*
-    |--------------------------------------------------------------------------
-    | 3️⃣ Analisis Tren
-    |--------------------------------------------------------------------------
-    */
-    $delta = $successRate5 - $successRate20;
-
-    /*
-    |--------------------------------------------------------------------------
-    | 4️⃣ Klasifikasi Tren
-    |--------------------------------------------------------------------------
-    |
-    | STABIL     : baseline ≥ 70% dan tidak turun signifikan
-    | FLUKTUATIF : baseline 40–70% atau penurunan sedang
-    | MENURUN    : baseline < 40% atau penurunan tajam (≥30%)
-    |
-    */
-
-    // 🔴 MENURUN (krisis performa)
-    if (
-        $successRate20 < 0.40 ||
-        $delta <= -0.30
-    ) {
-        return 'stop';
-    }
-
-    // 🟡 FLUKTUATIF (belum stabil)
-    if (
-        $successRate20 < 0.70 ||
-        $delta <= -0.15
-    ) {
-        return 'uji_coba';
-    }
-
-    // 🟢 STABIL
-    return 'lanjut';
-}
 
 
 
@@ -434,24 +578,25 @@ private function tentukanRekomendasiSistem($perkawinanPasangan): string
         $anakansPasangan,
         $anakansJantanGlobal,
         $anakansBetinaGlobal,
-         string $konteksTripIndukanLain,
+        string $konteksTripIndukanLain,
+        string $konteksFaseProduksi,
         $perkawinanPasangan,
         array $payloadJurnal,
         $riwayatTindakLanjutPeternakGlobal,
         string $rekomendasiSistem
     ): string {
-$konteksKeputusanPeternak = '';
+        $konteksKeputusanPeternak = '';
 
-if (
-    isset($riwayatTindakLanjutPeternakGlobal)
-    && $riwayatTindakLanjutPeternakGlobal->count() > 0
-) {
-    $ringkasanKeputusan = $riwayatTindakLanjutPeternakGlobal
-        ->countBy()
-        ->map(fn ($jumlah, $aksi) => strtoupper($aksi) . ": {$jumlah}x")
-        ->implode(', ');
+        if (
+            isset($riwayatTindakLanjutPeternakGlobal)
+            && $riwayatTindakLanjutPeternakGlobal->count() > 0
+        ) {
+            $ringkasanKeputusan = $riwayatTindakLanjutPeternakGlobal
+                ->countBy()
+                ->map(fn($jumlah, $aksi) => strtoupper($aksi) . ": {$jumlah}x")
+                ->implode(', ');
 
-    $konteksKeputusanPeternak = <<<TEXT
+            $konteksKeputusanPeternak = <<<TEXT
 
 ========================
 KONTEKS RIWAYAT KEPUTUSAN PETERNAK
@@ -465,10 +610,10 @@ Data ini digunakan sebagai konteks gaya pengelolaan peternak
 secara umum dan tidak digunakan sebagai dasar utama evaluasi
 atau penilaian benar atau salah keputusan peternak.
 TEXT;
-}
+        }
 
 
-        /* =========================================================
+    /* =========================================================
      * A. DATA DASAR ANAKAN & PERKAWINAN
      * ========================================================= */
         $jumlahAnakanPasangan = $anakansPasangan->count();
@@ -482,25 +627,25 @@ TEXT;
             ? $perkawinanTerakhir->tanggal_kawin
             : 'Tidak ada data';
 
-            /* =========================================================
- * KONTEKS RIWAYAT PRODUKSI INDIVIDU INDUKAN
- * (WAJIB SELALU ADA – DIPAKAI DI PROMPT)
- * ========================================================= */
+    /* =========================================================
+    * KONTEKS RIWAYAT PRODUKSI INDIVIDU INDUKAN
+    * (WAJIB SELALU ADA – DIPAKAI DI PROMPT)
+    * ========================================================= */
 
-// anakan jantan dari pasangan LAIN
-$jumlahAnakanJantanLain = $anakansJantanGlobal
-    ->where('indukan_betina_id', '!=', $betina->id)
-    ->count();
+        // anakan jantan dari pasangan LAIN
+        $jumlahAnakanJantanLain = $anakansJantanGlobal
+            ->where('indukan_betina_id', '!=', $betina->id)
+            ->count();
 
-// anakan betina dari pasangan LAIN
-$jumlahAnakanBetinaLain = $anakansBetinaGlobal
-    ->where('indukan_jantan_id', '!=', $jantan->id)
-    ->count();
+        // anakan betina dari pasangan LAIN
+        $jumlahAnakanBetinaLain = $anakansBetinaGlobal
+            ->where('indukan_jantan_id', '!=', $jantan->id)
+            ->count();
 
 
-        /* =========================================================
-     * B. RINCIAN ANAKAN PASANGAN INI (MAX 5 TERBARU)
-     * ========================================================= */
+    /* =========================================================
+    * B. RINCIAN ANAKAN PASANGAN INI (MAX 5 TERBARU)
+    * ========================================================= */
         $ringkasanAnakanPasangan = $anakansPasangan
             ->sortByDesc('tanggal_menetas')
             ->take(5)
@@ -527,9 +672,9 @@ $jumlahAnakanBetinaLain = $anakansBetinaGlobal
         $ringkasanAnakanPasangan = $ringkasanAnakanPasangan
             ?: "Belum ada anakan tercatat di antara kedua pasangan ini.";
 
-        /* =========================================================
-     * C. RINGKASAN KARAKTERISTIK – HASIL PASANGAN INI
-     * ========================================================= */
+    /* =========================================================
+    * C. RINGKASAN KARAKTERISTIK – HASIL PASANGAN INI
+    * ========================================================= */
         $ringkasanKarakteristikPasanganIni = '';
 
         if ($jumlahAnakanPasangan > 0) {
@@ -545,95 +690,96 @@ $jumlahAnakanBetinaLain = $anakansBetinaGlobal
             $ringkasanKarakteristikPasanganIni = $ringkasanKarakteristikPasanganIni
                 ?: "- Data karakteristik anakan hasil pasangan ini belum tersedia.";
         }
-/* =========================================================
- * D. RINGKASAN KARAKTERISTIK – HASIL PASANGAN LAIN (KONTEKS)
- * ========================================================= */
+    /* =========================================================
+    * D. RINGKASAN KARAKTERISTIK – HASIL PASANGAN LAIN (KONTEKS)
+    * ========================================================= */
 
-$ringkasanKarakteristikPasanganLain = '';
+        $ringkasanKarakteristikPasanganLain = '';
 
-$anakansPasanganLain = collect()
-    ->merge($anakansJantanGlobal)
-    ->merge($anakansBetinaGlobal)
-    ->reject(fn ($a) =>
-        $a->indukan_jantan_id === $jantan->id &&
-        $a->indukan_betina_id === $betina->id
-    )
-    ->filter(fn ($a) => !empty($a->deskripsi_karakteristik));
+        $anakansPasanganLain = collect()
+            ->merge($anakansJantanGlobal)
+            ->merge($anakansBetinaGlobal)
+            ->reject(
+                fn($a) =>
+                $a->indukan_jantan_id === $jantan->id &&
+                    $a->indukan_betina_id === $betina->id
+            )
+            ->filter(fn($a) => !empty($a->deskripsi_karakteristik));
 
-if ($anakansPasanganLain->isNotEmpty()) {
+        if ($anakansPasanganLain->isNotEmpty()) {
 
-    // Kelompokkan berdasarkan pasangan indukan
-    $grouped = $anakansPasanganLain->groupBy(
-        fn ($a) => $a->indukan_jantan_id . '-' . $a->indukan_betina_id
-    );
+            // Kelompokkan berdasarkan pasangan indukan
+            $grouped = $anakansPasanganLain->groupBy(
+                fn($a) => $a->indukan_jantan_id . '-' . $a->indukan_betina_id
+            );
 
-    $blok = [];
+            $blok = [];
 
-    foreach ($grouped as $pairKey => $anakans) {
+            foreach ($grouped as $pairKey => $anakans) {
 
-        $contoh = $anakans->first();
+                $contoh = $anakans->first();
 
-        $namaJantan = $contoh->indukanJantan->nama ?? 'Jantan Tidak Diketahui';
-        $namaBetina = $contoh->indukanBetina->nama ?? 'Betina Tidak Diketahui';
+                $namaJantan = $contoh->indukanJantan->nama ?? 'Jantan Tidak Diketahui';
+                $namaBetina = $contoh->indukanBetina->nama ?? 'Betina Tidak Diketahui';
 
-        $karakteristik = $anakans
-            ->pluck('deskripsi_karakteristik')
-            ->filter()
-            ->unique()
-            ->map(fn ($d) => "  • {$d}")
-            ->implode("\n");
+                $karakteristik = $anakans
+                    ->pluck('deskripsi_karakteristik')
+                    ->filter()
+                    ->unique()
+                    ->map(fn($d) => "  • {$d}")
+                    ->implode("\n");
 
-        if ($karakteristik) {
-            $blok[] =
-                "- {$namaJantan} × {$namaBetina}:\n{$karakteristik}";
+                if ($karakteristik) {
+                    $blok[] =
+                        "- {$namaJantan} × {$namaBetina}:\n{$karakteristik}";
+                }
+            }
+
+            $ringkasanKarakteristikPasanganLain = $blok
+                ? implode("\n\n", $blok)
+                : "- Data karakteristik anakan dari pasangan lain belum tersedia.";
         }
-    }
-
-    $ringkasanKarakteristikPasanganLain = $blok
-        ? implode("\n\n", $blok)
-        : "- Data karakteristik anakan dari pasangan lain belum tersedia.";
-}
-
-        
-// =========================================================
-// TRIP BREEDING (5 TERAKHIR) – KHUSUS PASANGAN INI
-// =========================================================
-
-$tripPasangan = $perkawinanPasangan
-    ->sortByDesc('created_at')
-    ->take(5)
-    ->values();
-
-$ringkasanTripText = [];
-
-foreach ($tripPasangan as $i => $trip) {
-
-    $jumlahAnakanTrip = $trip->anakans->count();
-    $statusTrip = $trip->status === 'gagal'
-        ? 'GAGAL'
-        : 'BERHASIL';
-
-    $ringkasanTripText[] =
-        "- Trip " . ($i + 1) .
-        " | Tanggal kawin: {$trip->tanggal_kawin}" .
-        " | Status: {$statusTrip}" .
-        " | Jumlah anakan: {$jumlahAnakanTrip}";
-}
-
-$totalTrip = $perkawinanPasangan->count();
-$totalGagal = $perkawinanPasangan->where('status','gagal')->count();
-$totalBerhasil = $totalTrip - $totalGagal;
-
-$successRate = $totalTrip > 0
-    ? round(($totalBerhasil / $totalTrip) * 100)
-    : 0;
 
 
-$ringkasanTripText = $ringkasanTripText
-    ? implode("\n", $ringkasanTripText)
-    : "Belum terdapat data trip breeding yang dapat dievaluasi.";
+    // =========================================================
+    // TRIP BREEDING (5 TERAKHIR) – KHUSUS PASANGAN INI
+    // =========================================================
 
-        /* =========================================================
+        $tripPasangan = $perkawinanPasangan
+            ->sortByDesc('created_at')
+            ->take(5)
+            ->values();
+
+        $ringkasanTripText = [];
+
+        foreach ($tripPasangan as $i => $trip) {
+
+            $jumlahAnakanTrip = $trip->anakans->count();
+            $statusTrip = $trip->status === 'gagal'
+                ? 'GAGAL'
+                : 'BERHASIL';
+
+            $ringkasanTripText[] =
+                "- Trip " . ($i + 1) .
+                " | Tanggal kawin: {$trip->tanggal_kawin}" .
+                " | Status: {$statusTrip}" .
+                " | Jumlah anakan: {$jumlahAnakanTrip}";
+        }
+
+        $totalTrip = $perkawinanPasangan->count();
+        $totalGagal = $perkawinanPasangan->where('status', 'gagal')->count();
+        $totalBerhasil = $totalTrip - $totalGagal;
+
+        $successRate = $totalTrip > 0
+            ? round(($totalBerhasil / $totalTrip) * 100)
+            : 0;
+
+
+        $ringkasanTripText = $ringkasanTripText
+            ? implode("\n", $ringkasanTripText)
+            : "Belum terdapat data trip breeding yang dapat dievaluasi.";
+
+    /* =========================================================
      * E. RIWAYAT PRODUKSI INDUKAN
      * ========================================================= */
         $ringkasanGlobalText = [];
@@ -652,7 +798,7 @@ $ringkasanTripText = $ringkasanTripText
             ? implode("\n", $ringkasanGlobalText)
             : "Tidak ada data anakan dari pasangan ini secara keseluruhan.";
 
-        /* =========================================================
+    /* =========================================================
      * F. DATA PERILAKU INDUKAN
      * ========================================================= */
         $perilakuJantan =
@@ -665,7 +811,7 @@ $ringkasanTripText = $ringkasanTripText
             "- Aktif Membuat Sarang: " . ($betina->aktif_buat_sarang ? "Ya" : "Tidak") . "\n" .
             "- Temperamen: " . ($betina->temperamen ?: "-");
 
-        /* =========================================================
+     /* =========================================================
      * G. EVALUASI RULE-BASED
      * ========================================================= */
 
@@ -684,9 +830,8 @@ $ringkasanTripText = $ringkasanTripText
 
         if ($ringkasanKarakteristikPasanganIni) {
             $blokKarakteristik .= "
-Ringkasan karakteristik anakan (hasil pasangan ini):
-{$ringkasanKarakteristikPasanganIni}
-";
+            Ringkasan karakteristik anakan (hasil pasangan ini):
+            {$ringkasanKarakteristikPasanganIni}";
         }
 
         if ($ringkasanKarakteristikPasanganLain) {
@@ -697,7 +842,8 @@ Ringkasan karakteristik anakan (hasil pasangan lain, sebagai konteks historis):
 Catatan:
 Data ini digunakan sebagai konteks pengalaman indukan dan tidak dijadikan
 bukti kecocokan pasangan yang dianalisis.
-"; }
+";
+        }
         /*  END BLOCK  */
 
         return <<<PROMPT
@@ -784,8 +930,6 @@ perilaku indukan saat ini.
 
 - Riwayat pasangan ini:
   Pasangan ini telah menghasilkan {$jumlahAnakanPasangan} anakan.
-  - Rincian anakan:
-{$ringkasanAnakanPasangan}
 
 Catatan:
 Riwayat produksi individu indukan digunakan sebagai
@@ -829,50 +973,92 @@ Catatan:
 - Data ini tidak digunakan untuk prediksi biologis atau genetika.
 
 ------------------------------------------------
-3 Konteks Historis Trip Indukan (Pasangan Lain)
+------------------------------------------------
+4 Konteks Historis Trip Indukan (Pasangan Lain)
 
-3.1 Catatan Karakteristik Anakan
+4.1 Catatan Karakteristik Anakan
 Gunakan data karakteristik anakan hasil pasangan ini
 {$konteksTripIndukanLain}
 {$blokKarakteristik}
 
+
+------------------------------------------------
+Ringkasan Fase Produksi Indukan:
+{$konteksFaseProduksi}
+
+Sistem WAJIB menggunakan data fase produksi ini
+untuk memahami apakah indukan menunjukkan:
+
+- pola peningkatan performa,
+- pola penurunan performa,
+- atau perbedaan performa antar pasangan.
 Catatan:
 Data ini digunakan sebagai konteks pengalaman reproduksi
-dan kestabilan hasil breeding indukan secara individual,
-bukan sebagai dasar utama evaluasi kecocokan pasangan aktif.
+dan kestabilan hasil breeding indukan secara individual.
+Sistem WAJIB mempertimbangkan konteks ini
+sebelum menyusun kesimpulan manajerial.
 
 ------------------------------------------------
 
-3.2 Evaluasi Karakteristik Anakan
+4.2 Evaluasi Karakteristik Anakan
 Gunakan data karakteristik anakan di atas untuk
 menyusun evaluasi kualitatif hasil breeding secara
 objektif dan deskriptif.
 
+Jika terdapat perbedaan hasil karakteristik
+antara pasangan aktif dan pasangan sebelumnya,
+jelaskan secara eksplisit.
+
 ------------------------------------------------
 
-3.3 Kesimpulan bagian ini:
+4.3 Analisis Perbandingan Wajib
+
+Sistem WAJIB melakukan perbandingan eksplisit antara:
+
+- Performa pasangan aktif saat ini
+- Performa indukan yang sama dengan pasangan lain sebelumnya
+
+Langkah analisis yang WAJIB dilakukan:
+
+1. Bandingkan tingkat keberhasilan (success rate).
+2. Bandingkan jumlah trip dan konsistensi hasil.
+3. Jelaskan apakah performa meningkat, menurun,
+   atau menunjukkan pola berbeda.
+4. Jelaskan implikasi manajerial dari perbedaan tersebut.
+5. WAJIB menyebut pasangan pembanding secara eksplisit
+   (contoh: "dibandingkan dengan pasangan sebelumnya Cakra × Ratna").\
+6. DILARANG menyimpulkan faktor genetika atau biologis.
+- Tingkat keberhasilan (success rate) cukup disebutkan secara eksplisit satu kali.
+- Pada bagian selanjutnya gunakan istilah deskriptif seperti:
+  "rendah", "menurun", "konsisten", atau "tidak stabil".
+- Hindari pengulangan angka yang sama di lebih dari dua bagian laporan.
+Analisis ini harus ditulis sebagai paragraf khusus
+dan tidak boleh dilewati atau diringkas secara umum.
+
+------------------------------------------------
+
+4.4 Kesimpulan bagian ini:
 
 Jelaskan status reproduksi pasangan ini secara manajerial
-berdasarkan riwayat jumlah trip, jumlah anakan,
-dan konsistensi hasil breeding yang tercatat di sistem.
+berdasarkan:
+
+- Riwayat jumlah trip,
+- Konsistensi hasil breeding,
+- Hasil perbandingan dengan pasangan lain.
 
 Dalam kesimpulan ini, sistem wajib menetapkan status pasangan breeding
 (secara kontekstual), misalnya sebagai:
 
-misalnya pasangan baru dicoba, pasangan sudah terbukti menghasilkan,
-pasangan pernah menghasilkan namun belum konsisten,
-atau pasangan yang memerlukan pengawasan lebih ketat
+- pasangan baru dicoba,
+- pasangan menunjukkan kestabilan awal,
+- pasangan belum konsisten,
+- pasangan memerlukan pengawasan lebih ketat.
 
-Penetapan status ini digunakan untuk menjelaskan apakah pasangan
-telah terbukti produktif secara historis dan apakah kondisi perilaku
-saat ini selaras atau tidak dengan riwayat tersebut.
-
-Catatan:
 Penetapan status pasangan bersifat manajerial dan deskriptif,
-bukan penilaian biologis, bukan prediksi keberhasilan breeding,
-dan digunakan sebagai konteks untuk rekomendasi lanjutan sistem.
+bukan penilaian biologis dan bukan prediksi keberhasilan breeding.
 
 ------------------------------------------------
+
 
 D. Evaluasi Kesiapan Produksi Berdasarkan Perilaku
 (berdasarkan indikator perilaku Saputro 2016)
@@ -912,7 +1098,7 @@ Sistem telah melakukan evaluasi kuantitatif
 berbasis tren historis (20 trip terakhir dibanding 5 terbaru).
 
 Rekomendasi awal sistem:
-REKOMENDASI_ENGINE: {$rekomendasiSistem}
+REKOMENDASI: {$rekomendasiSistem}
 
 Instruksi:
 
@@ -938,39 +1124,58 @@ bukan prediksi biologis.
 
 ------------------------------------------------
 
+------------------------------------------------
+
 G. Rekomendasi Tindakan Praktis
+(Berbasis Perilaku + Konteks Historis)
 
 Bagian ini menyajikan rekomendasi tindakan manajerial
-berdasarkan indikator perilaku yang belum terpenuhi
-pada pasangan indukan yang dianalisis.
+yang disusun dengan mempertimbangkan:
 
-Definisi indikator perilaku:
-- Indikator "Aktif Kicau" merujuk pada perilaku kicau
-  yang berfungsi sebagai respons interaksi atau
-  rayuan terhadap betina dalam konteks breeding,
-  dan bukan kicau agresif, kicau tarung,
-  atau kicau untuk tujuan kompetisi.
+1. Indikator perilaku saat ini,
+2. Riwayat trip pasangan aktif,
+3. Tren performa historis,
+4. Fase produksi indukan pada pasangan lain,
+5. Hasil perbandingan yang telah dianalisis pada bagian 3.
 
-Langkah penyusunan:
-1. Identifikasi indikator perilaku yang bernilai "Tidak".
-2. Untuk setiap indikator tersebut, jelaskan:
-   - indikator yang belum terpenuhi,
-   - konteks perilaku yang teramati,
-   - rekomendasi tindakan manajerial yang dapat dipertimbangkan
-     berdasarkan praktik lapangan umum,
-   - durasi pengamatan yang wajar,
-   - waktu evaluasi ulang yang disarankan.
-3. Jika seluruh indikator bernilai "Ya",
-   jelaskan bahwa tidak diperlukan tindakan khusus
-   selain pemantauan rutin.
+Instruksi penyusunan:
 
-Catatan:
-- Rekomendasi bersifat panduan manajerial,
-  bukan instruksi wajib.
-- Pelaksanaan dapat disesuaikan dengan pengalaman
-  dan kondisi lapangan oleh peternak.
+1 Evaluasi Perilaku
+- Identifikasi indikator yang bernilai "Tidak".
+- Jika ada indikator belum terpenuhi,
+  berikan tindakan korektif spesifik
+  beserta durasi pengamatan dan waktu evaluasi ulang.
 
-------------------------------------------------
+2  Evaluasi Konteks Historis
+- Jika seluruh indikator bernilai "Ya",
+  sistem TIDAK BOLEH langsung menyimpulkan
+  bahwa tidak diperlukan tindakan.
+
+- Sistem WAJIB mengevaluasi:
+  - apakah performa pasangan aktif menurun,
+  - apakah pasangan sebelumnya lebih stabil,
+  - apakah terdapat pola kegagalan berulang.
+
+Jika terdapat:
+- penurunan performa,
+- ketidakstabilan hasil,
+- atau perbedaan signifikan dibanding pasangan lain,
+
+maka rekomendasi harus mencerminkan
+pengawasan tambahan, jeda pairing,
+atau evaluasi manajemen kandang,
+meskipun indikator perilaku saat ini terpenuhi.
+
+3 Jika performa stabil DAN indikator perilaku terpenuhi,
+jelaskan bahwa cukup dilakukan pemantauan rutin.
+
+Catatan penting:
+- Rekomendasi bersifat manajerial dan kontekstual.
+- Tidak boleh bertentangan dengan rekomendasi engine pada bagian F.
+- Tidak boleh menyimpulkan faktor genetika atau biologis.
+- Rekomendasi harus konsisten dengan tren historis yang telah dijelaskan.
+- Sistem WAJIB konsisten dengan bagian D dan tidak boleh menyatakan indikator terpenuhi jika sebelumnya dinyatakan tidak terpenuhi.
+
 H. Potensi Tantangan Awal
 
 Bagian ini menjelaskan potensi tantangan awal yang dapat muncul
@@ -1014,23 +1219,19 @@ BATASAN BAHASA
 
 PROMPT;
     }
+private function fallbackAnalisa($jantan, $betina, $rekomendasiSistem)
+{
+    return "# Laporan Analisis Breeding (Fallback Mode)
 
-    private function fallbackAnalisa($jantan, $betina)
-    {
-        return "# Laporan Analisis Breeding (Fallback Mode — AI Limit)
 A. Ringkasan Singkat
 - Jantan: {$jantan->nomor_ring} ({$jantan->nama})
 - Betina: {$betina->nomor_ring} ({$betina->nama})
 
-B. AI tidak bisa diakses karena batas penggunaan (rate limit).
-Namun sistem tetap memberikan rekomendasi awal berdasarkan aturan breeding.
+B. Rekomendasi Sistem (Berbasis Evaluasi Deterministik)
+REKOMENDASI: {$rekomendasiSistem}
 
-C. Rekomendasi Awal
-- Lakukan uji coba perkawinan terbatas 14-30 hari.
-- Pantau interaksi, kesiapan sarang & kondisi fisik harian.
-
-D. Catatan
-Ini bukan analisa AI penuh — hanya mode darurat untuk memastikan fitur tetap berjalan.
-";
-    }
+C. Catatan
+Komponen AI tidak dapat diakses.
+Rekomendasi di atas sepenuhnya dihasilkan oleh mekanisme evaluasi berbasis aturan deterministik.";
+}
 }
