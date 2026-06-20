@@ -47,13 +47,23 @@
                               <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                                   Status Kandang <span class="text-red-500">*</span>
                               </label>
+
+                              @if($currentPairing && $currentPairing->status === 'dihentikan')
+                                  <p class="mt-1 text-sm text-yellow-700 dark:text-yellow-300">
+                                      Pairing ini sedang dihentikan. Status breeding baru tidak dapat dimulai sampai pairing diaktifkan kembali.
+                                  </p>
+                              @endif
+
                               <select name="status" id="status" required
                                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary dark:bg-darker dark:border-primary-darker dark:text-white sm:text-sm @error('status') border-red-300 @enderror">
-                                  <option value="">Pilih Status</option>
-                                  <option value="kosong" {{ old('status', $kandang->status) === 'kosong' ? 'selected' : '' }}>Kosong</option>
-                                  <option value="bertelur" {{ old('status', $kandang->status) === 'bertelur' ? 'selected' : '' }}>Bertelur</option>
-                                  <option value="mengeram" {{ old('status', $kandang->status) === 'mengeram' ? 'selected' : '' }}>Mengeram</option>
-                                  <option value="menetas" {{ old('status', $kandang->status) === 'menetas' ? 'selected' : '' }}>Menetas</option>
+                                  <option value="{{ $kandang->status }}" {{ old('status', $kandang->status) === $kandang->status ? 'selected' : '' }}>
+                                      Saat ini: {{ $statusLabels[$kandang->status] ?? ucfirst($kandang->status) }}
+                                  </option>
+                                  @foreach($validNextStatuses as $status)
+                                      <option value="{{ $status }}" {{ old('status') === $status ? 'selected' : '' }}>
+                                          {{ $statusLabels[$status] ?? ucfirst($status) }}
+                                      </option>
+                                  @endforeach
                               </select>
                               @error('status')
                                   <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -79,7 +89,7 @@
     <h2 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Penugasan Indukan</h2>
 
     @php
-        $isLocked = in_array($kandang->status, ['bertelur', 'mengeram', 'menetas']);
+        $isLocked = in_array($kandang->status, ['bertelur', 'mengeram']);
     @endphp
 
     @if($isLocked)

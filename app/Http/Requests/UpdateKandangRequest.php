@@ -28,7 +28,7 @@ class UpdateKandangRequest extends FormRequest
                 'unique:kandang,nomor_kandang,' . $kandangId . ',id,peternak_id,' . $peternakId,
             ],
             'deskripsi_kandang' => ['nullable', 'string'],
-            'status' => ['required', 'in:kosong,bertelur,mengeram,menetas,gagal'],
+            'status' => ['required', 'in:kosong,bertelur,mengeram,berhasil,gagal'],
             'indukan_jantan_id' => ['nullable', 'exists:indukan,id'],
             'indukan_betina_id' => ['nullable', 'exists:indukan,id'],
         ];
@@ -45,5 +45,24 @@ class UpdateKandangRequest extends FormRequest
             'indukan_jantan_id.exists' => 'Indukan jantan tidak ditemukan.',
             'indukan_betina_id.exists' => 'Indukan betina tidak ditemukan.',
         ];
+    }
+
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator) {
+            $kandang = $this->route('kandang');
+            
+            $status = $this->input('status');
+            $breedingStatuses = ['bertelur', 'mengeram', 'berhasil', 'gagal'];
+            
+            if (in_array($status, $breedingStatuses)) {
+                $jantanId = $this->input('indukan_jantan_id', is_object($kandang) ? $kandang->indukan_jantan_id : null);
+                $betinaId = $this->input('indukan_betina_id', is_object($kandang) ? $kandang->indukan_betina_id : null);
+                
+                if (empty($jantanId) || empty($betinaId)) {
+                    $validator->errors()->add('status', 'Status kandang hanya dapat diubah ke fase breeding (' . $status . ') jika terdapat pasangan Indukan Jantan dan Betina yang lengkap di kandang.');
+                }
+            }
+        });
     }
 }

@@ -43,7 +43,7 @@
                             @elseif($item->rekomendasi=='lanjut') bg-green-600
                             @elseif($item->rekomendasi=='stop') bg-red-600
                             @endif">
-                            {{ strtoupper($item->rekomendasi) }}
+                            {{ str_replace('_', ' ', strtoupper($item->rekomendasi)) }}
                         </span>
 
                         {{-- TINDAK LANJUT --}}
@@ -58,6 +58,12 @@
                         @else
                             <span class="px-2.5 py-1 rounded bg-gray-400 text-white text-xs">
                                Tindak Lanjut: BELUM DITENTUKAN
+                            </span>
+                        @endif
+
+                        @if($item->pairing)
+                            <span class="px-2.5 py-1 rounded text-white text-xs {{ $item->pairing->status === 'aktif' ? 'bg-emerald-700' : 'bg-slate-700' }}">
+                                Pairing: {{ strtoupper($item->pairing->status) }}
                             </span>
                         @endif
                     </div>

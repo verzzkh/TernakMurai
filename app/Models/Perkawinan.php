@@ -18,6 +18,7 @@ class Perkawinan extends Model
 
     protected $fillable = [
          'peternak_id',        // ✅ tambahkan baris ini
+        'pairing_id',
         'kandang_id',
         'indukan_jantan_id',
         'indukan_betina_id',
@@ -37,6 +38,11 @@ class Perkawinan extends Model
     public function kandang(): BelongsTo
     {
         return $this->belongsTo(Kandang::class);
+    }
+
+    public function pairing(): BelongsTo
+    {
+        return $this->belongsTo(Pairing::class);
     }
 
     public function indukanJantan(): BelongsTo

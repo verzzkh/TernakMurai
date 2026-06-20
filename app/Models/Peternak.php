@@ -38,6 +38,11 @@ class Peternak extends Model
         return $this->hasMany(Kandang::class);
     }
 
+    public function pairings(): HasMany
+    {
+        return $this->hasMany(Pairing::class);
+    }
+
     public function anakans(): HasMany
     {
         return $this->hasMany(Anakan::class);

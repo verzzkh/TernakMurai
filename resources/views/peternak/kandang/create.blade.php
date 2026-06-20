@@ -46,8 +46,6 @@
                                   <option value="">Pilih Status</option>
                                   <option value="kosong" {{ old('status') === 'kosong' ? 'selected' : '' }}>Kosong</option>
                                   <option value="bertelur" {{ old('status') === 'bertelur' ? 'selected' : '' }}>Bertelur</option>
-                                  <option value="mengeram" {{ old('status') === 'mengeram' ? 'selected' : '' }}>Mengeram</option>
-                                  <option value="menetas" {{ old('status') === 'menetas' ? 'selected' : '' }}>Menetas</option>
                               </select>
                               @error('status')
                                   <p class="mt-1 text-sm text-red-600">{{ $message }}</p>

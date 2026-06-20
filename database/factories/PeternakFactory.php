@@ -14,15 +14,16 @@ class PeternakFactory extends Factory
     public function definition(): array
     {
         return [
+            // Buat user otomatis saat membuat data peternak via factory.
             'user_id' => User::factory(),
+            // Nama peternakan (untuk identitas peternak di sistem).
             'nama_peternakan' => fake()->company(),
+            // Alamat peternakan (opsional).
             'alamat' => fake()->address(),
+            // Nomor handphone (opsional) untuk kontak.
             'nomor_handphone' => fake()->phoneNumber(),
+            // Foto profil (nullable) — default null pada data dummy.
             'foto_profil' => null,
-            'jenis_akun' => 'free',
-            'pro_berlaku_hingga' => null,
-            'periode_deteksi' => now()->format('Y-m'),
-            'deteksi_terpakai' => 0,
         ];
     }
 }

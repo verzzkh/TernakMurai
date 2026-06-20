@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 
 <head>
     <meta charset="utf-8" />
@@ -11,7 +11,7 @@
     <script src="https://cdn.jsdelivr.net/gh/alpine-collective/alpine-magic-helpers@0.5.x/dist/component.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.7.3/dist/alpine.min.js" defer></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
 </head>
 
 <body>
@@ -175,6 +175,54 @@
           updateLineChart,
         }
       }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        if (typeof flatpickr === 'undefined') {
+          return;
+        }
+
+        function normalizeValue(value) {
+          if (!value) {
+            return '';
+          }
+          if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+            return value;
+          }
+          if (/^\d{2}\/\d{2}\/\d{4}$/.test(value)) {
+            var parts = value.split('/');
+            return parts[2] + '-' + parts[1] + '-' + parts[0];
+          }
+          return value;
+        }
+
+        document.querySelectorAll('.custom-datepicker').forEach(function (input) {
+          input.value = normalizeValue(input.value);
+
+          var fpInstance = flatpickr(input, {
+            dateFormat: 'Y-m-d',
+            altInput: true,
+            altFormat: 'd/m/Y',
+            allowInput: false,
+            clickOpens: true,
+            maxDate: 'today',
+            disableMobile: true,
+            mode: 'single',
+            position: 'auto',
+          });
+
+          // Pastikan datepickr terbuka saat fokus
+          input.addEventListener('focus', function () {
+            fpInstance.open();
+          });
+
+          // Cegah input manual jika allowInput false
+          input.addEventListener('keypress', function (e) {
+            e.preventDefault();
+          });
+        });
+      });
     </script>
      @stack('scripts')
 </body>

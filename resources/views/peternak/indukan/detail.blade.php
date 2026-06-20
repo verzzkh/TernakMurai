@@ -183,10 +183,13 @@
                                 @php
                                     $first = $perkawinanGroup->first();
 
+                                    $namaJantan = $first->indukanJantan?->nama ? " ({$first->indukanJantan->nama})" : "";
+                                    $namaBetina = $first->indukanBetina?->nama ? " ({$first->indukanBetina->nama})" : "";
+                                    
                                     $pairName =
-                                        ($first->indukanJantan?->nomor_ring ?? 'J?') .
+                                        ($first->indukanJantan?->nomor_ring ?? 'J?') . $namaJantan .
                                         ' × ' .
-                                        ($first->indukanBetina?->nomor_ring ?? 'B?');
+                                        ($first->indukanBetina?->nomor_ring ?? 'B?') . $namaBetina;
 
                                     $totalTrip = $perkawinanGroup->count();
                                     $totalAnakan = $perkawinanGroup->sum(fn($p) => $p->anakans->count());
@@ -217,7 +220,7 @@
                                     </div>
 
                                     {{-- DAFTAR TRIP (DEFAULT HIDDEN) --}}
-                                    <div id="indukan-pair-{{ $loop->index }}" class="hidden mt-3 space-y-4">
+                                    <div id="indukan-pair-{{ $loop->index }}" class="hidden mt-3 space-y-4 trip-pagination-container">
 
                                         @foreach ($perkawinanGroup->values() as $index => $perkawinan)
                                             @php
@@ -227,7 +230,7 @@
                                                 $countBetina = $anakans->where('jenis_kelamin', 'betina')->count();
                                             @endphp
 
-                                            <div class="relative pl-4 border-l-4 border-primary/70">
+                                            <div class="relative pl-4 border-l-4 border-primary/70 trip-item">
 
                                                 <div class="text-sm font-semibold flex flex-wrap items-center gap-1">
                                                     <span
@@ -262,6 +265,12 @@
                                                         </button>
                                                     @endif
                                                 </div>
+
+                                                @if ($perkawinan->status === 'gagal' && !empty($perkawinan->catatan))
+                                                    <div class="mt-1 text-xs text-red-600 dark:text-red-400 italic">
+                                                        *Catatan kegagalan: {{ $perkawinan->catatan }}
+                                                    </div>
+                                                @endif
 
                                                 {{-- LIST ANAK PER TRIP --}}
                                                 <div id="indukan-trip-{{ $perkawinan->id }}"
@@ -559,5 +568,70 @@
     </script>
 
 
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const containers = document.querySelectorAll('.trip-pagination-container');
+            containers.forEach(container => {
+                const items = Array.from(container.querySelectorAll('.trip-item'));
+                if (items.length <= 10) return; // No pagination needed
+
+                let currentPage = 1;
+                const perPage = 10;
+                const totalPages = Math.ceil(items.length / perPage);
+
+                // Create pagination controls
+                const controls = document.createElement('div');
+                controls.className = 'flex justify-between items-center mt-4 pt-4 border-t border-gray-200 dark:border-gray-700';
+                
+                const prevBtn = document.createElement('button');
+                prevBtn.type = 'button';
+                prevBtn.className = 'px-3 py-1 text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition';
+                prevBtn.innerText = '← Sebelumnya';
+
+                const info = document.createElement('span');
+                info.className = 'text-xs text-gray-500 font-medium';
+
+                const nextBtn = document.createElement('button');
+                nextBtn.type = 'button';
+                nextBtn.className = 'px-3 py-1 text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition';
+                nextBtn.innerText = 'Selanjutnya →';
+
+                controls.appendChild(prevBtn);
+                controls.appendChild(info);
+                controls.appendChild(nextBtn);
+                container.appendChild(controls);
+
+                function render() {
+                    items.forEach((item, index) => {
+                        if (index >= (currentPage - 1) * perPage && index < currentPage * perPage) {
+                            item.style.display = 'block';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                    prevBtn.disabled = currentPage === 1;
+                    nextBtn.disabled = currentPage === totalPages;
+                    info.innerText = `Halaman ${currentPage} dari ${totalPages}`;
+                }
+
+                prevBtn.addEventListener('click', () => {
+                    if (currentPage > 1) {
+                        currentPage--;
+                        render();
+                    }
+                });
+
+                nextBtn.addEventListener('click', () => {
+                    if (currentPage < totalPages) {
+                        currentPage++;
+                        render();
+                    }
+                });
+
+                render(); // initial render
+            });
+        });
+    </script>
 
 </x-layout>

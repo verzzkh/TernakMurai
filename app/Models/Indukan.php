@@ -72,9 +72,19 @@ class Indukan extends Model
         return $this->hasMany(Perkawinan::class, 'indukan_jantan_id');
     }
 
+    public function pairingsSebagaiJantan(): HasMany
+    {
+        return $this->hasMany(Pairing::class, 'indukan_jantan_id');
+    }
+
     public function perkawinansBetina(): HasMany
     {
         return $this->hasMany(Perkawinan::class, 'indukan_betina_id');
+    }
+
+    public function pairingsSebagaiBetina(): HasMany
+    {
+        return $this->hasMany(Pairing::class, 'indukan_betina_id');
     }
 
     /**

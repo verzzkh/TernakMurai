@@ -10,9 +10,9 @@
             <!-- ========================================================= -->
 <!-- 1️⃣ STATISTIK UTAMA (Versi Premium) -->
 <!-- ========================================================= -->
-<div class="grid grid-cols-1 gap-6 p-4 md:grid-cols-2 xl:grid-cols-4">
+<div class="grid grid-cols-1 gap-6 p-4 md:grid-cols-2 xl:grid-cols-3">
 
-    <!-- Keuntungan Bulan Ini -->
+    <!-- Keuntungan Bulan Ini (Dihide sementara) 
     <div class="group flex items-center justify-between p-5 bg-white rounded-xl shadow-md dark:bg-darker transition-all hover:-translate-y-1 hover:shadow-lg">
         <div>
             <p class="text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-primary-light">
@@ -33,6 +33,7 @@
             </svg>
         </div>
     </div>
+    -->
 
     <!-- Total Kandang -->
     <div class="group flex items-center justify-between p-5 bg-white rounded-xl shadow-md dark:bg-darker transition-all hover:-translate-y-1 hover:shadow-lg">
@@ -118,8 +119,7 @@
 
 
             <!-- ========================================================= -->
-            <!-- 3️⃣ AKTIVITAS TERBARU -->
-            <!-- ========================================================= -->
+            <!-- 3️⃣ AKTIVITAS TERBARU (Dihide sementara) 
             <div class="p-4">
                 <div class="bg-white rounded-md shadow dark:bg-darker">
                     <div class="flex items-center justify-between p-4 border-b dark:border-primary">
@@ -147,6 +147,7 @@
                     </ul>
                 </div>
             </div>
+            -->
 
         </div>
     </main>

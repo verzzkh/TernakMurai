@@ -62,9 +62,11 @@
                     <div>
                         <label for="tanggal_lahir" class="text-gray-700 dark:text-gray-200">Tanggal Menetas <span
                                 class="text-red-500">*</span></label>
-                        <input type="date" id="tanggal_lahir" name="tanggal_lahir" required
+                        <input type="text" id="tanggal_lahir" name="tanggal_lahir" required
                             value="{{ old('tanggal_lahir') }}"
-                            class="block w-full px-4 py-2 mt-2 border border-gray-300 rounded-md bg-white dark:bg-darker dark:text-gray-300 dark:border-gray-600 focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-40">
+                            placeholder="dd/mm/yyyy"
+                            autocomplete="off"
+                            class="custom-datepicker block w-full px-4 py-2 mt-2 border border-gray-300 rounded-md bg-white dark:bg-darker dark:text-gray-300 dark:border-gray-600 focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-40">
                         @error('tanggal_lahir')
                             <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                         @enderror

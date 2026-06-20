@@ -107,12 +107,14 @@
                             <label for="tanggal_lahir" class="text-gray-700 dark:text-gray-200">
                                 Tanggal Menetas <span class="text-red-500">*</span>
                             </label>
-                            <input type="date" id="tanggal_lahir" name="tanggal_lahir" required
-                                class="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-300 rounded-md 
+                            <input type="text" id="tanggal_lahir" name="tanggal_lahir" required
+                                value="{{ old('tanggal_lahir') }}"
+                                placeholder="dd/mm/yyyy"
+                                autocomplete="off"
+                                class="custom-datepicker block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-300 rounded-md 
                dark:bg-darker dark:text-gray-300 dark:border-gray-600 focus:border-primary 
                dark:focus:border-primary focus:outline-none focus:ring focus:ring-primary 
-               focus:ring-opacity-40"
-                                value="{{ old('tanggal_lahir') }}">
+               focus:ring-opacity-40">
                             @error('tanggal_lahir')
                                 <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                             @enderror
@@ -293,8 +295,11 @@
                         <div class="mt-4">
                             <label for="tanggal_lahir" class="text-gray-700 dark:text-gray-200">Tanggal Lahir /
                                 Perkiraan <span class="text-red-500">*</span></label>
-                            <input type="date" id="tanggal_lahir" name="tanggal_lahir" required
-                                class="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-300 rounded-md dark:bg-darker dark:text-gray-300 dark:border-gray-600 focus:border-primary dark:focus:border-primary focus:outline-none focus:ring focus:ring-primary focus:ring-opacity-40">
+                            <input type="text" id="tanggal_lahir" name="tanggal_lahir" required
+                                value="{{ old('tanggal_lahir') }}"
+                                placeholder="dd/mm/yyyy"
+                                autocomplete="off"
+                                class="custom-datepicker block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-300 rounded-md dark:bg-darker dark:text-gray-300 dark:border-gray-600 focus:border-primary dark:focus:border-primary focus:outline-none focus:ring focus:ring-primary focus:ring-opacity-40">
                         </div>
 
                         <h2 class="text-xl font-medium border-b pb-3 mt-10 dark:border-primary-darker">Informasi Asal

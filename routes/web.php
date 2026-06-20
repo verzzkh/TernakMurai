@@ -1,13 +1,15 @@
 <?php
 
+use App\Http\Controllers\Auth\ForgotPasswordWhatsAppController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Peternak\AnakanController;
-use App\Http\Controllers\Peternak\DashboardController;
-use App\Http\Controllers\Peternak\DeteksiPenyakitController;
 use App\Http\Controllers\Peternak\AnalisaSemuaIndukanController;
+use App\Http\Controllers\Peternak\DashboardController;
 use App\Http\Controllers\Peternak\IndukanController;
 use App\Http\Controllers\Peternak\KandangController;
 use App\Http\Controllers\Peternak\KeuanganController;
+use App\Http\Controllers\Peternak\PairingController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -15,12 +17,29 @@ use Illuminate\Support\Facades\Route;
 // GUEST ROUTES (Tidak perlu login)
 // ============================================================================
 Route::middleware('guest')->group(function () {
+    // Arahkan root ke halaman login untuk pengguna yang belum login.
     Route::get('/', function () {
         return redirect()->route('login');
     });
+    // Halaman login dan proses autentikasi.
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [LoginController::class, 'login']);
-    // Registration for peternak
+
+    // Lupa password via WhatsApp (tanpa email, semi-manual oleh admin).
+    Route::get('/lupa-password', [ForgotPasswordWhatsAppController::class, 'showRequestForm'])
+        ->name('password.whatsapp.request');
+    Route::post('/lupa-password', [ForgotPasswordWhatsAppController::class, 'submitRequest'])
+        ->middleware('throttle:5,1')
+        ->name('password.whatsapp.submit');
+    Route::get('/lupa-password/konfirmasi', [ForgotPasswordWhatsAppController::class, 'showConfirmation'])
+        ->name('password.whatsapp.confirm');
+
+    // Halaman ganti password menggunakan token reset yang dikirim admin.
+    Route::get('/reset-password/{token}', [ResetPasswordController::class, 'showResetForm'])
+        ->name('password.reset');
+    Route::post('/reset-password', [ResetPasswordController::class, 'update'])
+        ->name('password.update');
+    // Registrasi akun peternak.
     Route::get('/register', [\App\Http\Controllers\Auth\RegisterController::class, 'showRegistrationForm'])->name('register');
     Route::post('/register', [\App\Http\Controllers\Auth\RegisterController::class, 'register']);
 });
@@ -29,6 +48,7 @@ Route::middleware('guest')->group(function () {
 // UNIFIED DASHBOARD ROUTE (Redirects based on user role)
 // ============================================================================
 Route::middleware('auth')->get('/dashboard', function () {
+    // Redirect dashboard berdasarkan role user (admin/peternak).
     $role = Auth::user()->role;
 
     return match ($role) {
@@ -49,7 +69,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Users management skeleton
     Route::get('/users', [\App\Http\Controllers\Admin\UserController::class, 'index'])->name('users.index');
 
-    // Deteksi disease history
+    // Riwayat evaluasi (fitur ini dipakai untuk melihat riwayat hasil evaluasi breeding).
     Route::get('/deteksi', [\App\Http\Controllers\Admin\DeteksiController::class, 'index'])->name('deteksi.index');
     Route::get('/deteksi/{id}', [\App\Http\Controllers\Admin\DeteksiController::class, 'show'])->name('deteksi.show');
 
@@ -58,6 +78,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Pengaturan
     Route::get('/settings', [\App\Http\Controllers\Admin\SettingsController::class, 'index'])->name('settings.index');
     Route::post('/settings', [\App\Http\Controllers\Admin\SettingsController::class, 'update'])->name('settings.update');
+
+    // Reset password manual via admin (generate link untuk dikirim lewat WhatsApp).
+    Route::get('/reset-password', [\App\Http\Controllers\Admin\AdminResetPasswordController::class, 'index'])
+        ->name('reset-password.index');
+    Route::post('/reset-password/{user}', [\App\Http\Controllers\Admin\AdminResetPasswordController::class, 'generate'])
+        ->name('reset-password.generate');
 
     // // User Management
     // Route::get('/users', function () {
@@ -86,17 +112,18 @@ Route::middleware(['auth', 'peternak'])->prefix('peternak')->name('peternak.')->
     Route::get('/profile', [\App\Http\Controllers\Peternak\ProfileController::class, 'show'])->name('profile.show');
     Route::put('/profile', [\App\Http\Controllers\Peternak\ProfileController::class, 'update'])->name('profile.update');
 
-  // ❗ ROUTE UPDATE FOTO INDUKAN
+    // Update foto indukan (khusus update file foto tanpa ubah data lainnya).
     Route::put('/indukan/{indukan}/foto',
         [IndukanController::class, 'updateFoto']
     )->name('indukan.update-foto');
 
-    Route::get('/indukan/analisa-semua', 
-            [AnalisaSemuaIndukanController::class, 'index']
-        )->name('indukan.analisaSemua');
+    Route::get('/indukan/analisa-semua',
+        [AnalisaSemuaIndukanController::class, 'index']
+    )->name('indukan.analisaSemua');
 
     // Indukan Management
     Route::prefix('indukan')->name('indukan.')->group(function () {
+        // CRUD indukan (jantan/betina) milik peternak.
         Route::get('/', [IndukanController::class, 'index'])->name('index');
         Route::get('/create', [IndukanController::class, 'create'])->name('create');
         Route::post('/', [IndukanController::class, 'store'])->name('store');
@@ -104,39 +131,43 @@ Route::middleware(['auth', 'peternak'])->prefix('peternak')->name('peternak.')->
         Route::get('/{indukan}/edit', [IndukanController::class, 'edit'])->name('edit');
         Route::put('/{indukan}', [IndukanController::class, 'update'])->name('update');
         Route::delete('/{indukan}', [IndukanController::class, 'destroy'])->name('destroy');
-        
-        
+
     });
-  
 
+    Route::prefix('kandang')->name('kandang.')->group(function () {
+        // CRUD kandang + alur tambah anakan dari kandang.
+        Route::get('/', [KandangController::class, 'index'])->name('index');
+        Route::get('/create', [KandangController::class, 'create'])->name('create');
+        Route::post('/', [KandangController::class, 'store'])->name('store');
+        Route::get('/{kandang}/create-anak', [KandangController::class, 'createAnak'])->name('createAnak');
+        Route::post('/{kandang}/anakan', [KandangController::class, 'storeAnakan'])->name('anakan.store');
+        Route::get('/{kandang}', [KandangController::class, 'show'])->name('show');
+        // ✅ BARU – FORM GAGAL
+        Route::get('/{kandang}/form-gagal',
+            [KandangController::class, 'formGagal']
+        )->name('formGagal');
 
-  Route::prefix('kandang')->name('kandang.')->group(function () {
-    Route::get('/', [KandangController::class, 'index'])->name('index');
-    Route::get('/create', [KandangController::class, 'create'])->name('create');
-    Route::post('/', [KandangController::class, 'store'])->name('store');
-    Route::get('/{kandang}/create-anak', [KandangController::class, 'createAnak'])->name('createAnak');
-    Route::post('/{kandang}/anakan', [KandangController::class, 'storeAnakan'])->name('anakan.store');
-    Route::get('/{kandang}', [KandangController::class, 'show'])->name('show');
-       // ✅ BARU – FORM GAGAL
-    Route::get('/{kandang}/form-gagal',
-        [KandangController::class, 'formGagal']
-    )->name('formGagal');
+        // ✅ BARU – STORE GAGAL
+        Route::post('/{kandang}/store-gagal',
+            [KandangController::class, 'storeGagal']
+        )->name('storeGagal');
+        Route::put('/{kandang}/activate-pairing', [KandangController::class, 'activatePairing'])->name('activatePairing');
+        Route::get('/{kandang}/edit', [KandangController::class, 'edit'])->name('edit');
+        Route::put('/{kandang}', [KandangController::class, 'update'])->name('update');
+        Route::delete('/{kandang}', [KandangController::class, 'destroy'])->name('destroy');
+    });
 
-    // ✅ BARU – STORE GAGAL
-    Route::post('/{kandang}/store-gagal',
-        [KandangController::class, 'storeGagal']
-    )->name('storeGagal');
-    Route::get('/{kandang}/edit', [KandangController::class, 'edit'])->name('edit');
-    Route::put('/{kandang}', [KandangController::class, 'update'])->name('update');
-    Route::delete('/{kandang}', [KandangController::class, 'destroy'])->name('destroy');
-});
-
+    Route::prefix('pairings')->name('pairings.')->group(function () {
+        Route::get('/', [PairingController::class, 'index'])->name('index');
+        Route::put('/{pairing}/status', [PairingController::class, 'updateStatus'])->name('updateStatus');
+    });
 
     // Anakan Management
     Route::prefix('anakan')->name('anakan.')->group(function () {
+        // CRUD anakan + update status/penjualan.
         Route::get('/', [AnakanController::class, 'index'])->name('index');
         Route::get('/create', [AnakanController::class, 'create'])->name('create');
-       Route::post('/', [AnakanController::class, 'store'])->name('store');
+        Route::post('/', [AnakanController::class, 'store'])->name('store');
         Route::get('/{id}', [AnakanController::class, 'show'])->name('show');
         Route::put('/{id}', [AnakanController::class, 'update'])->name('update');
         Route::put('/{id}/status', [AnakanController::class, 'updateStatus'])->name('updateStatus');
@@ -144,94 +175,72 @@ Route::middleware(['auth', 'peternak'])->prefix('peternak')->name('peternak.')->
         Route::delete('/{id}', [AnakanController::class, 'destroy'])->name('destroy');
     });
 
+    // Analisa Breeding (Kecocokan Indukan)
+    Route::prefix('analisa-breeding')->name('analisaBreeding.')->group(function () {
 
-// Analisa Breeding (Kecocokan Indukan)
-Route::prefix('analisa-breeding')->name('analisaBreeding.')->group(function () {
+        // Form
+        Route::get('/form',
+            [\App\Http\Controllers\Peternak\AnalisaBreedingController::class, 'form']
+        )->name('form');
 
-    // Form
-    Route::get('/form', 
-        [\App\Http\Controllers\Peternak\AnalisaBreedingController::class, 'form']
-    )->name('form');
+        // Jalankan analisa AI untuk evaluasi pairing indukan.
+        Route::post('/analisa',
+            [\App\Http\Controllers\Peternak\AnalisaBreedingController::class, 'analisa']
+        )->name('analisa');
 
-    Route::post('/analisa', 
-        [\App\Http\Controllers\Peternak\AnalisaBreedingController::class, 'analisa']
-    )->name('analisa');
+        // halaman hasil khusus (GET)
+        Route::get('/hasil',
+            [\App\Http\Controllers\Peternak\AnalisaBreedingController::class, 'hasil']
+        )->name('hasil');
 
-    // halaman hasil khusus (GET)
-Route::get('/hasil', 
-    [\App\Http\Controllers\Peternak\AnalisaBreedingController::class, 'hasil']
-)->name('hasil');
+        // ➤ Simpan hasil AI ke database (POST dari tombol Simpan)
+        Route::post('/save',
+            [\App\Http\Controllers\Peternak\AnalisaBreedingController::class, 'save']
+        )->name('save');
 
-     // ➤ Simpan hasil AI ke database (POST dari tombol Simpan)
-    Route::post('/save', 
-        [\App\Http\Controllers\Peternak\AnalisaBreedingController::class, 'save']
-    )->name('save');
+        // ➤ Riwayat semua analisa yang pernah disimpan
+        Route::get('/riwayat',
+            [\App\Http\Controllers\Peternak\AnalisaBreedingController::class, 'riwayat']
+        )->name('riwayat');
+        // ➤ Simpan tindak lanjut peternak (lanjut / pantau / stop)
+        Route::post('/{id}/tindak-lanjut',
+            [\App\Http\Controllers\Peternak\AnalisaBreedingController::class, 'updateTindakLanjut']
+        )->name('updateTindakLanjut');
 
-    // ➤ Riwayat semua analisa yang pernah disimpan
-    Route::get('/riwayat', 
-        [\App\Http\Controllers\Peternak\AnalisaBreedingController::class, 'riwayat']
-    )->name('riwayat');
-// ➤ Simpan tindak lanjut peternak (lanjut / pantau / stop)
-Route::post('/{id}/tindak-lanjut',
-    [\App\Http\Controllers\Peternak\AnalisaBreedingController::class, 'updateTindakLanjut']
-)->name('updateTindakLanjut');
+        // ➤ Detail 1 analisa + halaman untuk memberikan catatan lapangan
+        Route::get('/detail/{id}',
+            [\App\Http\Controllers\Peternak\AnalisaBreedingController::class, 'detail']
+        )->name('detail');
 
-    // ➤ Detail 1 analisa + halaman untuk memberikan catatan lapangan
-    Route::get('/detail/{id}', 
-        [\App\Http\Controllers\Peternak\AnalisaBreedingController::class, 'detail']
-    )->name('detail');
+        // ➤ Simpan catatan setelah breeding (UPDATE)
+        Route::post('/update-catatan/{id}',
+            [\App\Http\Controllers\Peternak\AnalisaBreedingController::class, 'updateCatatan']
+        )->name('updateCatatan');
 
-    // ➤ Simpan catatan setelah breeding (UPDATE)
-Route::post('/update-catatan/{id}',
-    [\App\Http\Controllers\Peternak\AnalisaBreedingController::class,'updateCatatan']
-)->name('updateCatatan');
-
-Route::delete('/hapus/{id}',
-    [\App\Http\Controllers\Peternak\AnalisaBreedingController::class, 'hapus']
-)->name('hapus');
-
-
-});
-
-
-
- // Keuangan Management
-Route::prefix('keuangan')->name('keuangan.')->group(function () {
-    Route::get('/', [KeuanganController::class, 'index'])->name('index');
-    Route::get('/create', [KeuanganController::class, 'create'])->name('create');
-    Route::post('/', [KeuanganController::class, 'store'])->name('store');
- Route::put('/{transaksi}', [KeuanganController::class, 'update'])->name('update');
-Route::get('/{transaksi}/edit', [KeuanganController::class, 'edit'])->name('edit');
-  Route::delete('/{transaksi}', [KeuanganController::class, 'destroy'])->name('destroy');
-
-});
-
-
-    // Deteksi Penyakit
- 
-    Route::prefix('deteksi-penyakit')->name('deteksi-penyakit.')->group(function () {
-
-        Route::get('/', 
-            [DeteksiPenyakitController::class, 'index'])
-            ->name('index');
-
-        Route::post('/process', 
-            [DeteksiPenyakitController::class, 'process'])
-            ->name('process');
-
-        Route::get('/hasil/{id}', 
-            [DeteksiPenyakitController::class, 'hasil'])
-            ->name('hasil');
-
-            Route::get('/pdf/{id}', [DeteksiPenyakitController::class, 'pdf'])
-    ->name('pdf');
+        Route::delete('/hapus/{id}',
+            [\App\Http\Controllers\Peternak\AnalisaBreedingController::class, 'hapus']
+        )->name('hapus');
 
     });
+
+    // Keuangan Management
+    Route::prefix('keuangan')->name('keuangan.')->group(function () {
+        // CRUD transaksi keuangan peternak (pemasukan/pengeluaran).
+        Route::get('/', [KeuanganController::class, 'index'])->name('index');
+        Route::get('/create', [KeuanganController::class, 'create'])->name('create');
+        Route::post('/', [KeuanganController::class, 'store'])->name('store');
+        Route::put('/{transaksi}', [KeuanganController::class, 'update'])->name('update');
+        Route::get('/{transaksi}/edit', [KeuanganController::class, 'edit'])->name('edit');
+        Route::delete('/{transaksi}', [KeuanganController::class, 'destroy'])->name('destroy');
+
+    });
+
 });
 
 // ============================================================================
 // AUTHENTICATED ROUTES (Semua user yang sudah login)
 // ============================================================================
 Route::middleware('auth')->group(function () {
+    // Logout untuk semua role yang sudah terautentikasi.
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 });

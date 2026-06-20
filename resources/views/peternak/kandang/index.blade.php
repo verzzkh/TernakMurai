@@ -134,8 +134,6 @@
                             Bertelur</option>
                         <option value="mengeram" {{ ($filters['status'] ?? '') === 'mengeram' ? 'selected' : '' }}>
                             Mengeram</option>
-                        <option value="menetas" {{ ($filters['status'] ?? '') === 'menetas' ? 'selected' : '' }}>
-                            Menetas</option>
                     </select>
                 </div>
 

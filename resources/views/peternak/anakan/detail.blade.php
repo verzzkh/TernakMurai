@@ -140,6 +140,7 @@
                             </span>
                         </div>
 
+                        <!-- (Dihide sementara)
                         <div class="flex items-center justify-between">
                             <span class="text-gray-700 dark:text-light font-medium">Harga:</span>
                             <div class="flex items-center">
@@ -147,6 +148,7 @@
                                     {{ number_format($anakan->harga ?? 0, 0, ',', '.') }}</span>
                             </div>
                         </div>
+                        -->
 
                         <div>
 
@@ -344,12 +346,14 @@
                                     </select>
                                 </div>
 
+                                <!-- (Dihide sementara)
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-light">Harga
                                         Baru</label>
                                     <input type="text" id="newPriceInput" value="{{ $anakan->harga ?? 0 }}"
                                         class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md dark:bg-darker dark:border-primary">
                                 </div>
+                                -->
 
                                 <button id="updateStatusBtn"
                                     class="w-full px-4 py-2 text-sm font-medium text-white 
@@ -363,7 +367,7 @@
                         </div>
                     </div>
 
-                    <!-- Panel Penjualan -->
+                    <!-- Panel Penjualan (Dihide sementara) 
                     @if ($anakan->status_penjualan === 'belum_dijual')
                         <div class="bg-white dark:bg-darker rounded-md shadow-md p-4">
                             <h2 class="text-xl font-semibold mb-4 text-gray-700 dark:text-light">Penjualan</h2>
@@ -386,6 +390,8 @@
                                             Penjualan</label>
                                         <input type="date" name="tanggal_jual" id="saleDate"
                                             value="{{ now()->format('Y-m-d') }}"
+                                            max="{{ date('Y-m-d') }}"
+                                            lang="id"
                                             class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md dark:bg-darker dark:border-primary"
                                             required>
                                     </div>
@@ -432,6 +438,7 @@
                             </div>
                         </div>
                     @endif
+                    -->
                 </div>
             </div>
         </div>
@@ -758,18 +765,12 @@
 
             updateStatusBtn?.addEventListener('click', async function() {
                 const newStatus = document.getElementById('newStatusSelect').value;
-                let newPrice = document.getElementById('newPriceInput').value;
-
-                // Hapus titik sebelum dikirim ke backend
-                newPrice = newPrice.replace(/\./g, "");
+                
+                // Harga diset 0 karena fitur keuangan disembunyikan sementara
+                let newPrice = "0";
 
                 if (!newStatus) {
                     showToast('Silakan pilih status pertumbuhan', false);
-                    return;
-                }
-
-                if (!newPrice) {
-                    showToast('Masukkan harga terlebih dahulu', false);
                     return;
                 }
 

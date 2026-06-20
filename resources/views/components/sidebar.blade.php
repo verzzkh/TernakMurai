@@ -160,7 +160,7 @@
         </a>
 
 
-        <!-- keuangan link -->
+        <!-- keuangan link (Dihide sementara) 
         <a href="{{ route('peternak.keuangan.index') }}"
             class="flex items-center p-2 rounded-md transition-colors
 @if (request()->routeIs('peternak.keuangan.*'))
@@ -169,7 +169,6 @@
     text-slate-200 hover:bg-slate-600 hover:text-white
 @endif"
 >
-            <!-- Icon -->
             <span aria-hidden="true">
                 <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
@@ -178,10 +177,9 @@
                    M16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
                 </svg>
             </span>
-
-            <!-- Label -->
             <span class="ml-2 text-sm">Pencatatan Keuangan</span>
         </a>
+        -->
 
 
         <!-- Divider -->

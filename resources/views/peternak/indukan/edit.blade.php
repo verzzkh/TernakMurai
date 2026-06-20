@@ -75,9 +75,10 @@
                               <label for="tanggal_lahir" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                                   Tanggal Lahir
                               </label>
-                              <input type="date" name="tanggal_lahir" id="tanggal_lahir" value="{{ old('tanggal_lahir', $indukan->tanggal_lahir?->format('Y-m-d')) }}"
-                                     max="{{ date('Y-m-d') }}"
-                                     class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary dark:bg-darker dark:border-primary-darker dark:text-white sm:text-sm @error('tanggal_lahir') border-red-300 @enderror">
+                              <input type="text" name="tanggal_lahir" id="tanggal_lahir" value="{{ old('tanggal_lahir', $indukan->tanggal_lahir?->format('Y-m-d')) }}"
+                                     placeholder="dd/mm/yyyy"
+                                     autocomplete="off"
+                                     class="custom-datepicker mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary dark:bg-darker dark:border-primary-darker dark:text-white sm:text-sm @error('tanggal_lahir') border-red-300 @enderror">
                               @error('tanggal_lahir')
                                   <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                               @enderror

@@ -16,6 +16,10 @@ use Illuminate\Support\Str;
 
 class AnakanService
 {
+    public function __construct(
+        private PairingService $pairingService
+    ) {}
+
     /**
      * Generate unique ring number for peternak
      */
@@ -105,9 +109,16 @@ class AnakanService
         ]);
 
         $inserted[] = $anakan;
-    }
+        }
 
-    return $inserted;
+        $this->pairingService->markHistoricalChangeByPair(
+            $peternakId,
+            $data['indukan_jantan_id'] ?? null,
+            $data['indukan_betina_id'] ?? null,
+            $tanggalLahir
+        );
+
+        return $inserted;
 }
 
 
@@ -213,6 +224,10 @@ class AnakanService
         }
 
         $anakan->save();
+
+        if (array_key_exists('deskripsi_karakteristik', $toUpdate)) {
+            $this->pairingService->markHistoricalChangeFromAnakan($anakan);
+        }
 
         Log::info('[AnakanService] Anakan updated', [
             'id' => $anakan->id,

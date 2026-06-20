@@ -1,14 +1,10 @@
 <x-layout>
     <main>
-        <!-- Content header -->
+        <!-- Header halaman: judul + tombol aksi utama -->
         <div class="flex items-center justify-between px-4 py-4 border-b lg:py-6 dark:border-primary-darker">
             <h1 class="text-2xl font-semibold">Manajemen Anakan</h1>
             <div class="flex items-center space-x-4">
-                {{-- @if (!$peternak->isPro())
-                    <div class="text-sm text-text-secondary dark:text-gray-400">
-                        Anakan: {{ $peternak->getActiveAnakanCount() }}/20
-                    </div>
-                @endif --}}
+                {{-- Tombol untuk menuju form tambah anakan --}}
                 <a href="{{ route('peternak.anakan.create') }}"
                     class="px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 
           rounded-lg
@@ -52,9 +48,9 @@
 
 
 
-        <!-- Content -->
+        <!-- Konten utama halaman -->
         <div class="mt-2">
-            <!-- Search and filter section -->
+            <!-- Form pencarian dan filter daftar anakan -->
             <form method="GET"
                 class="flex flex-col md:flex-row items-center justify-between p-4 space-y-3 md:space-y-0">
                 <div class="w-full md:w-1/3">
@@ -72,6 +68,7 @@
                     </div>
                 </div>
                 <div class="w-full flex flex-col gap-3 md:flex-row md:w-auto md:space-x-3">
+                    {{-- Filter jenis kelamin --}}
                     <select name="jenis_kelamin"
                         class="w-full md:w-auto px-4 py-2 rounded-md border dark:border-primary-darker dark:bg-darker focus:outline-none focus:ring focus:ring-primary-light">
                         <option value="">Semua Gender</option>
@@ -83,6 +80,7 @@
                             {{ request('jenis_kelamin') == 'tidak_diketahui' ? 'selected' : '' }}>Belum Diketahui
                         </option>
                     </select>
+                    {{-- Filter status pertumbuhan --}}
                     <select name="status_pertumbuhan"
                         class="w-full md:w-auto px-4 py-2 rounded-md border dark:border-primary-darker dark:bg-darker focus:outline-none focus:ring focus:ring-primary-light">
                         <option value="">Semua Status</option>
@@ -93,6 +91,7 @@
                         <option value="lomba" {{ request('status_pertumbuhan') == 'lomba' ? 'selected' : '' }}>Lomba
                         </option>
                     </select>
+                    {{-- Filter status penjualan --}}
                     <select name="status_penjualan"
                         class="w-full md:w-auto px-4 py-2 rounded-md border dark:border-primary-darker dark:bg-darker focus:outline-none focus:ring focus:ring-primary-light">
                         <option value="">Semua</option>
@@ -109,12 +108,14 @@
                 </div>
             </form>
 
-            <!-- Anakan cards grid -->
+            <!-- Grid kartu anakan (hasil list) -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4">
                 @forelse($anakans as $anakan)
+                    {{-- Kartu anakan: klik untuk menuju detail --}}
                     <div class="bg-white rounded-md shadow-md overflow-hidden dark:bg-darker cursor-pointer hover:shadow-lg transition duration-300"
                         onclick="window.location.href = '{{ route('peternak.anakan.show', $anakan->id) }}'">
                         <div class="h-40 bg-gray-200 dark:bg-gray-700 relative overflow-hidden">
+                            {{-- Foto anakan bila tersedia, jika tidak tampilkan placeholder icon --}}
                             @if ($anakan->foto_path)
                                 <img src="{{ Storage::url($anakan->foto_path) }}" alt="Anakan"
                                     class="w-full h-full object-cover">
@@ -133,6 +134,7 @@
                                 class="absolute top-2 left-2 
         {{ $anakan->jenis_kelamin == 'jantan' ? 'bg-blue-600' : 'bg-pink-600' }} 
         text-white px-2 py-1 rounded-md text-xs">
+                                {{-- Badge jenis kelamin --}}
                                 {{ str_replace('_', ' ', ucfirst($anakan->jenis_kelamin)) }}
 
                             </div>
@@ -142,10 +144,12 @@
                                 class="absolute top-2 right-2 
         {{ $anakan->status_pertumbuhan == 'trotol' ? 'bg-blue-500' : ($anakan->status_pertumbuhan == 'pastol' ? 'bg-purple-500' : 'bg-green-500') }} 
         text-white px-2 py-1 rounded-md text-xs">
+                                {{-- Badge status pertumbuhan --}}
                                 {{ ucfirst($anakan->status_pertumbuhan) }}
                             </div>
 
                             @if ($anakan->status_penjualan === 'terjual')
+                                {{-- Overlay status jika anakan sudah terjual --}}
                                 <div
                                     class="absolute bottom-0 left-0 right-0 bg-gray-800 bg-opacity-75 text-white text-center py-1 text-sm">
                                     Terjual
@@ -154,6 +158,7 @@
                         </div>
 
                         <div class="p-4">
+                            {{-- Identitas utama anakan --}}
                             <h3 class="text-lg font-semibold">{{ $anakan->nomor_ring }}</h3>
 
                             @if ($anakan->nama)
@@ -162,6 +167,7 @@
                                 </p>
                             @endif
 
+                            {{-- Ringkasan umur dan harga --}}
                             <div class="flex justify-between mt-2">
                                 <p class="text-text-secondary dark:text-gray-300">
                                     <span class="font-medium">Umur:</span> {{ $anakan->age['formatted'] }}
@@ -172,11 +178,11 @@
                                 </p>
                             </div>
 
-
-
+                            {{-- Area tombol aksi per kartu --}}
                             <div class="mt-3 flex justify-between">
                                 @if ($anakan->status_penjualan === 'belum_dijual')
                                     <div class="flex space-x-2">
+                                        {{-- Tombol edit harga menggunakan AJAX (Dihide sementara) 
                                         <button
                                             class="px-2 py-1 text-xs font-medium
            text-indigo-700 bg-indigo-300
@@ -187,7 +193,9 @@
                                             onclick="event.stopPropagation(); editPrice({{ $anakan->id }})">
                                             Edit Harga
                                         </button>
+                                        --}}
 
+                                        {{-- Tombol update status pertumbuhan + harga menggunakan AJAX --}}
                                         <button
                                             class="px-2 py-1 text-xs bg-primary-100 text-primary-dark rounded hover:bg-primary-200 dark:bg-primary dark:text-primary-100 dark:hover:bg-primary-dark"
                                             onclick="event.stopPropagation(); updateStatus({{ $anakan->id }})">
@@ -195,12 +203,14 @@
                                         </button>
                                     </div>
                                 @else
+                                    {{-- Informasi tanggal jual jika sudah terjual --}}
                                     <span class="text-xs text-text-tertiary dark:text-gray-400">
                                         Terjual pada
                                         {{ $anakan->tanggal_jual ? $anakan->tanggal_jual->format('d/m/Y') : '' }}
                                     </span>
                                 @endif
                                 {{-- 🔥 BTN DELETE BARU --}}
+                                {{-- Form hapus anakan (submit dipicu lewat konfirmasi SweetAlert) --}}
                                 <form id="deleteAnakanForm-{{ $anakan->id }}"
                                     action="{{ route('peternak.anakan.destroy', $anakan->id) }}" method="POST">
                                     @csrf
@@ -216,6 +226,7 @@
                         </div>
                     </div>
                 @empty
+                    {{-- State kosong: tidak ada data anakan --}}
                     <div class="col-span-full text-center py-12">
                         <svg class="mx-auto h-12 w-12 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none"
                             viewBox="0 0 24 24" stroke="currentColor">
@@ -241,6 +252,7 @@
             <!-- Pagination -->
             @if ($anakans->hasPages())
                 <div class="px-4 py-3">
+                    {{-- Pagination dengan mempertahankan query filter --}}
                     {{ $anakans->appends(request()->query())->links() }}
 
                 </div>
@@ -253,6 +265,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
+        // Konfirmasi hapus anakan menggunakan modal SweetAlert sebelum submit form delete.
         function confirmDeleteAnakan(id) {
             Swal.fire({
                 title: "Hapus anakan?",
@@ -269,7 +282,7 @@
         }
 
 
-        // Edit price function
+        // Update harga anakan via request AJAX ke endpoint update.
         function editPrice(anakanId) {
             const newPrice = prompt('Masukkan harga baru:');
             if (newPrice && !isNaN(newPrice)) {
@@ -300,7 +313,7 @@
         }
 
 
-        // Update status function
+        // Update status pertumbuhan + harga via request AJAX ke endpoint updateStatus.
         function updateStatus(anakanId) {
             const newStatus = prompt('Pilih status baru (trotol/pastol/lomba):');
             const newPrice = prompt('Masukkan harga baru:');
@@ -334,7 +347,7 @@
             }
         }
 
-        // Sell anakan function
+        // Proses penjualan anakan via request AJAX ke endpoint sell.
         function sellAnakan(anakanId) {
             const hargaJual = prompt('Masukkan harga jual:');
             const tanggalJual = prompt('Masukkan tanggal jual (YYYY-MM-DD):');

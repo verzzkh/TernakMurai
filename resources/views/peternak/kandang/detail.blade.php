@@ -93,6 +93,17 @@
                                 <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ $kandang->anakans->count() }}
                                     anakan</dd>
                             </div>
+
+                            @if ($currentPairing)
+                                <div>
+                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Status Pairing</dt>
+                                    <dd class="mt-1">
+                                        <span class="px-2 py-1 text-xs font-medium rounded-full {{ $currentPairing->status === 'aktif' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-slate-200 text-slate-800 dark:bg-slate-800 dark:text-slate-200' }}">
+                                            {{ ucfirst($currentPairing->status) }}
+                                        </span>
+                                    </dd>
+                                </div>
+                            @endif
                         </div>
 
                         @if ($kandang->deskripsi_kandang)
@@ -125,117 +136,97 @@
 
                         @php
                             // Ambil semua perkawinan pasangan aktif, urut dari trip pertama ke terakhir
-                            $perkawinanAktif = $kandang
-                                ->perkawinans()
-                                ->where('indukan_jantan_id', $kandang->indukan_jantan_id)
+                            $perkawinanAktif = \App\Models\Perkawinan::where('indukan_jantan_id', $kandang->indukan_jantan_id)
                                 ->where('indukan_betina_id', $kandang->indukan_betina_id)
+                                ->with('anakans')
                                 ->orderBy('tanggal_kawin')
                                 ->get()
                                 ->values();
-
-                            // Ambil semua anakan pasangan aktif beserta relasinya
-                            $anakansAktif = $kandang
-                                ->anakans()
-                                ->whereHas('perkawinan', function ($q) use ($kandang) {
-                                    $q->where('indukan_jantan_id', $kandang->indukan_jantan_id)->where(
-                                        'indukan_betina_id',
-                                        $kandang->indukan_betina_id,
-                                    );
-                                })
-                                ->with('perkawinan')
-                                ->get();
-
-                            // Urutkan anakan berdasarkan nomor trip (bukan id atau tanggal lahir)
-                            $anakansAktif = $anakansAktif
-                                ->sortBy(function ($anakan) use ($perkawinanAktif) {
-                                    $tripIndex = $perkawinanAktif->search(fn($p) => $p->id === $anakan->perkawinan_id);
-                                    return $tripIndex !== false ? $tripIndex : 9999; // trip tak dikenal taruh paling bawah
-                                })
-                                ->values();
                         @endphp
 
-
-                        @if ($anakansAktif->count() > 0)
-                            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                                @foreach ($anakansAktif as $anakan)
+                        @if ($perkawinanAktif->count() > 0)
+                            <div class="space-y-4 trip-pagination-container">
+                                @foreach ($perkawinanAktif as $index => $perkawinan)
                                     @php
-                                        // cari trip keberapa anakan ini termasuk
-                                        $tripIndex =
-                                            $perkawinanAktif->search(function ($p) use ($anakan) {
-                                                return $p->id === $anakan->perkawinan_id;
-                                            }) + 1; // +1 biar mulai dari 1, bukan 0
+                                        $anakans = $perkawinan->anakans;
+                                        $countTotal = $anakans->count();
+                                        $countJantan = $anakans->where('jenis_kelamin', 'jantan')->count();
+                                        $countBetina = $anakans->where('jenis_kelamin', 'betina')->count();
                                     @endphp
 
-                                    <div
-                                        class="border border-gray-200 dark:border-primary-darker rounded-lg p-4 hover:shadow-md transition">
-                                        <div class="flex items-center justify-between mb-1">
-                                            <h3 class="text-sm font-semibold text-gray-900 dark:text-white">
-                                                🪶 {{ $anakan->nomor_ring ?? '(tanpa ring)' }}
-                                            </h3>
-                                            <span
-                                                class="px-2 py-1 text-xs font-medium rounded-full
-                            {{ $anakan->jenis_kelamin === 'jantan'
-                                ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
-                                : ($anakan->jenis_kelamin === 'betina'
-                                    ? 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200'
-                                    : 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200') }}">
-                                                {{ ucfirst(str_replace('_', ' ', $anakan->jenis_kelamin)) }}
+                                    <div class="relative pl-4 border-l-4 border-primary/70 trip-item">
+
+                                        <div class="text-sm font-semibold flex flex-wrap items-center gap-1">
+                                            <span class="inline-block w-2 h-2 bg-primary rounded-full mr-2"></span>
+
+                                            Trip {{ $index + 1 }}
+                                            @if ($perkawinan->status === 'gagal')
+                                                <span class="ml-2 px-2 py-0.5 text-xs font-semibold bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200 rounded-full">
+                                                    GAGAL
+                                                </span>
+                                            @endif
+
+                                            <span class="font-normal text-gray-600 dark:text-gray-300">
+                                                — {{ $perkawinan->tanggal_kawin?->format('d M Y') ?? '-' }}
                                             </span>
+                                            , total <span class="text-primary font-semibold">{{ $countTotal }}</span> anakan
+                                            ({{ $countJantan }} jantan, {{ $countBetina }} betina)
+                                            </span>
+
+                                            @if ($countTotal > 0)
+                                                <button type="button" onclick="toggleTrip('kandang-trip-{{ $perkawinan->id }}')"
+                                                    class="text-xs text-primary hover:text-primary-dark ml-2">
+                                                    👁️ Lihat Anak
+                                                </button>
+                                            @endif
                                         </div>
 
-                                        <!-- Info Trip -->
-                                        @if ($anakan->perkawinan)
-                                            <p class="text-xs text-gray-600 dark:text-gray-300">
-                                                Trip ke-{{ $tripIndex }} —
-                                                {{ $anakan->perkawinan?->tanggal_kawin?->format('d M Y') ?? '-' }}
-                                            </p>
+                                        @if ($perkawinan->status === 'gagal' && !empty($perkawinan->catatan))
+                                            <div class="mt-1 text-xs text-red-600 dark:text-red-400 italic">
+                                                *Catatan kegagalan: {{ $perkawinan->catatan }}
+                                            </div>
                                         @endif
 
-                                        <!-- Info tanggal lahir -->
-                                        @if ($anakan->tanggal_lahir)
-                                            <p class="text-xs text-gray-500 dark:text-gray-400">
-                                                {{ $anakan->tanggal_lahir->format('d M Y') }}
-                                                ({{ $anakan->age['formatted'] ?? '-' }})
-                                            </p>
-                                        @endif
+                                        {{-- LIST ANAK PER TRIP --}}
+                                        <div id="kandang-trip-{{ $perkawinan->id }}"
+                                            class="hidden mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
 
-                                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">
-                                            Status: {{ ucfirst(str_replace('_', ' ', $anakan->status_pertumbuhan)) }}
-                                        </p>
+                                            @foreach ($anakans as $child)
+                                                <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-3 bg-gray-50 dark:bg-gray-800 hover:shadow transition">
+                                                    <div class="flex justify-between items-center mb-1">
+                                                        <h4 class="text-xs font-semibold">
+                                                            {{ $child->nomor_ring ?? '(tanpa ring)' }}
+                                                        </h4>
+                                                        <span class="px-2 py-0.5 text-xs rounded-full {{ $child->jenis_kelamin === 'jantan' ? 'bg-blue-100 text-blue-800' : ($child->jenis_kelamin === 'betina' ? 'bg-pink-100 text-pink-800' : 'bg-gray-100 text-gray-800') }}">
+                                                            {{ ucfirst(str_replace('_', ' ', $child->jenis_kelamin)) }}
+                                                        </span>
+                                                    </div>
 
-                                        <div class="mt-3 flex justify-between items-center">
-                                            <a href="{{ route('peternak.anakan.show', $anakan) }}"
-                                                class="text-xs text-primary hover:text-primary-dark flex items-center gap-1">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
-                                                    viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                                </svg>
-                                                Lihat Detail
-                                            </a>
-                                        </div>
+                                                    @if ($child->tanggal_lahir)
+                                                        <p class="text-xs text-gray-500">
+                                                            {{ $child->tanggal_lahir->format('d M Y') }}
+                                                            ({{ $child->age['formatted'] ?? '-' }})
+                                                        </p>
+                                                    @endif
+                                                    
+                                                    @if ($child->status_pertumbuhan)
+                                                        <p class="text-xs text-gray-500 mb-2">
+                                                            Status: {{ ucfirst(str_replace('_', ' ', $child->status_pertumbuhan)) }}
+                                                        </p>
+                                                    @endif
 
-                                        <!-- Anak lain di trip yang sama -->
-                                        <div id="trip-children-{{ $anakan->perkawinan_id }}"
-                                            class="hidden mt-3 border-t pt-2 space-y-1">
-                                            @forelse ($anakan->perkawinan->anakans ?? [] as $child)
-                                                <a href="{{ route('peternak.anakan.show', $child) }}"
-                                                    class="block text-xs text-gray-800 dark:text-gray-300 hover:text-primary">
-                                                    • {{ $child->nomor_ring ?? '(tanpa ring)' }}
-                                                </a>
-                                            @empty
-                                                <p class="text-xs text-gray-500 italic">Belum ada anakan di trip ini.
-                                                </p>
-                                            @endforelse
+                                                    <a href="{{ route('peternak.anakan.show', $child) }}" class="text-xs text-primary hover:text-primary-dark">
+                                                        🔍 Detail
+                                                    </a>
+                                                </div>
+                                            @endforeach
+
                                         </div>
                                     </div>
                                 @endforeach
                             </div>
                         @else
-                            <!-- Jika tidak ada anak -->
+                            <!-- Jika tidak ada anak atau trip -->
                             <div class="text-center py-10">
                                 <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-600"
                                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -243,9 +234,9 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                                 </svg>
-                                <h3 class="mt-3 text-sm font-medium text-gray-900 dark:text-white">Belum ada anakan</h3>
+                                <h3 class="mt-3 text-sm font-medium text-gray-900 dark:text-white">Belum ada riwayat trip</h3>
                                 <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                    Belum ada anakan dari pasangan aktif di kandang ini.
+                                    Belum ada riwayat trip atau anakan dari pasangan aktif di kandang ini.
                                 </p>
                             </div>
                         @endif
@@ -315,12 +306,34 @@
     <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Ubah Status</h3>
 
     @php
-        $bolehUbah = $kandang->indukanBetina ? true : false; // hanya boleh jika ada betina
+        $bolehUbah = ($kandang->indukanJantan && $kandang->indukanBetina && count($validNextStatuses) > 0) ? true : false;
     @endphp
 
-    @if(!$bolehUbah)
+    @if(!$kandang->indukanJantan || !$kandang->indukanBetina)
         <div class="p-3 mb-3 text-sm rounded bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200">
-            Status hanya dapat diubah jika terdapat <b>Indukan Betina</b> di kandang.
+            Status hanya dapat diubah jika terdapat pasangan <b>Indukan Jantan dan Betina</b> yang lengkap di kandang.
+        </div>
+    @elseif($currentPairing && $currentPairing->status === 'dihentikan')
+        <div class="p-3 mb-3 text-sm rounded bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+            <p class="font-medium">Pairing ini sedang dihentikan.</p>
+            <p class="mt-1">Trip breeding baru belum bisa dimulai sampai pairing diaktifkan kembali.</p>
+        </div>
+
+        <form action="{{ route('peternak.kandang.activatePairing', $kandang) }}" method="POST" class="mb-3">
+            @csrf
+            @method('PUT')
+            <button type="submit"
+                class="w-full px-3 py-2 text-sm text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg">
+                Aktifkan Kembali Pairing
+            </button>
+        </form>
+
+        <div class="p-3 mb-3 text-xs rounded bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200">
+            Aktivasi ulang hanya mengubah status pairing saat ini. Tindak lanjut peternak pada hasil analisa lama tetap tersimpan sebagai histori.
+        </div>
+    @elseif(count($validNextStatuses) === 0)
+        <div class="p-3 mb-3 text-sm rounded bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-200">
+            Tidak ada transisi status lanjutan yang tersedia untuk status saat ini.
         </div>
     @endif
 
@@ -334,11 +347,12 @@
                 class="block w-full px-3 py-2 border border-gray-300 rounded-md bg-white dark:bg-darker 
                        dark:border-primary-darker dark:text-white focus:outline-none">
 
-                <option value="kosong" {{ $kandang->status === 'kosong' ? 'selected' : '' }}>Kosong</option>
-                <option value="bertelur" {{ $kandang->status === 'bertelur' ? 'selected' : '' }}>Bertelur</option>
-                <option value="mengeram" {{ $kandang->status === 'mengeram' ? 'selected' : '' }}>Mengeram</option>
-                <option value="menetas">Menetas</option>
-                <option value="gagal">Gagal</option>
+                <option value="{{ $kandang->status }}" selected>
+                    Saat ini: {{ $statusLabels[$kandang->status] ?? ucfirst($kandang->status) }}
+                </option>
+                @foreach($validNextStatuses as $status)
+                    <option value="{{ $status }}">{{ $statusLabels[$status] ?? ucfirst($status) }}</option>
+                @endforeach
             </select>
         </div>
 
@@ -377,8 +391,12 @@
                 <label class="text-sm text-gray-700 dark:text-gray-300">
                     Tanggal Gagal <span class="text-red-500">*</span>
                 </label>
-                <input type="date" name="tanggal_gagal" required
-                       class="mt-1 w-full px-3 py-2 border rounded-md dark:bg-darker dark:border-gray-600">
+                <input type="text" id="tanggal_gagal" name="tanggal_gagal"
+                       value="{{ old('tanggal_gagal', $kandang->perkawinans()->latest('tanggal_kawin')->first()?->tanggal_kawin?->toDateString() ?? now()->format('Y-m-d')) }}"
+                       placeholder="dd/mm/yyyy"
+                       autocomplete="off"
+                       required
+                       class="custom-datepicker mt-1 w-full px-3 py-2 border rounded-md dark:bg-darker dark:border-gray-600">
             </div>
 
             <!-- Catatan -->
@@ -524,8 +542,8 @@
             // ===================================================
             // 👶 Toggle tampilan daftar anak per trip
             // ===================================================
-            window.toggleTrip = function(tripId) {
-                const el = document.getElementById(`trip-${tripId}`);
+            window.toggleTrip = function(id) {
+                const el = document.getElementById(id);
                 if (!el) return;
                 el.classList.toggle('hidden');
             };
@@ -571,5 +589,70 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const containers = document.querySelectorAll('.trip-pagination-container');
+            containers.forEach(container => {
+                const items = Array.from(container.querySelectorAll('.trip-item'));
+                if (items.length <= 10) return; // No pagination needed
+
+                let currentPage = 1;
+                const perPage = 10;
+                const totalPages = Math.ceil(items.length / perPage);
+
+                // Create pagination controls
+                const controls = document.createElement('div');
+                controls.className = 'flex justify-between items-center mt-4 pt-4 border-t border-gray-200 dark:border-gray-700';
+                
+                const prevBtn = document.createElement('button');
+                prevBtn.type = 'button';
+                prevBtn.className = 'px-3 py-1 text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition';
+                prevBtn.innerText = '← Sebelumnya';
+
+                const info = document.createElement('span');
+                info.className = 'text-xs text-gray-500 font-medium';
+
+                const nextBtn = document.createElement('button');
+                nextBtn.type = 'button';
+                nextBtn.className = 'px-3 py-1 text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition';
+                nextBtn.innerText = 'Selanjutnya →';
+
+                controls.appendChild(prevBtn);
+                controls.appendChild(info);
+                controls.appendChild(nextBtn);
+                container.appendChild(controls);
+
+                function render() {
+                    items.forEach((item, index) => {
+                        if (index >= (currentPage - 1) * perPage && index < currentPage * perPage) {
+                            item.style.display = 'block';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                    prevBtn.disabled = currentPage === 1;
+                    nextBtn.disabled = currentPage === totalPages;
+                    info.innerText = `Halaman ${currentPage} dari ${totalPages}`;
+                }
+
+                prevBtn.addEventListener('click', () => {
+                    if (currentPage > 1) {
+                        currentPage--;
+                        render();
+                    }
+                });
+
+                nextBtn.addEventListener('click', () => {
+                    if (currentPage < totalPages) {
+                        currentPage++;
+                        render();
+                    }
+                });
+
+                render(); // initial render
+            });
+        });
+    </script>
 
 </x-layout>

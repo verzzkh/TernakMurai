@@ -8,8 +8,6 @@ use App\Models\Kandang;
 use App\Models\Peternak;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 
 class KandangService
@@ -17,7 +15,9 @@ class KandangService
 
 
     public function __construct(
-        private Kandang $kandang
+        private Kandang $kandang,
+        private BreedingLifecycleService $breedingLifecycleService,
+        private PairingService $pairingService
     ) {}
 
     /**
@@ -68,6 +68,18 @@ class KandangService
     {
         $data['peternak_id'] = $peternak->id;
 
+        if (
+            ($data['status'] ?? null) === BreedingLifecycleService::STATUS_BERTELUR
+            && !empty($data['indukan_jantan_id'])
+            && !empty($data['indukan_betina_id'])
+        ) {
+            $this->pairingService->ensureCanStartBreeding(
+                $peternak->id,
+                (int) $data['indukan_jantan_id'],
+                (int) $data['indukan_betina_id']
+            );
+        }
+
         return $this->kandang->create($data);
     }
 
@@ -76,9 +88,8 @@ class KandangService
      */
     public function updateKandang(Kandang $kandang, array $data): bool
     {
-        if (isset($data['status'])) {
-            $kandang->status = $data['status'];
-        }
+        unset($data['status']);
+
         return $kandang->update($data);
     }
 
@@ -90,13 +101,13 @@ public function getAvailableIndukanForEdit(Peternak $peternak, Kandang $currentK
 {
     // Ambil semua ID indukan yang sedang aktif di kandang NON-kosong
     $busyJantanIds = Kandang::where('peternak_id', $peternak->id)
-        ->whereIn('status', ['bertelur', 'mengeram', 'menetas'])
+        ->whereIn('status', ['bertelur', 'mengeram'])
         ->whereNotNull('indukan_jantan_id')
         ->where('id', '!=', $currentKandang->id)
         ->pluck('indukan_jantan_id');
 
     $busyBetinaIds = Kandang::where('peternak_id', $peternak->id)
-        ->whereIn('status', ['bertelur', 'mengeram', 'menetas'])
+        ->whereIn('status', ['bertelur', 'mengeram'])
         ->whereNotNull('indukan_betina_id')
         ->where('id', '!=', $currentKandang->id)
         ->pluck('indukan_betina_id');
@@ -133,6 +144,8 @@ public function getAvailableIndukanForEdit(Peternak $peternak, Kandang $currentK
      */
 public function updateKandangWithRolling(Kandang $kandang, array $data): bool
 {
+    unset($data['status']);
+
     // Simpan pasangan lama
     $oldJantan = $kandang->indukan_jantan_id;
     $oldBetina = $kandang->indukan_betina_id;
@@ -191,15 +204,11 @@ public function updateKandangWithRolling(Kandang $kandang, array $data): bool
             ->where('status', 'bertelur')->count();
         $mengeramCount = $this->kandang->where('peternak_id', $peternak->id)
             ->where('status', 'mengeram')->count();
-        $menetasCount = $this->kandang->where('peternak_id', $peternak->id)
-            ->where('status', 'menetas')->count();
-
         return [
             'total' => $totalKandang,
             'kosong' => $kosongCount,
             'bertelur' => $bertelurCount,
             'mengeram' => $mengeramCount,
-            'menetas' => $menetasCount,
         ];
     }
 
@@ -294,98 +303,13 @@ public function updateKandangWithRolling(Kandang $kandang, array $data): bool
 
    public function storeAnakanFromKandang(array $data, Kandang $kandang, int $peternakId)
 {
-    // 1) Buat Perkawinan (trip) BARU di luar transaksi anakan
-    $perkawinan = \App\Models\Perkawinan::create([
-        'peternak_id'        => $peternakId,                         // pastikan sudah ada di $fillable
-        'kandang_id'         => $kandang->id,
-        'indukan_jantan_id'  => $kandang->indukan_jantan_id,
-        'indukan_betina_id'  => $kandang->indukan_betina_id,
-           'nomor_trip'         => \App\Models\Perkawinan::generateNomorTripPasangan(
-        $peternakId,
-        $kandang->indukan_jantan_id,
-        $kandang->indukan_betina_id
-    ),
-    'tanggal_kawin'      => $data['tanggal_lahir'], // ✅ PENTING
-       'catatan'            => 'Perkawinan otomatis dibuat saat menetas (' . $data['tanggal_lahir'] . ')',
-    ]);
+    $result = $this->breedingLifecycleService->recordSuccessfulTripWithAnakan($kandang, $peternakId, $data);
 
-    // 2) Lengkapi data untuk anakan
-    $data['perkawinan_id']   = $perkawinan->id;
-    $data['kandang_id']      = $kandang->id;
-    $data['sumber_anakan']   = 'internal';
-
-    // Normalisasi jumlah & jenis_kelamin
-    $jumlah         = (int) ($data['jumlah_anakan'] ?? 1);
-    $tanggalLahir   = $data['tanggal_lahir'] ?? now();
-
-    $jenisKelaminRaw  = $data['jenis_kelamin'] ?? 'tidak_diketahui';
-    $jenisKelaminList = is_array($jenisKelaminRaw) ? array_values($jenisKelaminRaw) : [$jenisKelaminRaw];
-
-    // Normalisasi foto -> array
-    $fotoList = request()->hasFile('foto_anakan')
-        ? (is_array(request()->file('foto_anakan')) ? array_values(request()->file('foto_anakan')) : [request()->file('foto_anakan')])
-        : [];
-
-    // 3) Transaksi hanya untuk insert anak & update status kandang
-    DB::beginTransaction();
-    try {
-        $inserted = [];
-
-        for ($i = 0; $i < $jumlah; $i++) {
-    $fotoPath = null;
-    if (!empty($fotoList[$i])) {
-        $fotoPath = $fotoList[$i]->store("anakans/{$peternakId}", 'public');
-    }
-
-    // Ambil nomor ring sesuai indeks (ingat: form dimulai dari [1])
-    $nomorRing = null;
-    if (isset($data['nomor_ring']) && is_array($data['nomor_ring'])) {
-        $nomorRing = $data['nomor_ring'][$i + 1] ?? null;
-    } elseif (isset($data['nomor_ring']) && is_string($data['nomor_ring'])) {
-        $nomorRing = $data['nomor_ring'];
-    }
-
-    $anakan = \App\Models\Anakan::create([
-        'peternak_id'             => $peternakId,
-        'kandang_id'              => $data['kandang_id'],
-        'perkawinan_id'           => $data['perkawinan_id'],
-        'indukan_jantan_id'       => $kandang->indukan_jantan_id, // pastikan ikut masuk
-        'indukan_betina_id'       => $kandang->indukan_betina_id, // ini juga
-        'nomor_ring'              => $nomorRing,
-        'tanggal_lahir'           => $tanggalLahir,
-        'jenis_kelamin'           => $jenisKelaminList[$i] ?? 'tidak_diketahui',
-        'status_pertumbuhan'      => $data['status_pertumbuhan'] ?? 'trotol',
-        'deskripsi_karakteristik' => $data['deskripsi_karakteristik'] ?? null,
-        'foto_path'               => $fotoPath,
-        'sumber_anakan'           => 'internal',
-    ]);
-
-    $inserted[] = $anakan;
+    return [
+        'success' => true,
+        'message' => 'Berhasil menambahkan ' . count($result['anakans']) . ' anakan pada Trip #' . $result['perkawinan']->nomor_trip,
+        'data' => $result['anakans'],
+    ];
 }
-
-        // Update status kandang → kosong (pakai update/save sesuai fillable)
-        if (in_array('status', $kandang->getFillable() ?? [])) {
-            $kandang->update(['status' => 'kosong']);
-        } else {
-            $kandang->status = 'kosong';
-            $kandang->save();
-        }
-
-        DB::commit();
-
-        return [
-            'success' => true,
-            'message' => 'Berhasil menambahkan ' . count($inserted) . ' anakan pada Trip #' . $perkawinan->nomor_trip,
-            'data'    => $inserted,
-        ];
-    } catch (\Throwable $th) {
-        DB::rollBack();
-        return [
-            'success' => false,
-            'message' => 'Gagal menyimpan anakan: ' . $th->getMessage(),
-        ];
-    }
-}
-
 
 }

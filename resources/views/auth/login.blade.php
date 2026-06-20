@@ -87,7 +87,8 @@
                         class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 focus:ring-2" />
                     <span class="ml-2 text-sm text-text-secondary dark:text-light">Ingat saya</span>
                 </label>
-                <a href="#" class="text-sm text-blue-600 hover:text-blue-800 hover:underline transition duration-200">
+                <a href="{{ route('password.whatsapp.request') }}"
+                    class="text-sm text-blue-600 hover:text-blue-800 hover:underline transition duration-200">
                     Lupa password?
                 </a>
             </div>

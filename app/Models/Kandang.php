@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Kandang extends Model
 {
@@ -53,16 +54,24 @@ class Kandang extends Model
         return $this->hasMany(Perkawinan::class);
     }
 
+    public function pairing(): HasOne
+    {
+        return $this->hasOne(Pairing::class, 'indukan_jantan_id', 'indukan_jantan_id')
+            ->whereColumn('pairings.indukan_betina_id', 'kandang.indukan_betina_id')
+            ->whereColumn('pairings.peternak_id', 'kandang.peternak_id');
+    }
+
 
     // ====== RELASI TAMBAHAN: Anakan dari indukan jantan aktif ======
 
- public function anakansAktif()
+ public function getAnakansAktifAttribute()
 {
-    return $this->hasMany(Anakan::class)
-        ->whereHas('perkawinan', function ($q) {
-            $q->where('indukan_jantan_id', $this->indukan_jantan_id)
-              ->where('indukan_betina_id', $this->indukan_betina_id);
-        });
+    if (!$this->indukan_jantan_id || !$this->indukan_betina_id) {
+        return collect();
+    }
+    return Anakan::where('indukan_jantan_id', $this->indukan_jantan_id)
+                 ->where('indukan_betina_id', $this->indukan_betina_id)
+                 ->get();
 }
 
 

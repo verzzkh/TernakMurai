@@ -202,7 +202,7 @@
             </div>
 
 
-            <!-- Pencatatan link -->
+            <!-- Pencatatan link (Dihide sementara) 
             <div x-data="{ isActive: false, open: false }">
                 <a href="{{ route('peternak.keuangan.index') }}"
                     class="flex items-center p-2 rounded-md transition-colors
@@ -223,6 +223,7 @@
                 </a>
 
             </div>
+            -->
 
             <!-- Divider -->
             <hr class="my-3 dark:border-primary-darker">

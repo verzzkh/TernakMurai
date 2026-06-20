@@ -18,6 +18,11 @@
             class="px-4 py-2 text-sm text-white bg-green-600 hover:bg-green-700 rounded-lg">
             Riwayat Analisa
         </a>
+
+        <a href="{{ route('peternak.pairings.index') }}"
+            class="px-4 py-2 text-sm text-white bg-amber-600 hover:bg-amber-700 rounded-lg">
+            Pairing
+        </a>
     </div>
 </div>
 
@@ -27,6 +32,10 @@
                 <h2 class="text-xl font-semibold mb-4 text-gray-700 dark:text-light">
                     Pilih Pasangan Indukan
                 </h2>
+
+                <p class="text-sm text-gray-500 mb-4">
+                    Pairing yang dihentikan tidak akan membuat analisa baru. Sistem akan menampilkan hasil analisa terakhir jika tersedia.
+                </p>
 
                <form action="{{ route('peternak.analisaBreeding.analisa') }}" method="POST">
                     @csrf

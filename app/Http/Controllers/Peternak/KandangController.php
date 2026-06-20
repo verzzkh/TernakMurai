@@ -8,14 +8,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreKandangRequest;
 use App\Http\Requests\UpdateKandangRequest;
 use App\Models\Kandang;
+use App\Models\Pairing;
+use App\Services\BreedingLifecycleService;
 use App\Services\KandangService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreAnakanDariDalamKandangRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
-use Illuminate\Support\Facades\DB;
-use App\Services\AnakanService;
 
 
 
@@ -23,7 +23,8 @@ use App\Services\AnakanService;
 class KandangController extends Controller
 {
     public function __construct(
-        private KandangService $kandangService
+        private KandangService $kandangService,
+        private BreedingLifecycleService $breedingLifecycleService
     ) {}
 
     public function index(Request $request): View
@@ -72,8 +73,13 @@ class KandangController extends Controller
 
             $kandang = $this->kandangService->getKandangById($peternak, $kandang->id);
             $performa = $this->kandangService->getPerformaPasanganAktif($kandang);
+            $validNextStatuses = $this->breedingLifecycleService->validNextStatuses($kandang);
+            $statusLabels = $this->breedingLifecycleService->statusLabels();
+            $currentPairing = $this->breedingLifecycleService->pairingAvailable()
+                ? $this->breedingLifecycleService->getPairingForKandang($kandang)
+                : null;
 
-            return view('peternak.kandang.detail', compact('kandang', 'performa'));
+            return view('peternak.kandang.detail', compact('kandang', 'performa', 'validNextStatuses', 'statusLabels', 'currentPairing'));
         }
 
 
@@ -81,7 +87,7 @@ class KandangController extends Controller
 /**
  * Tampilkan form untuk menambahkan anakan dari dalam kandang (saat menetas)
  */
-public function createAnak(Kandang $kandang): \Illuminate\View\View
+public function createAnak(Kandang $kandang): View|RedirectResponse
 {
     $peternak = Auth::user()->peternak;
 
@@ -89,6 +95,13 @@ public function createAnak(Kandang $kandang): \Illuminate\View\View
     if ($kandang->peternak_id !== $peternak->id) {
         abort(404);
     }
+
+    if (!$kandang->indukan_jantan_id || !$kandang->indukan_betina_id) {
+        return redirect()->route('peternak.kandang.show', $kandang)
+            ->with('error', 'Kandang harus memiliki pasangan Indukan Jantan dan Betina yang lengkap sebelum anakan dapat menetas.');
+    }
+
+    $this->breedingLifecycleService->ensureTransitionAllowed($kandang, BreedingLifecycleService::HASIL_BERHASIL);
 
     // Ambil indukan jantan & betina dari kandang untuk ditampilkan di form
     $indukanJantan = $kandang->indukanJantan;
@@ -111,13 +124,18 @@ public function createAnak(Kandang $kandang): \Illuminate\View\View
 
      // Tentukan apakah boleh edit pasangan indukan
     $canEditIndukan = in_array($kandang->status, ['kosong']);
+    $validNextStatuses = $this->breedingLifecycleService->validNextStatuses($kandang);
+    $statusLabels = $this->breedingLifecycleService->statusLabels();
+    $currentPairing = $this->breedingLifecycleService->pairingAvailable()
+        ? $this->breedingLifecycleService->getPairingForKandang($kandang)
+        : null;
 
     // Ambil indukan hanya jika bisa edit
     $indukan = $canEditIndukan
         ? $this->kandangService->getAvailableIndukanForEdit($peternak, $kandang)
         : ['jantan' => collect(), 'betina' => collect()];
 
-    return view('peternak.kandang.edit', compact('kandang', 'indukan', 'canEditIndukan'));
+    return view('peternak.kandang.edit', compact('kandang', 'indukan', 'canEditIndukan', 'validNextStatuses', 'statusLabels', 'currentPairing'));
 }
 
 public function update(UpdateKandangRequest $request, Kandang $kandang): RedirectResponse
@@ -135,7 +153,11 @@ public function update(UpdateKandangRequest $request, Kandang $kandang): Redirec
     | STATUS GAGAL → Redirect ke Form Input Tanggal
     |--------------------------------------------------------------------------
     */
-    if ($data['status'] === 'gagal') {
+    $newStatus = $data['status'] ?? $kandang->status;
+    $statusChanged = $newStatus !== $kandang->status;
+
+    if ($statusChanged && $newStatus === BreedingLifecycleService::HASIL_GAGAL) {
+        $this->breedingLifecycleService->ensureTransitionAllowed($kandang, BreedingLifecycleService::HASIL_GAGAL);
 
         return redirect()
             ->route('peternak.kandang.formGagal', $kandang->id)
@@ -147,13 +169,12 @@ public function update(UpdateKandangRequest $request, Kandang $kandang): Redirec
     | STATUS MENETAS → Redirect ke Form Tambah Anakan
     |--------------------------------------------------------------------------
     */
-    if ($data['status'] === 'menetas') {
-
-        $kandang->update(['status' => 'kosong']);
+    if ($statusChanged && $newStatus === BreedingLifecycleService::HASIL_BERHASIL) {
+        $this->breedingLifecycleService->ensureTransitionAllowed($kandang, BreedingLifecycleService::HASIL_BERHASIL);
 
         return redirect()
             ->route('peternak.kandang.createAnak', $kandang->id)
-            ->with('info', 'Status "Menetas" terdeteksi. Silakan isi form penambahan anakan.');
+            ->with('info', 'Silakan isi data anakan untuk menyelesaikan trip berhasil.');
     }
 
     /*
@@ -161,6 +182,11 @@ public function update(UpdateKandangRequest $request, Kandang $kandang): Redirec
     | STATUS NORMAL
     |--------------------------------------------------------------------------
     */
+    if ($statusChanged) {
+        $this->breedingLifecycleService->transition($kandang, $newStatus);
+        unset($data['status']);
+    }
+
     $this->kandangService->updateKandangWithRolling($kandang, $data);
 
     return redirect()
@@ -192,22 +218,18 @@ public function storeGagal(Request $request, Kandang $kandang)
         'catatan' => 'nullable|string|max:1000'
     ]);
 
-    \App\Models\Perkawinan::create([
-        'peternak_id'        => $peternak->id,
-        'kandang_id'         => $kandang->id,
-        'indukan_jantan_id'  => $kandang->indukan_jantan_id,
-        'indukan_betina_id'  => $kandang->indukan_betina_id,
-        'nomor_trip' => \App\Models\Perkawinan::generateNomorTripPasangan(
-    $peternak->id,
-    $kandang->indukan_jantan_id,
-    $kandang->indukan_betina_id
-),
-        'tanggal_kawin'      => $request->tanggal_gagal,
-        'catatan'            => $request->catatan,
-        'status'             => 'gagal',
-    ]);
+    if (!$kandang->indukan_jantan_id || !$kandang->indukan_betina_id) {
+        return redirect()
+            ->route('peternak.kandang.show', $kandang)
+            ->with('error', 'Gagal memproses. Kandang harus memiliki pasangan Indukan Jantan dan Betina yang lengkap.');
+    }
 
-    $kandang->update(['status' => 'kosong']);
+    $this->breedingLifecycleService->recordFailedTrip(
+        $kandang,
+        $peternak->id,
+        $request->tanggal_gagal,
+        $request->catatan
+    );
 
     return redirect()
         ->route('peternak.kandang.show', $kandang)
@@ -226,20 +248,23 @@ public function storeAnakan(\App\Http\Requests\StoreAnakanDariDalamKandangReques
         abort(404);
     }
 
+    if (!$kandang->indukan_jantan_id || !$kandang->indukan_betina_id) {
+        return back()->with('error', 'Gagal memproses anakan. Kandang harus memiliki pasangan Indukan Jantan dan Betina yang lengkap.')->withInput();
+    }
+
     // Use the FormRequest validated() so prepareForValidation() runs and
     // any merged fields (peternak_id, sumber_anakan) are present for rules.
     $validated = $request->validated();
 
-    $result = $this->kandangService->storeAnakanFromKandang($validated, $kandang, $peternak->id);
+    try {
+        $result = $this->breedingLifecycleService->recordSuccessfulTripWithAnakan($kandang, $peternak->id, $validated);
 
-    if ($result['success']) {
         return redirect()
             ->route('peternak.kandang.show', $kandang)
-            ->with('success', $result['message']);
+            ->with('success', 'Berhasil menambahkan ' . count($result['anakans']) . ' anakan pada Trip #' . $result['perkawinan']->nomor_trip);
+    } catch (\Throwable $th) {
+        return back()->with('error', 'Gagal menyimpan anakan: ' . $th->getMessage())->withInput();
     }
-
-    // If backend reported failure, keep input and show message
-    return back()->with('error', $result['message'])->withInput();
 }
 
 
@@ -261,5 +286,40 @@ public function storeAnakan(\App\Http\Requests\StoreAnakanDariDalamKandangReques
 
         return redirect()->route('peternak.kandang.index')
             ->with('success', 'Kandang berhasil dihapus.');
+    }
+
+    public function activatePairing(Kandang $kandang): RedirectResponse
+    {
+        $peternak = Auth::user()->peternak;
+
+        if ($kandang->peternak_id !== $peternak->id) {
+            abort(404);
+        }
+
+        if (!$this->breedingLifecycleService->pairingAvailable()) {
+            return redirect()
+                ->route('peternak.kandang.show', $kandang)
+                ->with('error', 'Fitur pairing belum tersedia di database. Jalankan migrasi terlebih dahulu.');
+        }
+
+        $pairing = $this->breedingLifecycleService->getPairingForKandang($kandang);
+
+        if (!$pairing) {
+            return redirect()
+                ->route('peternak.kandang.show', $kandang)
+                ->with('error', 'Pairing untuk kandang ini belum tersedia.');
+        }
+
+        if ($pairing->status === Pairing::STATUS_AKTIF) {
+            return redirect()
+                ->route('peternak.kandang.show', $kandang)
+                ->with('info', 'Pairing pada kandang ini sudah aktif.');
+        }
+
+        $this->breedingLifecycleService->activatePairing($pairing);
+
+        return redirect()
+            ->route('peternak.kandang.show', $kandang)
+            ->with('success', 'Pairing berhasil diaktifkan kembali.');
     }
 }

@@ -14,11 +14,14 @@
                     <label class="block text-sm text-gray-700 dark:text-gray-300">
                         Tanggal Gagal <span class="text-red-500">*</span>
                     </label>
-                    <input type="date"
+                    <input type="text"
+                           id="tanggal_gagal"
                            name="tanggal_gagal"
-                           value="{{ now()->format('Y-m-d') }}"
+                           value="{{ old('tanggal_gagal', $kandang->perkawinans()->latest('tanggal_kawin')->first()?->tanggal_kawin?->toDateString() ?? now()->format('Y-m-d')) }}"
+                           placeholder="dd/mm/yyyy"
+                           autocomplete="off"
                            required
-                           class="mt-1 w-full px-3 py-2 border rounded-md dark:bg-darker dark:border-gray-600">
+                           class="custom-datepicker mt-1 w-full px-3 py-2 border rounded-md dark:bg-darker dark:border-gray-600">
                 </div>
 
                 <div class="mb-4">
